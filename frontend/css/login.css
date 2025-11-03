@@ -1,0 +1,368 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Reset de estilos para todos os elementos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos para o corpo da página */
+body {
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    min-height: 100vh;
+    background-attachment: fixed;
+    line-height: 1.6;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: 
+    url('/frontend/image/Fundo.png'),
+    linear-gradient(to right, #430097, #ff751f);
+}
+
+/* Estilos para o contêiner principal */
+main.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 450px;
+    margin: 20px auto;
+}
+
+/* Estilos para a caixa do formulário */
+.formbox {
+  padding: 40px;
+  border-radius: 40px;
+  background: 
+    linear-gradient(aliceblue, aliceblue) padding-box,
+    linear-gradient(to right, #ff751f, #430097) border-box;
+  border: 3px solid transparent;
+  box-shadow: 0 0 70px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 450px;
+  margin: 20px auto;
+}
+
+/* Estilos para o título dentro da caixa do formulário */
+.formbox h2 {
+    font-size: 30px;
+    margin-bottom: 30px;
+    color: #ff751f;
+    font-weight: 600;
+}
+
+/* Estilos para os botões de alternância de formulário */
+.buttonform {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    background-color: aliceblue;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Estilos base para os botões dentro do botão de formulário */
+.buttonform button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background-color: #ff751f;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: aliceblue;
+}
+
+/* Estilos para o botão ativo no formulário */
+.buttonform .buttonativo {
+    background: linear-gradient(to right, #430097);
+    color: aliceblue;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para os formulários de login e cadastro (ocultos por padrão) */
+#loginform,
+#cadastroform {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.5s ease;
+    width: 100%;
+    padding: 0;
+    position: absolute;
+    top: 170px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Estilos para os formulários de login e cadastro quando ativos */
+#loginform.active,
+#cadastroform.active {
+    opacity: 1;
+    height: auto;
+    position: static;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Estilos para os campos de entrada de texto nos formulários */
+#loginform input,
+#cadastroform input {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Estilos para o contêiner da senha */
+.password {
+    position: relative;
+    width: 100%;
+}
+
+/* Estilos para o campo de entrada de senha */
+.password input {
+    padding-right: 45px;
+}
+
+/* Estilos para o botão de alternar visibilidade da senha */
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #430097;
+}
+
+/* Estilos para o botão de alternar visibilidade da senha ao passar o mouse */
+.toggle-password:hover {
+    color: #ff751f;
+}
+
+.modalcontent {
+    background: 
+      linear-gradient(white, white) padding-box,
+      linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 3px solid transparent;
+    border-radius: 20px;
+
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.modalcontent h2 {
+    color: #430097;
+    margin-bottom: 10px;
+}
+
+/* Estilos para o link "Esqueceu a senha?" */
+.esqueceusenha {
+    text-align: right;
+    margin-top: -10px;
+    font-size: 0.9em;
+}
+
+#esqueceusenhaForm input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+#esqueceusenhaForm input[type="email"]:focus {
+    border-color: #ff751f;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para o link dentro de "Esqueceu a senha?" */
+.esqueceusenha a {
+    color: #430097;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Estilos para o link dentro de "Esqueceu a senha?" ao passar o mouse */
+.esqueceusenha a:hover {
+    color: #ff751f;
+}
+
+/* Estilos para os botões de envio dos formulários */
+.submitloginbutton,
+.submitcadastro {
+    width: 100%;
+    padding: 15px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+/* Estilos específicos para o botão de login */
+.submitloginbutton {
+    background: linear-gradient(to right, #430097, #ff751f);
+}
+
+/* Estilos específicos para o botão de cadastro */
+.submitcadastro {
+    background: linear-gradient(to right, #430097, #ff751f);
+}
+
+/* Estilos para os botões de envio ao passar o mouse */
+.submitloginbutton:hover,
+.submitcadastro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para o link de alternar entre formulários */
+.toggle-form-link {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Estilos para o link de alternar entre formulários */
+.toggle-form-link a {
+    color: #430097;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.5s ease;
+}
+
+/* Estilos para o link de alternar entre formulários ao passar o mouse */
+.toggle-form-link a:hover {
+    color: #ff751f;
+}
+
+/* Estilos para o rodapé */
+footer {
+    margin-top: 40px;
+    color: #ccc;
+    font-size: 0.8em;
+}
+
+#esqueceusenhabox {
+  display: none;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 2px solid transparent; /* borda inicial */
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+
+
+/* Media query para telas menores (mobile) */
+@media (max-width: 480px) {
+    /* Ajustes de preenchimento para a caixa do formulário */
+    .formbox {
+        padding: 25px;
+    }
+
+    /* Ajustes de tamanho de fonte para o título da caixa do formulário */
+    .formbox h2 {
+        font-size: 1.8em;
+    }
+
+    /* Ajustes de tamanho de fonte e preenchimento para os botões de alternância */
+    .buttonform button {
+        font-size: 1em;
+        padding: 10px 0;
+    }
+
+    /* Ajustes de preenchimento para os campos de entrada */
+    #loginform input,
+    #cadastroform input {
+        padding: 12px 15px;
+    }
+
+    /* Ajustes de tamanho de fonte e preenchimento para os botões de envio */
+    .submitloginbutton,
+    .submitcadastro {
+        font-size: 1em;
+        padding: 12px 0;
+    }
+
+    /* Ajustes de posição para os formulários */
+    #loginform,
+    #cadastroform {
+        top: 150px;
+    }
+}
+
+/* Estilos para o modal (popup) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Estilos para o conteúdo do modal */
+.modalcontent {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 300px;
+    width: 500px;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para o botão de fechar o modal */
+.fechar {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    background: none;
+    border: none;
+    padding: 5px;
+    z-index: 1000;
+}
