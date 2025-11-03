@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Alugarzin</title>
 
+  <link rel="stylesheet" href="/frontend/css/login.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <main class="container">
+    <div class="formbox">
+      <center><a href="index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" alt="Logo" width="300px"></a></center>
+
+      <div class="buttonform">
+        <button id="loginbutton" class="buttonativo" onclick="mostrarform('login')">Entrar</button>
+        <button id="criarbutton" onclick="mostrarform('criarconta')">Cadastrar</button>
+      </div>
+
+      <!-- Formulário de Login -->
+      <form id="loginform" class="active">
+        <input type="email" placeholder="Email" id="loginEmail" required />
+        <div class="password">
+          <input type="password" placeholder="Senha" id="loginPassword" required />
+          <i class="fas fa-eye toggle-password" data-target="loginPassword"></i>
+        </div>
+
+        <p class="esqueceusenha"><a href="#" id="abrir">Esqueceu a senha?</a></p>
+        <button type="submit" class="submitloginbutton">Entrar</button>
+        <p class="toggle-form-link" id="linkToSignup"><a href="#">Não é um usuário? Cadastre-se agora</a></p>
+      </form>
+
+      <!-- Formulário de Cadastro -->
+      <form id="cadastroform">
+        <input type="text" placeholder="Nome completo/Empresa" id="cadastroNomeCompleto" required />
+        <input type="email" placeholder="Email" id="cadastroEmail" required />
+        <div class="password">
+          <input type="password" placeholder="Senha" id="cadastroSenha" required />
+          <i class="fas fa-eye toggle-password" data-target="cadastroSenha"></i>
+        </div>
+
+        <button type="submit" class="submitcadastro">Cadastrar</button>
+        <p class="toggle-form-link" id="linkToLogin"><a href="#">Já é um usuário? Entrar</a></p>
+      </form>
+
+      <!-- Caixa de mensagens -->
+      <div id="messageBox" style="display:none;padding:10px;margin-top:15px;border-radius:8px;text-align:center;"></div>
+    </div>
+  </main>
+
+  <!-- Modal "Esqueceu a senha?" -->
+  <div id="esqueceusenhamodal" class="modal">
+    <div class="modalcontent">
+      <span class="fechar" id="fecharesqueceusenhamodal">&times;</span>
+      <h2>Lembrar Senha</h2>
+      <form id="esqueceusenhaForm">
+        <input type="email" placeholder="Seu e-mail cadastrado" id="resetEmail" required />
+        <button type="submit" class="submitloginbutton">Enviar Email</button>
+      </form>
+      <div id="esqueceusenhabox"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/frontend/js/login.js"></script>
+  <script type="module" src="/frontend/js/auth-guard.js"></script>
+</body>
+</html>
