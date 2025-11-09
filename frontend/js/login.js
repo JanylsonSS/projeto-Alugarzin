@@ -1,5 +1,6 @@
 import { protectRoute, secureLogout } from './auth-guard.js';
 
+
 document.addEventListener('DOMContentLoaded', () => {
   protectRoute();
 
@@ -29,12 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== LOGIN =====
   loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const nome = loginForm.querySelector('#loginNomeCompleto').value.trim();
     const email = loginForm.querySelector('#loginEmail').value.trim();
     const password = loginForm.querySelector('#loginPassword').value.trim();
     if (!email || !password) return showMessage('Preencha todos os campos.');
 
     try {
-      const response = await axios.post('/api/login', { email, password });
+      const response = await axios.post('http://localhost:3000/api/login', { email, password });
       const { token, user } = response.data;
 
       localStorage.setItem('token', token);
@@ -43,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       showMessage('Login realizado com sucesso!', 'success');
-      window.location.href = '/frontend/html/index.html';
+      window.location.href = '/frontend/index.html';
     } catch (error) {
       const msg = error.response?.data?.message || 'Falha ao fazer login.';
       showMessage(msg, 'error');
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (senha.length < 6) return showMessage('A senha deve ter pelo menos 6 caracteres.');
 
     try {
-      await axios.post('/api/cadastro', { nome, email, senha });
+      await axios.post('http://localhost:3000/api/usuarios', { nome, email, senha });
       showMessage('Conta criada com sucesso! Faça login.', 'success');
       mostrarform('login');
     } catch (error) {
@@ -122,8 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
   mostrarform('login');
 });
 
-
-
     // === Alternar visibilidade da senha ===
     document.querySelectorAll('.password .toggle-password').forEach(icon => {
         icon.addEventListener('click', () => {
@@ -139,3 +139,5 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    
