@@ -10,7 +10,7 @@ export function isTokenValid() {
 
     // Verifica se há expiração
     if (!decoded.exp) return true; // caso o token não tenha expiração
-    const isExpired = decoded.exp * 1000 < Date.now();
+    const isExpired = decoded.exp * 1000 < Date.now(); // exp em segundos alterar esse valor se necessário
 
     return !isExpired;
   } catch (error) {
@@ -53,7 +53,7 @@ export function protectRoute() {
   const publicPages = [
     '/',
     '/index.html',
-    '/frontend/html/login.html',
+    '/frontend/login.html',
     '/frontend/login.html',
     '/login.html'
   ];
@@ -65,33 +65,33 @@ export function protectRoute() {
   //Se NÃO autenticado e página é privada → redireciona pro login
   if (!isAuthenticated && !isPublicPage) {
     console.warn('Usuário não autenticado, redirecionando para login...');
-    window.location.replace('/frontend/html/login.html?expired=true');
+    window.location.replace('/frontend/login.html?expired=true');
     return false;
   }
 
   // Se autenticado e estiver em página pública → redireciona pro painel
   if (isAuthenticated && isPublicPage) {
     console.log('Usuário já autenticado, redirecionando para painel...');
-    window.location.replace('/frontend/html/painel.html');
+    window.location.replace('/frontend/painel.html');
     return false;
   }
 
   return true;
 }
 
-// Logout seguro (manual ou automático)
+ // Logout seguro (manual ou automático)
 export function secureLogout(expired = false) {
   // Remove dados locais
   localStorage.removeItem('token');
   localStorage.removeItem('user');
 
   // Impede voltar com botão do navegador
-  history.pushState(null, '', '/frontend/html/index.html');
+  history.pushState(null, '', '/frontend/index.html');
 
   // Redireciona com mensagem, se for por expiração
   if (expired) {
-    window.location.replace('/frontend/html/login.html?expired=true');
+    window.location.replace('/frontend/login.html?expired=true');
   } else {
-    window.location.replace('/frontend/html/login.html');
+    window.location.replace('/frontend/login.html');
   }
 }
