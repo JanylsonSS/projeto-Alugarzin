@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
+/* Reset de estilos para todos os elementos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: "Work Sans", sans-serif;
     font-optical-sizing: auto;
@@ -26,25 +33,25 @@ body {
     top: 10px;
     right: 40px;
     width: 250px;
-    display: bloc;
+    display: block; 
 }
 
 .paineldeusuario {
-  
-  width: 1500px;
-  height: 700px;
-  margin: 0 auto;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 5px 40px rgba(0,0,0,0.6);
+    width: 1500px;
+    height: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 40px rgba(0,0,0,0.6);
 }
 
+/* Foto de perfil no Modal de Edição (pré-visualização) */
 #previewImage {
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: cover; 
     margin-bottom: 10px;
     transition: 0.3s;
     cursor: pointer;
@@ -52,165 +59,175 @@ body {
         linear-gradient(white, white) padding-box,
         linear-gradient(to right, #ff751f, #430097) border-box;
     border: 3px solid transparent;
-
-
 }
 
 #previewImage:hover {
     opacity: 0.8;
     transform: scale(1.03);
-
 }
 
 /* ======== CABEÇALHO ======== */
 
 .header {
-  position: relative;
+    position: relative;
 }
 
 .capa {
-  position: relative;
-  height: 250px;
-  width: 100%;
+    position: relative;
+    height: 250px;
+    width: 100%;
 }
 
 .capa img:last-child {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 0;
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 0;
 }
 
 .fotoperfil {
-  position: absolute;
-  bottom: -60px;
-  left: 40px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 4px solid #fff;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    position: absolute;
+    bottom: -60px;
+    left: 40px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
+
 .fotoperfil img {
-  max-width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 100%;
+    height: 100%; 
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .perfil {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 20px 40px 10px 180px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 20px 40px 10px 180px;
 }
 
 .usuarioinfo h2 {
-  margin: 0;
-  font-size: 1.8rem;
+    margin: 0;
+    font-size: 1.8rem;
 }
 
 .localizacao {
-  font-size: 0.95rem;
-  color: #666;
+    font-size: 0.95rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adiciona espaçamento entre Local, WhatsApp e Email */
+}
+
+/* Estilos para os links sociais no perfil */
+.localizacao a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
 }
 
 .localizacao i {
-  margin-right: 5px;
-  color: #555;
+    margin-right: 5px;
+    color: #555;
+    font-size: 1.1em;
 }
 
 .botaoeditarperfil {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .botaoeditarperfil button {
-  border: none;
-  cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  background-color: #430097;
-  color: white;
-  transition: 0.3s;
+    border: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    background-color: #430097;
+    color: white;
+    transition: 0.3s;
 }
 
 .botaoeditarperfil button:hover {
-  background-color: #ff751f;
-  opacity: 0.8;
+    background-color: #ff751f;
+    opacity: 0.8;
 }
 
 /* ======== ABAS ======== */
 
 .anunciosefavoritos {
-  display: flex;
-  justify-content: center;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin-top: 20px;
 }
 
 .aba {
-  flex: 1;
-  text-align: center;
-  padding: 14px;
-  cursor: pointer;
-  font-weight: 600;
-  color: #646464;
-  transition: 0.3s;
+    flex: 1;
+    text-align: center;
+    padding: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #646464;
+    transition: 0.3s;
 }
 
 .aba:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
 .aba.ativo {
-  background-color: #430097;
-  color: #fff;
+    background-color: #430097;
+    color: #fff;
 }
 
 /* ======== FEED ======== */
 
 .feedanuncio, .feedfavoritos {
-  text-align: center;
-  padding: 40px 20px;
+    text-align: center;
+    padding: 40px 20px;
 }
 
 .hidden {
-  display: none !important;
+    display: none !important;
 }
 
 #addbtn {
-  background-color: #430097;
-  border: none;
-  color: white;
-  font-size: 1.4rem;
-  padding: 12px;
-  border-radius: 60px;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    background-color: #430097;
+    border: none;
+    color: white;
+    font-size: 1.4rem;
+    padding: 12px;
+    border-radius: 60px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 #addbtn:hover {
-  background-color: #ff751f;
+    background-color: #ff751f;
 }
 
 /* ======== MODAIS ======== */
 .modal {
     overflow: auto;
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
 }
 
 .modalcontent {
@@ -224,7 +241,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    overflow-y: auto;   
+    overflow-y: auto; 
+    margin: 40px auto; 
 }
 
 .modalcontent input, .modalcontent select {
@@ -243,330 +261,350 @@ body {
 }
 
 .fechar {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 1.8rem;
-  cursor: pointer;
-  color: #666;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #666;
 }
 
 .fechar:hover {
-  color: #000;
+    color: #000;
 }
 
+/* === MODAL EDITAR PERFIL === */
+
 .editProfileForm {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
 }
 
 .edit-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  width: 100%;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .profile-pic {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-shrink: 0; 
 }
 
 .profile-pic input[type="file"] {
-  margin-top: 8px;
-  font-size: 0.9em;
+    margin-top: 8px;
+    font-size: 0.9em;
+    display: none; 
 }
 
 .info-principal {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .edit-bottom {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
 }
 
-.localizacao {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
+/* NOVO: Layout de Localização Detalhada  */
+.localizacao-detalhada {
+    display: grid;
+ 
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
 }
 
-.localizacao .campo {
-  flex: 1;
-  min-width: 180px;
+.localizacao-detalhada .campo {
+    
+    grid-column: span 1; 
 }
+
+
+.localizacao-detalhada .campo:nth-child(2) { 
+    grid-column: 1 / 3; 
+}
+
 
 .editProfileForm label {
-  font-weight: 600;
-  color: #000000;
-  margin-bottom: 5px;
-  display: block;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 5px;
+    display: block;
 }
 
 .editProfileForm input {
-  width: 100%;
-  padding: 12px 16px;
-  background:
-    linear-gradient(white, white) padding-box,
-    linear-gradient(to right, #ff751f, #430097) border-box;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  font-size: 1em;
-  transition: all 0.3s ease;
+    width: 100%;
+    padding: 12px 16px;
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
 }
 
 .editProfileForm input:focus {
-  border-color: #430097;
-  box-shadow: 0 0 8px rgba(67, 0, 151, 0.3);
+    border-color: #430097;
+    box-shadow: 0 0 8px rgba(67, 0, 151, 0.3);
 }
 
 #btnsalvar {
-  background: linear-gradient(to right, #ff751f, #430097);
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
+    background: linear-gradient(to right, #ff751f, #430097);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 #btnsalvar:hover {
-  transform: translateY(-2px);
+    transform: translateY(-2px);
 }
 
-/* ======== MODAL CRIAR ANÚNCIO ======== */
+/* === MODAL CRIAR ANÚNCIO === */
 #addAnuncioForm {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
 }
 
 /* === IMAGENS === */
 .imagem-section input[type="file"] {
-  width: 100%;
-  padding: 12px;
-  background:
-    linear-gradient(white, white) padding-box,
-    linear-gradient(to right, #ff751f, #430097) border-box;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  font-size: 1em;
-  cursor: pointer;
+    width: 100%;
+    padding: 12px;
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
 }
 
 #previewImagens {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 #previewImagens img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 2px solid #ddd;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #ddd;
 }
 
 /* === PREÇO E LOCALIZAÇÃO === */
 .preco-tipo {
-  display: flex;
-  justify-content: space-between;
-  gap: 25px;
-  align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    gap: 25px;
+    align-items: flex-end;
 }
 
 .campo-preco,
 .campo-local {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .valores {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 /* Botões Diária / Mensal */
 .radio-group {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .radio-group input[type="radio"] {
-  display: none;
+    display: none;
 }
 
 .radio-group label {
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(white, white) padding-box,
-    linear-gradient(to right, #ff751f, #430097) border-box;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.25s;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s;
 }
 
 .radio-group input[type="radio"]:checked + label {
-  background: linear-gradient(to right, #ff751f, #430097);
-  color: white;
-  border: none;
+    background: linear-gradient(to right, #ff751f, #430097);
+    color: white;
+    border: none;
 }
 
 .radio-group label:hover {
-  opacity: 0.9;
+    opacity: 0.9;
 }
 
 /* === TIPO DE LOCAL / ANÚNCIO === */
 .tipo-anuncio {
-  display: flex;
-  justify-content: space-between;
-  gap: 25px;
-  font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    gap: 25px;
+    font-weight: 600;
 }
 
 .tipo-anuncio select {
-  width: 100%;
+    width: 100%;
 }
 
 /* === BOTÕES DE SELEÇÃO (QUARTOS, BANHEIROS, VAGAS) === */
 .quantidades {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
     font-weight: 600;
 }
 
 .quantidades > div {
-  flex: 1;
+    flex: 1;
 }
 
 .btn-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btn-group input[type="radio"] {
-  display: none;
+    display: none;
 }
 
 .btn-group label {
-  flex: 1;
-  text-align: center;
-  padding: 14px 0;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(white, white) padding-box,
-    linear-gradient(to right, #ff751f, #430097) border-box;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.25s;
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s;
+    min-width: 40px; /* Garante que a opção 0 não fique muito pequena */
 }
 
 .btn-group input[type="radio"]:checked + label {
-  background: linear-gradient(to right, #ff751f, #430097);
-  color: white;
-  border: none;
+    background: linear-gradient(to right, #ff751f, #430097);
+    color: white;
+    border: none;
 }
 
 .btn-group label:hover {
-  opacity: 0.9;
+    opacity: 0.9;
 }
 
 /* === COMODIDADES === */
 .comodidades h3 {
-  color: #000000;
-  font-size: 1.1rem;
-  font-weight: 600;
+    color: #000000;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.seletor-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .seletor-container label {
-  font-weight: 500;
-  color: #000000;
-  
+    font-weight: 500;
+    color: #000000;
+    display: flex;
+    align-items: center;
 }
 
 .seletor-container input[type="checkbox"] {
-  accent-color: #430097;
-  width: 20px;
-  height: 18px;
-  
+    accent-color: #430097;
+    width: 20px;
+    height: 18px;
+    margin-right: 5px;
 }
 
 /* === BOTÃO PUBLICAR === */
-#btnsalvar {
-  align-self: center;
-  background: linear-gradient(to right, #ff751f, #430097);
-  color: white;
-  padding: 14px 40px;
-  border-radius: 10px;
-  font-weight: 600;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.2s;
-  margin-top: 15px;
+#addAnuncioForm #btnsalvar {
+    align-self: center;
+    background: linear-gradient(to right, #ff751f, #430097);
+    color: white;
+    padding: 14px 40px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 15px;
+    width: auto;
 }
 
-#btnsalvar:hover {
-  transform: translateY(-2px);
+#addAnuncioForm #btnsalvar:hover {
+    transform: translateY(-2px);
 }
+
 
 /* ===========================
-   RESPONSIVIDADE
+    RESPONSIVIDADE
 =========================== */
 @media (max-width: 1200px) {
     .paineldeusuario {
-        /* Aumenta a largura para telas menores que 1500px e a torna fluida */
         width: 95%;
-        height: auto; /* Permite que o conteúdo defina a altura */
-        min-height: 700px; /* Mantém a altura mínima */
-        margin-top: 80px; /* Espaço extra se o logo estiver no topo */
+        height: auto;
+        min-height: 700px;
+        margin-top: 80px;
     }
 
     .logo {
-        width: 200px; /* Reduz o tamanho do logo */
+        width: 200px;
         right: 20px;
     }
 
     .capa {
-        height: 200px; /* Reduz a altura da capa */
+        height: 200px;
     }
 
     .capa img:last-child {
         height: 200px;
     }
 
-    /* Reduz o padding lateral do perfil */
     .perfil {
         padding: 20px 20px 10px 150px; 
     }
@@ -584,41 +622,30 @@ body {
 }
 
 
-/* 2. Breakpoint para Dispositivos Móveis (max-width: 768px) */
-/* Reorganiza o layout para empilhar elementos verticalmente */
 @media (max-width: 768px) {
-    body {
-        /* Remove o padding fixo, deixa o flex centralizar */
-        padding: 10px; 
-    }
-
-    .logo {
-        /* Move o logo para o topo e centraliza para melhor visibilidade */
-        position: static; 
-        margin: 0 auto 20px auto; 
-        width: 180px; 
-        display: block;
-    }
-    
-    /* Remove a centralização do body se o logo for estático */
     body {
         justify-content: flex-start;
         padding-top: 20px;
     }
     
     .paineldeusuario {
-        /* Usa quase toda a largura e remove a altura mínima */
         width: 100%;
         min-height: auto;
         height: auto;
         margin-top: 0;
     }
+    
+    .logo {
+        position: static; 
+        margin: 0 auto 20px auto; 
+        width: 180px; 
+        display: block;
+    }
 
     /* --- CABEÇALHO / PERFIL --- */
     
     .capa {
-        height: 180px; /* Altura da capa bem reduzida */
-
+        height: 180px;
     }
 
     .capa img {
@@ -626,9 +653,7 @@ body {
     }
 
     .fotoperfil {
-        /* Reposiciona a foto do perfil para centralizar no topo (ou manter alinhada) */
-        position: absolute;
-        bottom: -80px; /* Coloca a foto dentro da capa */
+        bottom: -80px;
         left: 50%;
         transform: translateX(-50%);
         width: 120px;
@@ -637,17 +662,21 @@ body {
     }
 
     .perfil {
-        /* Permite que o perfil se reorganize verticalmente */
         flex-direction: column;
-        align-items: center; /* Centraliza verticalmente */
+        align-items: center;
         text-align: center;
-        /* Redefine o padding para não ter o grande espaço à esquerda */
         padding: 50px 20px 10px 20px; 
-        gap: 15px; /* Adiciona espaço entre as seções */
+        gap: 15px;
     }
 
     .usuarioinfo {
-        margin-top: 28px; /* Adiciona espaço entre a foto e o nome */
+        margin-top: 28px;
+    }
+    
+  
+    .localizacao {
+        flex-direction: column;
+        gap: 5px;
     }
 
     .usuarioinfo h2 {
@@ -655,7 +684,6 @@ body {
     }
 
     .botaoeditarperfil {
-        /* Permite que os botões se empilhem se necessário (opcional) */
         flex-direction: column; 
         width: 100%;
     }
@@ -665,11 +693,9 @@ body {
         padding: 12px 0;
     }
 
-
     /* --- ABAS --- */
 
     .anunciosefavoritos {
-        /* As abas permanecem horizontais, mas o padding pode ser ajustado */
         margin-top: 10px;
     }
 
@@ -681,22 +707,70 @@ body {
     /* --- MODAL --- */
     
     .modalcontent {
-        /* Garante que o modal use a maior parte da tela em dispositivos pequenos */
-        width: 80%;
+        width: 95%;
         max-width: 100%; 
         padding: 20px;
-
-    }
-
-    .modalcontent .form-row {
-        /* Empilha campos de formulário horizontalmente */
-        flex-direction: column;
-        gap: 0;
+        margin: 20px auto;
     }
     
-    .modalcontent input, .modalcontent select {
-        /* Ocupa 100% da largura em campos empilhados */
-        width: 100% !important; 
-        margin-bottom: 10px;
+    /* Edição de Perfil Responsiva */
+    .edit-top {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+   
+    .localizacao-detalhada {
+    
+        grid-template-columns: 1fr; 
+        gap: 10px;
+    }
+    
+   
+    .localizacao-detalhada .campo {
+        grid-column: span 1 !important; 
+    }
+    
+  
+    .preco-tipo, 
+    .tipo-anuncio, 
+    .quantidades {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .quantidades > div {
+        margin-right: 0;
+    }
+    
+    .valores {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .valores input[type="number"] {
+        width: 100%;
+    }
+
+    .radio-group {
+        flex-wrap: wrap;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .radio-group label {
+        flex: 0;
+        min-width: 100px;
+    }
+    
+    .btn-group {
+        flex-wrap: nowrap; /* Tenta manter em uma linha, mas permite overflow se necessário */
+        overflow-x: auto;
+    }
+    
+    .btn-group label {
+        min-width: 40px;
+        padding: 10px 0;
     }
 }

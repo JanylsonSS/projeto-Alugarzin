@@ -1,32 +1,52 @@
+// ===================================
+// VARIÁVEIS GLOBAIS / CONSTANTES
+// ===================================
+const editModal = document.getElementById("editmodal");
+const fecharEditModal = document.getElementById("fechareditmodal1");
+const editProfileForm = document.querySelector(".editProfileForm"); 
+const addAnuncioModal = document.getElementById("modaladdanuncio");
+const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
+const addAnuncioForm = document.getElementById("addAnuncioForm");
+
+
 // ===============================
 // Alternar abas (Anúncios / Favoritos)
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
-  const abaAnuncios = document.getElementById("anunciosperfil");
-  const abaFavoritos = document.getElementById("favoritosperfil");
-  const secAnuncio = document.getElementById("anuncio");
-  const secFavoritos = document.getElementById("favoritos");
+    const abaAnuncios = document.getElementById("anunciosperfil");
+    const abaFavoritos = document.getElementById("favoritosperfil");
+    const secAnuncio = document.getElementById("anuncio");
+    const secFavoritos = document.getElementById("favoritos");
 
-  if (abaAnuncios && abaFavoritos && secAnuncio && secFavoritos) {
-    // Ao clicar em "Anúncios"
-    abaAnuncios.addEventListener("click", () => {
-      abaAnuncios.classList.add("ativo");
-      abaFavoritos.classList.remove("ativo");
-      secAnuncio.classList.remove("hidden");
-      secFavoritos.classList.add("hidden");
-    });
+    if (abaAnuncios && abaFavoritos && secAnuncio && secFavoritos) {
+        // Ao clicar em "Anúncios"
+        abaAnuncios.addEventListener("click", () => {
+            abaAnuncios.classList.add("ativo");
+            abaFavoritos.classList.remove("ativo");
+            secAnuncio.classList.remove("hidden");
+            secFavoritos.classList.add("hidden");
+        });
 
-    // Ao clicar em "Favoritos"
-    abaFavoritos.addEventListener("click", () => {
-      abaFavoritos.classList.add("ativo");
-      abaAnuncios.classList.remove("ativo");
-      secFavoritos.classList.remove("hidden");
-      secAnuncio.classList.add("hidden");
-    });
-  }
+        // Ao clicar em "Favoritos"
+        abaFavoritos.addEventListener("click", () => {
+            abaFavoritos.classList.add("ativo");
+            abaAnuncios.classList.remove("ativo");
+            secFavoritos.classList.remove("hidden");
+            secAnuncio.classList.add("hidden");
+        });
+    }
 
-  // Carregar painel do usuário ao iniciar
-  carregarPainel();
+    // Aplica a máscara de telefone ao campo de número
+    const phoneById = document.getElementById('number');
+    if (phoneById) applyPhoneMaskToInput(phoneById);
+    
+   
+    setupEditModalListeners();
+    setupAddAnuncioListeners();
+    setupLogout();
+
+    // Carregar painel do usuário ao iniciar
+    carregarPainel();
 });
 
 
@@ -34,171 +54,218 @@ document.addEventListener("DOMContentLoaded", () => {
 // Componente Painel + Consumo da API
 // ===============================
 async function carregarPainel() {
-  const token = localStorage.getItem("token");
-
-  // --- BLOQUEIO DESATIVADO---
-  // if (!token) {
-  //   window.location.href = "./login.html";
-  //   return;
-  // }
-  // -------------------------------------------------------------------
-
-  try {
-    // Backend:
-    /*
-    const resposta = await fetch("/api/painel", {
-      headers: { Authorization: "Bearer " + token },
-    });
-    if (!resposta.ok) throw new Error("Falha ao obter dados");
-    const dadosUsuario = await resposta.json();
-    */
-
-    // --- Backend preenche com "dadosUsuario" ---
-    // document.getElementById("nomeUsuario").textContent = dadosUsuario.nome;
-    // document.getElementById("emailUsuario").textContent = dadosUsuario.email;
-    // document.getElementById("telefoneUsuario").textContent = dadosUsuario.telefone;
-    // document.getElementById("localizacaoUsuario").textContent = dadosUsuario.localizacao;
-    // if (dadosUsuario.foto) document.getElementById("fotoUsuario").src = dadosUsuario.foto;
-
-  } catch (erro) {
-    console.error("Erro ao carregar painel:", erro);
-
-    // BLOQUEIO DESATIVADO 
-    // alert("Erro ao carregar seus dados. Faça login novamente.");
-    // localStorage.removeItem("token");
-    // window.location.href = "./login.html";
-  }
-}
-
-
-// ===============================
-// Modal Editar Perfil
-// ===============================
-const editModal = document.getElementById("editmodal");
-const fecharEditModal = document.getElementById("fechareditmodal1");
-const editProfileForm = document.getElementById("editProfileForm");
-const editBox = document.getElementById("editbox");
-
-function abrirEditModal() {
-  if (editModal) editModal.style.display = "flex";
-}
-
-if (fecharEditModal) {
-  fecharEditModal.addEventListener("click", () => {
-    if (editModal) editModal.style.display = "none";
-    if (editProfileForm) editProfileForm.reset();
-    if (editBox) editBox.style.display = "none";
-  });
-}
-
-window.addEventListener("click", (event) => {
-  if (event.target === editModal) {
-    editModal.style.display = "none";
-    editProfileForm.reset();
-    if (editBox) editBox.style.display = "none";
-  }
-});
-
-if (editProfileForm) {
-  editProfileForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    // Captura dos campos
-    const nome = document.getElementById("name").value;
-    const localizacao = document.getElementById("location").value;
-    const email = document.getElementById("email").value;
-    const number = document.getElementById("number").value;
-
-    console.log("Editar Perfil →", { nome, localizacao, email, number });
-
-    // Backend:
-    /*
     const token = localStorage.getItem("token");
-    const formData = new FormData(editProfileForm);
-    await fetch("/api/usuario", {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    */
 
-    editModal.style.display = "none";
-    editProfileForm.reset();
-  });
 
-  // Pré-visualização de imagem no modal de edição
-  const imageInput = document.getElementById("image");
-  const preview = document.getElementById("previewImage");
+    // Simulação de dados do usuário 
+    const dadosUsuario = {
+        whatsapp_link: "https://wa.me/5541988887777", // Exemplo de link do WhatsApp
+        email: "karina@alugarzin.com" // Exemplo de e-mail
+    };
 
-    imageInput.addEventListener('change', () => {
-        const file = imageInput.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                preview.src = e.target.result; // muda a imagem mostrada no modal
-            };
-            reader.readAsDataURL(file);
+    // Preenche o link do WhatsApp 
+    const whatsappLinkElement = document.getElementById("whatsappLink");
+    if (whatsappLinkElement && dadosUsuario.whatsapp_link) {
+        whatsappLinkElement.href = dadosUsuario.whatsapp_link;
+        // Opcional: Altera a cor do ícone se o link estiver disponível
+        whatsappLinkElement.querySelector('i').style.color = '#25D366'; 
+    }
+
+    // Preenche o link do E-mail (Tarefa 2)
+    const emailLinkElement = document.getElementById("emailLink");
+    if (emailLinkElement && dadosUsuario.email) {
+        emailLinkElement.href = `mailto:${dadosUsuario.email}`;
+    }
+
+    try {
+        // ... (lógica de carregamento de dados do backend)
+    } catch (erro) {
+        console.error("Erro ao carregar painel:", erro);
+    }
+}
+
+
+// ===============================
+// Modal Editar Perfil (Lógica de Abertura/Fechamento)
+// ===============================
+function abrirEditModal() {
+    if (editModal) editModal.style.display = "flex";
+}
+
+function fecharModal(modal) {
+    if (modal) modal.style.display = "none";
+    if (editProfileForm) editProfileForm.reset();
+    // Reverter preview de imagem para o padrão, se necessário
+    const preview = document.getElementById("previewImage");
+    if (preview) preview.src = '/frontend/image/Karina.jpg'; 
+}
+
+function setupEditModalListeners() {
+    if (fecharEditModal) {
+        fecharEditModal.addEventListener("click", () => fecharModal(editModal));
+    }
+
+    window.addEventListener("click", (event) => {
+        if (event.target === editModal) {
+            fecharModal(editModal);
         }
     });
+
+    if (editProfileForm) {
+        editProfileForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+           
+            const dadosEdicao = {
+                nome: document.getElementById("name").value,
+                telefone: document.getElementById("number").value,
+                link_whatsapp: document.getElementById("whatsapp_link").value, 
+                email: document.getElementById("email").value,
+                cep: document.getElementById("cep").value, 
+                rua: document.getElementById("rua").value, 
+                numero: document.getElementById("numero").value, 
+                bairro: document.getElementById("bairro").value, 
+                cidade: document.getElementById("cidade").value, 
+                estado: document.getElementById("estado").value 
+            };
+
+            console.log("Editar Perfil →", dadosEdicao);
+
+            // ... (lógica de envio para o backend)
+
+            fecharModal(editModal);
+        });
+        
+        // ===================================
+        // Implementação da Tarefa 4 (Pré-visualização da Nova Foto)
+        // ===================================
+        const imageInput = document.getElementById("profileImageInput"); // ID corrigido
+        const preview = document.getElementById("previewImage");
+
+        if (imageInput && preview) {
+            imageInput.addEventListener('change', () => {
+                const file = imageInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Muda a imagem no modal
+                        preview.src = e.target.result; 
+                        
+                        // Opcional: Se precisar atualizar a imagem no painel principal imediatamente
+                        // document.getElementById("profileDisplayImage").src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // ===================================
+        // Preenchimento Automático do CEP
+        // ===================================
+        const cepInput = document.getElementById('cep');
+        
+        if (cepInput) {
+            // Máscara de CEP
+            cepInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.slice(0, 8);
+                if (value.length > 5) {
+                    e.target.value = value.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+                } else {
+                    e.target.value = value;
+                }
+            });
+
+            // Busca do CEP ao perder o foco (blur)
+            cepInput.addEventListener('blur', async (e) => {
+                const cep = e.target.value.replace(/\D/g, '');
+                if (cep.length !== 8) return;
+
+                // Desativa campos enquanto busca
+                document.getElementById('rua').value = '... buscando';
+                document.getElementById('cidade').value = '...';
+                document.getElementById('estado').value = '...';
+                
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    const data = await response.json();
+
+                    if (!data.erro) {
+                        document.getElementById('rua').value = data.logradouro || '';
+                        document.getElementById('bairro').value = data.bairro || '';
+                        document.getElementById('cidade').value = data.localidade || '';
+                        document.getElementById('estado').value = data.uf || '';
+
+                        // Foca no campo número, ou na rua se estiver vazia
+                        if (data.logradouro) {
+                           document.getElementById('numero').focus();
+                        } else {
+                           document.getElementById('rua').focus();
+                        }
+                    } else {
+                        console.log("CEP não encontrado.");
+                        document.getElementById('rua').value = '';
+                        document.getElementById('cidade').value = '';
+                        document.getElementById('estado').value = '';
+                    }
+
+                } catch (error) {
+                    console.error("Erro ao buscar CEP:", error);
+                }
+            });
+        }
+    }
 }
 
 
 // ===============================
-// Modal Adicionar Anúncio
+// Modal Adicionar Anúncio (Lógica de Abertura/Fechamento)
 // ===============================
-const addAnuncioModal = document.getElementById("modaladdanuncio");
-const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
-const addAnuncioForm = document.getElementById("addAnuncioForm");
-const addAnuncioBox = document.getElementById("addanunciobox");
 
 // Função para abrir o modal
 function abrirAddAnuncioModal() {
     addAnuncioModal.style.display = "flex";
 }
 
-// Fecha o modal ao clicar no X
-if (fecharAddAnuncioModal) {
-    fecharAddAnuncioModal.addEventListener("click", () => {
-        addAnuncioModal.style.display = "none";
-        addAnuncioForm.reset();
-        if (addAnuncioBox) addAnuncioBox.style.display = "none";
-    });
-}
-
-// Fecha o modal ao clicar fora dele
-window.addEventListener("click", (event) => {
-    if (event.target === addAnuncioModal) {
-        addAnuncioModal.style.display = "none";
-        addAnuncioForm.reset();
-        if (addAnuncioBox) addAnuncioBox.style.display = "none";
+function setupAddAnuncioListeners() {
+    // Fecha o modal ao clicar no X
+    if (fecharAddAnuncioModal) {
+        fecharAddAnuncioModal.addEventListener("click", () => {
+            fecharModal(addAnuncioModal);
+            // Limpa pré-visualizações de imagens (adicionado abaixo)
+            if (window.clearAnuncioImages) window.clearAnuncioImages();
+        });
     }
-});
 
-// Envio do formulário
-if (addAnuncioForm) {
-  addAnuncioForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const imagem = document.getElementById("imagem").files[0];
-    const preco = document.getElementById("preco").value;
-
-    console.log("Novo Anúncio →", { imagem, preco });
-
-    // Backend:
-    /*
-    const token = localStorage.getItem("token");
-    const formData = new FormData(addAnuncioForm);
-    await fetch("/api/anuncios", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+    // Fecha o modal ao clicar fora dele
+    window.addEventListener("click", (event) => {
+        if (event.target === addAnuncioModal) {
+            fecharModal(addAnuncioModal);
+            // Limpa pré-visualizações de imagens (adicionado abaixo)
+            if (window.clearAnuncioImages) window.clearAnuncioImages();
+        }
     });
-    */
 
-    addAnuncioModal.style.display = "none";
-    addAnuncioForm.reset();
-    if (addAnuncioBox) addAnuncioBox.style.display = "none";
-  });
+    // Envio do formulário
+    if (addAnuncioForm) {
+        addAnuncioForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            // Certifica-se de que o mínimo de imagens foi atendido antes de prosseguir
+            if (window.verificarMinimoImagensAnuncio && !window.verificarMinimoImagensAnuncio()) {
+                // A função já exibe a mensagem de erro
+                return; 
+            }
+
+            const formData = new FormData(addAnuncioForm);
+            console.log("Novo Anúncio →", Object.fromEntries(formData.entries()));
+
+            // ... (lógica de envio para o backend)
+
+            fecharModal(addAnuncioModal);
+            if (window.clearAnuncioImages) window.clearAnuncioImages();
+        });
+    }
 }
 
 
@@ -206,170 +273,204 @@ if (addAnuncioForm) {
 // Controle de Imagens no Modal de Anúncio
 // ===============================
 (function() {
-  const input = document.getElementById('imagem');
-  const preview = document.getElementById('previewImagens');
-  const btnFechar = document.getElementById('fechareditmodal2');
-  const modal = document.getElementById('modaladdanuncio');
-  const form = document.getElementById('form-anuncio'); 
-  
-  let objectURLs = [];
-  const MIN_IMAGENS = 3;
+    // ID corrigido no HTML para 'imagemInput' (era 'imagem' no JS antigo)
+    const input = document.getElementById('imagemInput'); 
+    const preview = document.getElementById('previewImagens');
+    const form = document.getElementById('addAnuncioForm'); 
+    
+    // Armazena as URLs temporárias para poder revogar
+    let objectURLs = []; 
+    const MIN_IMAGENS = 3;
 
-  // Cria (ou acha) o elemento para mensagens de erro
-  let erroMsg = document.createElement('p');
-  erroMsg.id = 'erro-imagens';
-  erroMsg.style.color = 'red';
-  erroMsg.style.fontSize = '14px';
-  erroMsg.style.marginTop = '8px';
-  erroMsg.style.display = 'none';
-  input.insertAdjacentElement('afterend', erroMsg);
-
-  function renderPreviews() {
-    preview.innerHTML = '';
-
-    const files = Array.from(input.files || []);
-    files.forEach((file, index) => {
-      const thumbWrap = document.createElement('div');
-      thumbWrap.className = 'thumb-wrap';
-      thumbWrap.style.position = 'relative';
-      thumbWrap.style.display = 'inline-block';
-      thumbWrap.style.margin = '5px';
-
-      const img = document.createElement('img');
-      const url = URL.createObjectURL(file);
-      objectURLs.push(url);
-      img.src = url;
-      img.alt = file.name;
-      img.style.width = '100px';
-      img.style.height = '100px';
-      img.style.objectFit = 'cover';
-      img.style.borderRadius = '8px';
-      img.style.border = '2px solid #e6e6e6';
-      img.style.display = 'block';
-
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.innerText = '×';
-      btn.title = 'Remover imagem';
-      btn.style.position = 'absolute';
-      btn.style.top = '-8px';
-      btn.style.right = '-8px';
-      btn.style.width = '26px';
-      btn.style.height = '26px';
-      btn.style.borderRadius = '50%';
-      btn.style.border = 'none';
-      btn.style.background = 'linear-gradient(to right,#ff751f,#430097)';
-      btn.style.color = '#fff';
-      btn.style.cursor = 'pointer';
-      btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
-      btn.style.fontSize = '16px';
-      btn.style.lineHeight = '0.9';
-
-      btn.addEventListener('click', () => {
-        removeImageAtIndex(index);
-      });
-
-      thumbWrap.appendChild(img);
-      thumbWrap.appendChild(btn);
-      preview.appendChild(thumbWrap);
-    });
-
-    verificarMinimoImagens();
-  }
-
-  function setInputFiles(filesArray) {
-    const dt = new DataTransfer();
-    filesArray.forEach(f => dt.items.add(f));
-    input.files = dt.files;
-  }
-
-  function removeImageAtIndex(indexToRemove) {
-    const files = Array.from(input.files || []);
-    if (indexToRemove < 0 || indexToRemove >= files.length) return;
-    if (objectURLs[indexToRemove]) {
-      URL.revokeObjectURL(objectURLs[indexToRemove]);
+    // Cria ou acha o elemento para mensagens de erro
+    let erroMsg = document.createElement('p');
+    erroMsg.id = 'erro-imagens';
+    erroMsg.style.color = 'red';
+    erroMsg.style.fontSize = '14px';
+    erroMsg.style.marginTop = '8px';
+    erroMsg.style.display = 'none';
+    
+    // Garante que a mensagem seja inserida apenas uma vez
+    if (input && !document.getElementById('erro-imagens')) {
+        input.insertAdjacentElement('afterend', erroMsg);
     }
-    const newFiles = files.filter((_, i) => i !== indexToRemove);
-    setInputFiles(newFiles);
-    objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
-    objectURLs = [];
-    renderPreviews();
-  }
 
-  input.addEventListener('change', () => {
-    objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
-    objectURLs = [];
-    renderPreviews();
-  });
+    function renderPreviews() {
+        // Limpa previews antigos e revoga URLs antigas
+        preview.innerHTML = '';
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
+        objectURLs = [];
 
-  function clearImages() {
-    objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
-    objectURLs = [];
-    preview.innerHTML = '';
-    input.value = '';
-    try { input.files = new DataTransfer().files; } catch (e) {}
-    erroMsg.style.display = 'none'; // limpa mensagem
-  }
+        const files = Array.from(input.files || []);
+        
+        files.forEach((file, index) => {
+            const thumbWrap = document.createElement('div');
+            thumbWrap.className = 'thumb-wrap';
+            thumbWrap.style.position = 'relative';
+            thumbWrap.style.display = 'inline-block';
+            thumbWrap.style.margin = '5px';
 
-  function verificarMinimoImagens() {
-    const total = input.files ? input.files.length : 0;
-    if (total < MIN_IMAGENS) {
-      erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/3)`;
-      erroMsg.style.display = 'block';
-      input.style.outline = '2px solid red';
-      return false;
-    } else {
-      erroMsg.style.display = 'none';
-      input.style.outline = 'none';
-      return true;
+            const img = document.createElement('img');
+            const url = URL.createObjectURL(file);
+            objectURLs.push(url);
+            img.src = url;
+            img.alt = file.name;
+     
+            img.style.width = '100px'; 
+            img.style.height = '100px';
+            img.style.objectFit = 'cover';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.innerText = '×';
+            btn.title = 'Remover imagem';
+            // Estilos para o botão de remover
+            btn.style.position = 'absolute';
+            btn.style.top = '-8px';
+            btn.style.right = '-8px';
+            btn.style.width = '26px';
+            btn.style.height = '26px';
+            btn.style.borderRadius = '50%';
+            btn.style.border = 'none';
+            btn.style.background = 'linear-gradient(to right,#ff751f,#430097)';
+            btn.style.color = '#fff';
+            btn.style.cursor = 'pointer';
+            btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+            btn.style.fontSize = '16px';
+            btn.style.lineHeight = '0.9';
+
+            btn.addEventListener('click', () => {
+                removeImageAtIndex(index);
+            });
+
+            thumbWrap.appendChild(img);
+            thumbWrap.appendChild(btn);
+            preview.appendChild(thumbWrap);
+        });
+
+        verificarMinimoImagens();
     }
-  }
 
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      if (!verificarMinimoImagens()) {
-        e.preventDefault(); // bloqueia envio
-        alert('Você precisa enviar pelo menos 3 imagens antes de continuar.');
-      }
-    });
-  }
+   
+    // Antigamente, ele limpava todos os arquivos e adicionava apenas os novos.
+    // Agora ele adiciona os novos arquivos aos antigos.
+    if (input) {
+        input.addEventListener('change', () => {
+            const currentFiles = Array.from(input.files || []);
+            
+            // Cria um array de DataTransfer e adiciona todos os arquivos antigos
+            const dataTransfer = new DataTransfer();
+            
+            // Se houver arquivos existentes, adiciona eles
+            if (input.dataset.existingFiles) {
+                const existingFiles = JSON.parse(input.dataset.existingFiles);
+                existingFiles.forEach(file => dataTransfer.items.add(file));
+            }
+            
+            // Adiciona os novos arquivos
+            currentFiles.forEach(file => dataTransfer.items.add(file));
 
-  if (btnFechar) {
-    btnFechar.addEventListener('click', () => {
-      clearImages();
-    });
-  }
+            // Atualiza o input.files
+            input.files = dataTransfer.files;
 
-  if (modal) {
-    modal.addEventListener('click', (evt) => {
-      if (evt.target === modal) {
-        clearImages();
-      }
-    });
-  }
+            // Armazena os arquivos existentes para a próxima mudança
+            input.dataset.existingFiles = JSON.stringify(Array.from(input.files));
 
-  window.clearAnuncioImages = clearImages;
+            renderPreviews();
+        });
+    }
+
+
+    function setInputFiles(filesArray) {
+        const dt = new DataTransfer();
+        filesArray.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+        // Atualiza o dataset para persistir a lista
+        input.dataset.existingFiles = JSON.stringify(filesArray);
+    }
+
+    function removeImageAtIndex(indexToRemove) {
+        const files = Array.from(input.files || []);
+        if (indexToRemove < 0 || indexToRemove >= files.length) return;
+        
+        // Revoga a URL do objeto que será removido
+        if (objectURLs[indexToRemove]) {
+            URL.revokeObjectURL(objectURLs[indexToRemove]);
+        }
+        
+        const newFiles = files.filter((_, i) => i !== indexToRemove);
+        setInputFiles(newFiles);
+        renderPreviews();
+    }
+
+    function clearImages() {
+        // Revoga todas as URLs
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
+        objectURLs = [];
+        preview.innerHTML = '';
+        input.value = ''; // Limpa o valor do input (para o navegador)
+        
+        // Limpa a lista de arquivos via DataTransfer e o dataset
+        try { 
+            input.files = new DataTransfer().files; 
+        } catch (e) {
+         
+        }
+        input.dataset.existingFiles = JSON.stringify([]);
+
+        erroMsg.style.display = 'none'; // limpa mensagem
+    }
+
+    function verificarMinimoImagens() {
+        const total = input.files ? input.files.length : 0;
+        if (total < MIN_IMAGENS) {
+            erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/${MIN_IMAGENS})`;
+            erroMsg.style.display = 'block';
+            input.style.borderColor = 'red'; 
+            return false;
+        } else {
+            erroMsg.style.display = 'none';
+            input.style.borderColor = 'transparent';
+            return true;
+        }
+    }
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            if (!verificarMinimoImagens()) {
+                e.preventDefault(); // bloqueia envio
+      
+            }
+        });
+    }
+    
+    // Expõe a função para ser chamada no fechamento do modal
+    window.clearAnuncioImages = clearImages;
+    window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+
 })();
+
 
 // ===============================
 // Logout
 // ===============================
-const btnLogout = document.getElementById("bntlogout");
 
-if (btnLogout) {
-  btnLogout.addEventListener("click", () => {
-    // Remove token do localStorage
-    localStorage.removeItem("token");
+function setupLogout() {
+    const btnLogout = document.getElementById("bntlogout");
 
-    // Redireciona para login
-    window.location.href = "./index.html";
+    if (btnLogout) {
+        btnLogout.addEventListener("click", () => {
+            // Remove token do localStorage
+            localStorage.removeItem("token");
 
-    // Substitui o histórico, impedindo voltar
-    window.history.pushState(null, "", "./index.html");
-    window.onpopstate = function () {
-      window.history.go(1);
-    };
-  });
+            // Redireciona para index.html (página de login/landing)
+            // Usa replace() para GARANTIR que a página atual seja substituída no histórico
+            // impedindo que o botão "Voltar" do navegador retorne para o painel.html
+            window.location.replace("./index.html"); 
+            
+  
+        });
+    }
 }
 
 
@@ -377,59 +478,75 @@ if (btnLogout) {
 // Máscara de telefone
 // -----------------------------
 function formatPhoneValue(value) {
-  // remove tudo que não é dígito
-  const digits = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
-  if (!digits) return '';
+    // remove tudo que não é dígito
+    const digits = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
+    if (!digits) return '';
 
-  const ddd = digits.slice(0, 2);
-  const nine = digits.slice(2, 3);
-  const part1 = digits.slice(3, 7); // 4 dígitos
-  const part2 = digits.slice(7, 11); // 4 dígitos
+    // (XX) X XXXX-XXXX (9 dígitos) ou (XX) XXXX-XXXX (8 dígitos)
+    let out = '';
+    
+    if (digits.length > 0) {
+        out += `(${digits.slice(0, 2)}`;
+    }
+    if (digits.length > 2) {
+        out += `) ${digits.slice(2, 3)}`; // Opcional 9º dígito
+    }
+    
+    // Se tem 9º dígito
+    if (digits.length > 3 && digits.length <= 7) {
+        out += ` ${digits.slice(3, 7)}`;
+    } else if (digits.length > 7) {
+        out += ` ${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+    }
+    // Se não tem 9º dígito
+    else if (digits.length > 2 && digits.length <= 6) {
+         out += ` ${digits.slice(2, 6)}`;
+    } else if (digits.length > 6) {
+        out += ` ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+    }
 
-  let out = `(${ddd})`;
-  if (nine) out += ` ${nine}`;
-  if (part1) out += ` ${part1}`;
-  if (part2) out += `-${part2}`;
-
-  return out;
+    return out;
 }
+
 
 function applyPhoneMaskToInput(input) {
-  if (!input) return;
+    if (!input) return;
 
-  // quando digitar/colar
-  const onInput = (e) => {
-    const start = input.selectionStart;
-    const oldLen = input.value.length;
+    // Garante que o input seja do tipo 'text' para o funcionamento ideal da máscara
+    input.setAttribute('type', 'text'); 
+    
+    // Adicionado o tratamento para o CEP
+    const onInput = (e) => {
+        let value = e.target.value.replace(/\D/g, '').slice(0, 11);
+        
+        let formattedValue = '';
+        if (value.length > 2) {
+            formattedValue += `(${value.slice(0, 2)}) `;
+            if (value.length > 7 && value.length === 11) { // Telefone com 9º dígito
+                formattedValue += `${value.slice(2, 3)} ${value.slice(3, 7)}-${value.slice(7, 11)}`;
+            } else if (value.length > 6) { // Telefone padrão (8 dígitos)
+                formattedValue += `${value.slice(2, 6)}-${value.slice(6, 10)}`;
+            } else if (value.length > 2) {
+                formattedValue += value.slice(2);
+            }
+        } else {
+            formattedValue = value;
+        }
 
-    input.value = formatPhoneValue(input.value);
+        e.target.value = formattedValue;
+    };
 
-    // posiciona o cursor no final
-    const newLen = input.value.length;
-    const diff = newLen - oldLen;
-    const newPos = Math.max(0, start + diff);
-    input.setSelectionRange(newPos, newPos);
-  };
+    const onPaste = (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        e.target.value = paste;
+        e.target.dispatchEvent(new Event('input'));
+        
+      
+        const len = input.value.length;
+        input.setSelectionRange(len, len);
+    };
 
-  const onPaste = (e) => {
-    e.preventDefault();
-    const paste = (e.clipboardData || window.clipboardData).getData('text');
-    input.value = formatPhoneValue(paste);
-    // move cursor pro final
-    const len = input.value.length;
-    input.setSelectionRange(len, len);
-  };
-
-  input.addEventListener('input', onInput, { passive: true });
-  input.addEventListener('paste', onPaste);
-
+    input.addEventListener('input', onInput);
+    input.addEventListener('paste', onPaste);
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const phoneById = document.getElementById('number');
-  if (phoneById) applyPhoneMaskToInput(phoneById);
-
-  const phones = document.querySelectorAll('input.phone');
-  phones.forEach(inp => applyPhoneMaskToInput(inp));
-});
-
