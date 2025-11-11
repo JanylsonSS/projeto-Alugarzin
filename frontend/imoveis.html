@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alugarzin - Imóveis</title>
+
+    <!-- Ícones Bootstrap -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <link rel="stylesheet" href="imoveis.css"/>
+    <link rel="shortcut icon" href="/image/ARTE_2.png" type="image/x-icon">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="navbar">
+        <div class="logo">
+        <img src="/image/ARTE.png" alt="Logo Alugarzin" />
+        </div>
+
+        <nav class="menu">
+        <a href="#">ALUGAR</a>
+        <a href="#">COMPRAR</a>
+        <button class="btn login">LOGIN</button>
+        <button class="btn criar">CRIAR CONTA</button>
+        </nav>
+
+        <button class="menu-toggle"><i class="bi bi-list"></i></button>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main class="main-container">
+        <!-- SIDEBAR FILTROS -->
+        <aside class="sidebar">
+        <h3>Tipo de imóvel</h3>
+        <label><input type="checkbox" /> Apartamento</label>
+        <label><input type="checkbox" /> Casa</label>
+        <label><input type="checkbox" /> Kitnet/Conjugado</label>
+
+        <h3>Quartos</h3>
+        <div class="filter-buttons">
+            <button>1+</button>
+            <button>2+</button>
+            <button>3+</button>
+            <button>4+</button>
+        </div>
+
+        <h3>Banheiros</h3>
+        <div class="filter-buttons">
+            <button>1+</button>
+            <button>2+</button>
+            <button>3+</button>
+            <button>4+</button>
+        </div>
+
+        <h3>Vagas</h3>
+        <div class="filter-buttons">
+            <button>1+</button>
+            <button>2+</button>
+            <button>3+</button>
+            <button>4+</button>
+        </div>
+
+        <h3>Preço</h3>
+        <div class="price-inputs">
+            <input type="number" placeholder="Mínimo" />
+            <input type="number" placeholder="Máximo" />
+        </div>
+
+        <button id="btn-filtrar" class="btn aplicar">Aplicar filtros</button>
+        </aside>
+
+        <!-- LISTAGEM -->
+        <section class="listagem">
+        <div class="barra-pesquisa">
+            <i class="bi bi-search"></i>
+            <input
+            type="text"
+            id="search-input"
+            placeholder="Busque por cidade, bairro ou tipo de imóvel..."
+            />
+        </div>
+
+        <div id="imoveis-lista" class="cards-container">
+            <!-- Cards dos imóveis serão inseridos via JS -->
+        </div>
+        </section>
+    </main>
+
+  <script src="imoveis.js"></script>
+</body>
+</html>

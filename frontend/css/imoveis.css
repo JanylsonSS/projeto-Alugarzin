@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: "Work Sans", sans-serif;
+    background-image: 
+        url('/image/ideia.png');
+            font-family: "Work Sans", sans-serif;
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* ======== NAVBAR ======== */
+.navbar {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 30px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    transition: top 0.3s ease;
+}
+
+.logo img {
+    height: 65px;
+    margin-left: 250px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+.btn {
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.login {
+  background: #ff8c00;
+  color: white;
+}
+.criar {
+  background: #6f42c1;
+  color: white;
+}
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+}
+
+/* ======== LAYOUT PRINCIPAL ======== */
+.main-container {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+/* ======== SIDEBAR ======== */
+.sidebar {
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    background: white;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 9999;
+}
+.sidebar h3 {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 20px 0 10px;
+}
+.sidebar label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.filter-buttons button {
+  padding: 5px 10px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+.price-inputs {
+  display: flex;
+  gap: 8px;
+}
+.price-inputs input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.aplicar {
+  background: #6f42c1;
+  color: white;
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* ======== LISTAGEM ======== */
+.listagem {
+  flex: 1;
+  padding: 20px 150px;
+
+}
+
+.barra-pesquisa {
+  display: flex;
+  align-items: center;
+  border: 2px solid #ff6600;
+  border-radius: 30px;
+  background: white;
+  padding: 10px 20px;
+  margin-bottom: 30px;
+}
+.barra-pesquisa input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  padding-left: 10px;
+}
+
+/* ======== CARDS ======== */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.imovel-card {
+  display: flex;
+  flex-direction: row;
+  background: white;
+  border: 3px solid #6f42c1;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: 0.2s;
+}
+.imovel-card:hover {
+  transform: scale(1.01);
+}
+
+.imovel-card img {
+  width: 40%;
+  object-fit: cover;
+}
+
+.card-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-content h4 {
+  margin: 0;
+  color: #222;
+}
+.card-content p {
+  margin: 5px 0;
+  color: #666;
+}
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.preco {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.icones {
+  display: flex;
+  gap: 15px;
+  font-size: 1.3rem;
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 992px) {
+  .main-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+  .imovel-card {
+    flex-direction: column;
+  }
+  .imovel-card img {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu {
+    display: none;
+  }
+  .menu-toggle {
+    display: block;
+  }
+}
