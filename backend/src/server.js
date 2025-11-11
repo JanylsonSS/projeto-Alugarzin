@@ -7,6 +7,7 @@ import fs from "fs";
 import sequelize from "./database/connection.js";
 // Importar rotas
 import usuarioRoutes from "./routes/usuarioRoutes.js";
+import imovelRoutes from "./routes/imovelRoutes.js";
 import authRoutes from './routes/authRoutes.js';
 
 // Configurar __dirname para ES Modules
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 // ROTAS DA API
 // ========================================
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api", imovelRoutes);
 // app.use('/api', authRoutes);
 
 // Rota raiz
@@ -56,13 +58,13 @@ app.get("/", (req, res) => {
 // Rota de DEBUG para verificar caminhos
 app.get("/debug/paths", (req, res) => {
   const caminhoFrontend = path.join(__dirname, '..', '..', 'frontend');
-  
+
   res.json({
     servidor_rodando_em: __dirname,
     caminho_frontend_configurado: caminhoFrontend,
     frontend_existe: fs.existsSync(caminhoFrontend),
-    arquivos_no_frontend: fs.existsSync(caminhoFrontend) 
-      ? fs.readdirSync(caminhoFrontend) 
+    arquivos_no_frontend: fs.existsSync(caminhoFrontend)
+      ? fs.readdirSync(caminhoFrontend)
       : [],
     login_html_existe: fs.existsSync(path.join(caminhoFrontend, 'login.html'))
   });
@@ -92,7 +94,7 @@ const iniciarServidor = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ Conexão com MySQL estabelecida");
-    
+
     await sequelize.sync({ alter: false });
     console.log("✅ Modelos sincronizados com o banco");
 
@@ -112,7 +114,7 @@ const iniciarServidor = async () => {
       console.log(`   GET    /api/usuarios/:id - Buscar por ID`);
       console.log(`   DELETE /api/usuarios/:id - Deletar usuário`);
       console.log(`\n${"=".repeat(60)}\n`);
-      
+
       // Verificar se o frontend foi encontrado
       const frontendPath = path.join(__dirname, '..', '..', 'frontend');
       if (fs.existsSync(frontendPath)) {
