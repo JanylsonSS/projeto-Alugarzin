@@ -4,42 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel - Alugarzin</title>
-    <!-- Bootstrap Icons -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/frontend/css/painel.css">
+    <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon" />
     <link rel="shortcut icon" href="/frontend/image/ARTE_2.png" type="image/x-icon">
 </head>
 <body>
 
-    <a href="index.html"> <img src="/frontend/image/Alugarzin_branco_mudarlogo.png" alt="Logo"  class="logo"></a>
+    <a href="index.html"> <img src="/frontend/image/Alugarzin_branco_mudarlogo.png" alt="Logo" class="logo"></a>
 
     <div class="paineldeusuario">
         <header class="header">
             <div class="capa">
                 <div class="fotoperfil">
-                    <img src="/frontend/image/Karina.jpg">
-                    <!-- foto do perfil deve vir do banco de dados-->
+                
+                    <img id="profileDisplayImage" src="/frontend/image/Karina.jpg">
                 </div>
-                <!-- capa do perfil deve vir do banco de dados-->
                 <img src="/frontend/image/NINGNING_IS_THE_MAKNAE.jpg">
             </div>
 
             <div class="perfil">
 
                 <div class="usuarioinfo">
-                    <!-- Nome e localização tem que vir do banco de dados-->
                     <h2>Katarina das Neves</h2>
                     <div class="localizacao">
-                        <!--icone de localização-->
-                        <i class="bi bi-geo-alt-fill"></i>Curitiba, PR 
-                        <i class="bi bi-whatsapp"></i>
-                        <i class="bi bi-envelope-fill"></i>
+                        <i class="bi bi-geo-alt-fill"></i>Curitiba, PR
+                        
+                      
+                        <a href="#" id="whatsappLink" target="_blank" class="social-link"><i class="bi bi-whatsapp"></i></a>
+                        <a href="mailto:exemplo@email.com" id="emailLink" class="social-link"><i class="bi bi-envelope-fill"></i></a>
                     </div>
                 </div>
 
                 <div class="botaoeditarperfil">
                     <button onclick="abrirEditModal()" id="editbtn">EDITAR PERFIL</button>
-                    <button id="bntlogout">SAIR       <i class="bi bi-box-arrow-right"></i></button>
+                    <button id="bntlogout" class="logout-btn">SAIR <i class="bi bi-box-arrow-right"></i></button>
                 </div>
             </div>
         </header>
@@ -60,99 +60,132 @@
 
     </div>
 
-    <!-- modal editar perfil -->
-        <div id="editmodal" class="modal">
-            <div class="modalcontent">
-                <span class="fechar" id="fechareditmodal1">&times;</span>
-                <h2>Editar Perfil</h2>
+    <!-- Modal Editar Perfil -->
+    <div id="editmodal" class="modal">
+        <div class="modalcontent">
+            <span class="fechar" id="fechareditmodal1">&times;</span>
+            <h2>Editar Perfil</h2>
 
-                <form class="editProfileForm">
-                    <!-- Linha superior -->
-                    <div class="edit-top">
-                        <div class="profile-pic">
-                            <img id="previewImage" src="/frontend/image/Karina.jpg" alt="Foto de perfil">
-                            <input type="file" id="image" name="image" accept="image/*">
-                            <div id="fotoContainer"></div>
-                        </div>
-
-                        <div class="info-principal">
-                            <div class="campo">
-                                <label for="name">Nome Completo:</label>
-                                <input type="text" id="name" name="name" placeholder="Seu nome completo" required>
-                            </div>
-
-                            <div class="campo">
-                                <label for="number">Telefone de contato:</label>
-                                <input type="text" id="number" name="number" placeholder="(00) 0 0000-0000" required>
-                            </div>
-                        </div>
+            <form class="editProfileForm">
+                <div class="edit-top">
+                    <div class="profile-pic">
+                  
+                        <img id="previewImage" src="/frontend/image/Karina.jpg" alt="Foto de perfil">
+                   
+                        <input type="file" id="profileImageInput" name="image" accept="image/*">
+                       
+                        <label for="profileImageInput">Mudar Foto</label> 
                     </div>
 
-                    <!-- Linha inferior -->
-                    <div class="edit-bottom">
+                    <div class="info-principal">
                         <div class="campo">
-                            <label for="email">E-mail para contato:</label>
-                            <input type="email" id="email" name="email" placeholder="seuemail@gmail.com" required>
+                            <label for="name">Nome Completo:</label>
+                            <input type="text" id="name" name="name" placeholder="Seu nome completo" required>
                         </div>
 
-                        <div class="localizacao">
-                            <div class="campo">
-                                <label for="cidade">Cidade:</label>
-                                <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
-                            </div>
+                        <div class="campo">
+                            <label for="number">Telefone de contato:</label>
+                            <input type="text" id="number" name="number" placeholder="(00) 0 0000-0000" required>
+                        </div>
 
-                            <div class="campo">
-                                <label for="estado">Estado:</label>
-                                <input type="text" id="estado" name="estado" placeholder="Estado" required>
-                            </div>
+                        <div class="campo">
+                            <label for="whatsapp_link">Link do WhatsApp (opcional):</label>
+                            <input type="url" id="whatsapp_link" name="whatsapp_link" placeholder="Ex: https://wa.me/5541999999999">
                         </div>
                     </div>
+                </div>
 
-                    <button id="btnsalvar" type="submit">Salvar Alterações</button>
-                </form>
-            </div>
+                <div class="edit-bottom">
+                    <div class="campo">
+                        <label for="email">E-mail para contato:</label>
+                        <input type="email" id="email" name="email" placeholder="seuemail@gmail.com" required>
+                    </div>
+
+                    <div class="localizacao-detalhada">
+                        <div class="campo campo-cep">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" required>
+                        </div>
+                        <div class="campo">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="estado">Estado:</label>
+                            <input type="text" id="estado" name="estado" placeholder="Estado" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btnsalvar" type="submit">Salvar Alterações</button>
+            </form>
         </div>
+    </div>
 
-    <!-- ===== Modal Criar Anúncio ===== -->
-        <div id="modaladdanuncio" class="modal">
-            <div class="modalcontent">
-                <span class="fechar" id="fechareditmodal2">&times;</span>
-                <h2>Adicionar Anúncio</h2>
+    <div id="modaladdanuncio" class="modal">
+        <div class="modalcontent">
+            <span class="fechar" id="fechareditmodal2">&times;</span>
+            <h2>Adicionar Anúncio</h2>
 
-                <form id="addAnuncioForm">
-                <!-- ====== IMAGEM ====== -->
-                <div class="form-section imagem-section">
-                    <label for="imagem"><h4>Imagens do Anúncio:</h4></label>
-                    <input type="file" id="imagem" name="imagem" accept="image/*" multiple required>
-                    <div id="previewImagens"></div>
+            <form id="addAnuncioForm">
+            <div class="form-section imagem-section">
+                <label for="imagem"><h4>Imagens do Anúncio:</h4></label>
+             
+                <input type="file" id="imagemInput" name="imagem" accept="image/*" multiple required>
+            
+                <div id="previewImagens"></div>
+            </div>
+
+            <div class="form-section preco-tipo">
+                <div class="campo-preco">
+                <label for="preco"><h4>Preço:</h4></label>
+                <div class="valores">
+                    <input type="number" id="preco" name="preco" placeholder="Ex: 1500" required>
+                    <div class="radio-group">
+                    <input type="radio" id="dia" name="periodo" value="diaria">
+                    <label for="dia">Diária</label>
+                    <input type="radio" id="mes" name="periodo" value="mensal">
+                    <label for="mes">Mensal</label>
+                    </div>
+                </div>
                 </div>
 
-                <!-- ====== PREÇO E TIPO ====== -->
-                <div class="form-section preco-tipo">
-                    <div class="campo-preco">
-                    <label for="preco"><h4>Preço:</h4></label>
-                    <div class="valores">
-                        <input type="number" id="preco" name="preco" placeholder="Ex: 1500" required>
-                        <div class="radio-group">
-                        <input type="radio" id="dia" name="periodo" value="diaria">
-                        <label for="dia">Diária</label>
-                        <input type="radio" id="mes" name="periodo" value="mensal">
-                        <label for="mes">Mensal</label>
+                
+                
+                    <div class="localizacao-detalhada">
+                        <div class="campo campo-cep">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" required>
+                        </div>
+                        <div class="campo">
+                            <label for="rua">Rua:</label>
+                            <input type="text" id="rua" name="rua" placeholder="Rua" required>
+                        </div>
+                        <div class="campo campo-numero">
+                            <label for="numero">Número:</label>
+                            <input type="text" id="numero" name="numero" placeholder="Nº" required>
+                        </div>
+                        <div class="campo">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" placeholder="Bairro" required>
+                        </div>
+                        <div class="campo">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+                        </div>
+
+                        <div class="campo">
+                            <label for="estado">Estado:</label>
+                            <input type="text" id="estado" name="estado" placeholder="Estado" required>
                         </div>
                     </div>
-                    </div>
+            </div>
 
-                    <div class="campo-local">
-                    <label for="local"><h4>Localização:</h4></label>
-                    <input type="text" id="local" name="local" placeholder="Cidade ou bairro">
-                    </div>
-                </div>
-
-                <!-- ====== TIPO DE LOCAL E ANÚNCIO ====== -->
-                <div class="form-section tipo-anuncio">
-                    <div>
-                    <label for="tipolocal_select">Tipo de Local:</label>
-                    <select id="tipolocal_select" name="tipolocal" required>
+            <div class="form-section tipo-anuncio">
+                <div>
+                <label for="tipolocal_select">Tipo de Local:</label>
+                <select id="tipolocal_select" name="tipolocal" required>
                             <option value="" disabled selected>Selecione o tipo de local</option>
                             <option value="Terreno/Lote">Terreno/Lote</option>
                             <option value="Apartamento">Apartamento</option>
@@ -168,70 +201,71 @@
                             <option value="Galpão/Depósito/Armazém">Galpão/Depósito/Armazém</option>
                             <option value="Sala/Conjunto">Sala/Conjunto</option>
                             <option value="Ponto Comercial/Loja/Box">Ponto Comercial/Loja/Box</option>
-                    </select>
-                    </div>
-
-                    <div>
-                    <label for="tipoanuncio_select">Tipo de Anúncio:</label>
-                    <select id="tipoanuncio_select" name="tipoanuncio" required>
-                        <option value="" disabled selected>Selecione o tipo de anúncio</option>
-                        <option value="Venda">Venda</option>
-                        <option value="Aluguel">Aluguel</option>
-                    </select>
-                    </div>
+                </select>
                 </div>
 
-                <!-- ====== QUARTOS / BANHEIROS / VAGAS ====== -->
-                <div class="form-section quantidades">
-                    <div>
-                    <label>Quartos</label>
-                    <div class="btn-group">
-                        <input type="radio" id="q1" name="quartos" value="1"><label for="q1">1</label>
-                        <input type="radio" id="q2" name="quartos" value="2"><label for="q2">2</label>
-                        <input type="radio" id="q3" name="quartos" value="3"><label for="q3">3</label>
-                        <input type="radio" id="q4" name="quartos" value="4+"><label for="q4">4+</label>
-                    </div>
-                    </div>
-
-                    <div>
-                    <label>Banheiros</label>
-                    <div class="btn-group">
-                        <input type="radio" id="b1" name="banheiros" value="1"><label for="b1">1</label>
-                        <input type="radio" id="b2" name="banheiros" value="2"><label for="b2">2</label>
-                        <input type="radio" id="b3" name="banheiros" value="3"><label for="b3">3</label>
-                        <input type="radio" id="b4" name="banheiros" value="4+"><label for="b4">4+</label>
-                    </div>
-                    </div>
-
-                    <div>
-                    <label>Vagas</label>
-                    <div class="btn-group">
-                        <input type="radio" id="v1" name="vagas" value="1"><label for="v1">1</label>
-                        <input type="radio" id="v2" name="vagas" value="2"><label for="v2">2</label>
-                        <input type="radio" id="v3" name="vagas" value="3"><label for="v3">3</label>
-                        <input type="radio" id="v4" name="vagas" value="4+"><label for="v4">4+</label>
-                    </div>
-                    </div>
+                <div>
+                <label for="tipoanuncio_select">Tipo de Anúncio:</label>
+                <select id="tipoanuncio_select" name="tipoanuncio" required>
+                    <option value="" disabled selected>Selecione o tipo de anúncio</option>
+                    <option value="Venda">Venda</option>
+                    <option value="Aluguel">Aluguel</option>
+                </select>
                 </div>
-
-                <!-- ====== COMODIDADES ====== -->
-                <div class="form-section comodidades">
-                    <h3>O que seu local oferece:</h3>
-                    <div class="seletor-container">
-                    <label><input type="checkbox" name="comodidades" value="Mobiliado"> Mobiliado</label>
-                    <label><input type="checkbox" name="comodidades" value="Piscina"> Piscina</label>
-                    <label><input type="checkbox" name="comodidades" value="Garagem"> Garagem</label>
-                    <label><input type="checkbox" name="comodidades" value="Área Gourmet"> Área Gourmet</label>
-                    <label><input type="checkbox" name="comodidades" value="Ar Condicionado"> Ar Condicionado</label>
-                    <label><input type="checkbox" name="comodidades" value="Wi-Fi"> Wi-Fi</label>                    <label><input type="checkbox" name="comodidades" value="Academia"> Academia</label>
-                    </div>
-                </div>
-
-                <!-- ====== BOTÃO PUBLICAR ====== -->
-                <button id="btnsalvar" type="submit">Publicar</button>
-                </form>
             </div>
+
+         
+            <div class="form-section quantidades">
+                <div>
+                <label>Quartos</label>
+                <div class="btn-group">
+                    <input type="radio" id="q0" name="quartos" value="0"><label for="q0">0</label>
+                    <input type="radio" id="q1" name="quartos" value="1"><label for="q1">1</label>
+                    <input type="radio" id="q2" name="quartos" value="2"><label for="q2">2</label>
+                    <input type="radio" id="q3" name="quartos" value="3"><label for="q3">3</label>
+                    <input type="radio" id="q4" name="quartos" value="4+"><label for="q4">4+</label>
+                </div>
+                </div>
+
+                <div>
+                <label>Banheiros</label>
+                <div class="btn-group">
+                    <input type="radio" id="b0" name="banheiros" value="0"><label for="b0">0</label>
+                    <input type="radio" id="b1" name="banheiros" value="1"><label for="b1">1</label>
+                    <input type="radio" id="b2" name="banheiros" value="2"><label for="b2">2</label>
+                    <input type="radio" id="b3" name="banheiros" value="3"><label for="b3">3</label>
+                    <input type="radio" id="b4" name="banheiros" value="4+"><label for="b4">4+</label>
+                </div>
+                </div>
+
+                <div>
+                <label>Vagas</label>
+                <div class="btn-group">
+                    <input type="radio" id="v0" name="vagas" value="0"><label for="v0">0</label>
+                    <input type="radio" id="v1" name="vagas" value="1"><label for="v1">1</label>
+                    <input type="radio" id="v2" name="vagas" value="2"><label for="v2">2</label>
+                    <input type="radio" id="v3" name="vagas" value="3"><label for="v3">3</label>
+                    <input type="radio" id="v4" name="vagas" value="4+"><label for="v4">4+</label>
+                </div>
+                </div>
+            </div>
+
+            <div class="form-section comodidades">
+                <h3>O que seu local oferece:</h3>
+                <div class="seletor-container">
+                <label><input type="checkbox" name="comodidades" value="Mobiliado"> Mobiliado</label>
+                <label><input type="checkbox" name="comodidades" value="Piscina"> Piscina</label>
+                <label><input type="checkbox" name="comodidades" value="Garagem"> Garagem</label>
+                <label><input type="checkbox" name="comodidades" value="Área Gourmet"> Área Gourmet</label>
+                <label><input type="checkbox" name="comodidades" value="Ar Condicionado"> Ar Condicionado</label>
+                <label><input type="checkbox" name="comodidades" value="Wi-Fi"> Wi-Fi</label>                   <label><input type="checkbox" name="comodidades" value="Academia"> Academia</label>
+                </div>
+            </div>
+
+            <button id="btnsalvar" type="submit">Publicar</button>
+            </form>
         </div>
+    </div>
 
     <script src="/frontend/js/painel.js"></script>
 </body>
