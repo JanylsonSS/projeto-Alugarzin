@@ -1,0 +1,392 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 5px;
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    min-height: 90vh;
+    background-attachment: fixed;
+    line-height: 1.6;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url(/image/ideia.png);
+
+
+}
+
+/* =================================
+Cabeçalho
+================================= */
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    position: static;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    margin-bottom: 60px;
+}
+
+.header-left button,
+.header-right {
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+
+.btn-login {
+    background-color: #ff751f;
+    color: white;
+    border-color: #ff751f;
+}
+.btn-login:hover {
+    background-color: #e65c00;
+}
+
+.btn-criar-conta {
+    background-color: #430097;
+    color: #ffffff;
+    border-color: #430097;
+}
+.btn-criar-conta:hover {
+    background-color: #320075;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 20px;
+    font-weight: 600;
+}
+.header-right :hover {
+    color: #ff751f;
+}
+
+
+/* =================================
+Conteúdo Principal
+================================= */
+
+.main-content-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 5%;
+    gap: 30px;
+}
+
+/* =================================
+Caixa de Busca
+================================= */
+.search-box-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 3px solid transparent;
+    border-radius: 10px;
+    height: 400px;
+    box-shadow: 0 7px 8px rgba(0, 0, 0, 0.382);
+
+}
+
+.form {
+    margin-top: 55px;
+}
+
+#form {
+
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+
+.search-title {
+    color: #430097;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    line-height: 1.2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.search-title .sonhos {
+    color: #ff751f;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.search-form input {
+
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 16px;
+}
+.btn-buscar {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, #ff751f, #430097, #ff751f, #430097);
+    background-size: 300% 100%;
+    background-position: 0%;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.btn-buscar:hover {
+    animation: moveRight 2s linear infinite;
+    transform: scale(1.04);
+}
+
+@keyframes moveRight {
+    from {
+        background-position: 0%;
+    }
+    to {
+        background-position: 100%;
+    }
+}
+
+
+
+/* =================================
+Rodapé
+================================= */
+
+.footer-container {
+    background: linear-gradient(to right, #ff751f, #430097);
+    color: rgb(255, 255, 255);
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.footer-links a {
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    margin-right: 20px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.app-stores button {
+    border: none;
+    padding: 8px 15px;
+    margin-left: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.fa-brands {
+    color: white;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* =================================
+CARROSSEL E BANNERS
+================================= */
+.carrossel {
+    margin-top: 5px;
+    width: 65vw; 
+    max-width: 1000px;
+    height: auto;
+    overflow: hidden;
+    margin: 5px;
+    aspect-ratio: 1000 / 550; 
+}
+
+.slides {
+    display: flex;
+    width: 200%; 
+    animation: desliza 8s infinite;
+}
+
+.slide {
+    width: 50%;
+    height: 100%; 
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+@keyframes desliza {
+    /* ATUALIZADO: Usando porcentagem em vez de pixels */
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(0); }
+    50%  { transform: translateX(-50%); } /* Move para o segundo slide (metade da largura total) */
+    90%  { transform: translateX(-50%); } 
+    100% { transform: translateX(0); }
+}
+
+/* =================================
+Responsividade Header
+================================= */
+@media (max-width: 1200px) {
+    .header-center img {
+        width: 300px;
+    }
+    
+    .main-content-container {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .search-box-container {
+        width: 100%;
+        padding: 25px;
+    }
+
+    .search-title {
+        font-size: 22px;
+    }
+
+    .btn-buscar {
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .carrossel {
+        width: 100%;
+        aspect-ratio: auto;
+    }
+
+    .form {
+        margin-top: 20px;
+        width: 50%;
+        display: flex;
+        justify-content: flex-end;
+        transform: translateX(-20px);
+    }
+}
+
+
+/* =============================== */
+/* Para telas menores que 900px    */
+/* Formulário acima do carrossel   */
+/* =============================== */
+@media (max-width: 900px) {
+
+    .main-content-container {
+        flex-direction: column; /* FORM ↑ CARROSSEL ↓ */
+        align-items: center;
+        gap: 40px;
+    }
+
+    .form {
+        width: 80%;
+        transform: translateX(0); /* remove deslocamento */
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .search-box-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .carrossel {
+        width: 90%;
+    }
+}
+
+
+/* =============================== */
+/* Para telas menores que 600px    */
+/* Mobile                          */
+/* =============================== */
+@media (max-width: 600px) {
+
+    .form {
+        width: 70%;
+        margin-top: 0;
+
+    }
+
+    .search-box-container {
+        padding: 15px; 
+
+    }
+
+    .search-title {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .search-form input,
+    .search-form select {
+        font-size: 16px;
+    }
+
+    .btn-buscar {
+        width: 100%;
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    .carrossel {
+        width: 100%;
+    }
+
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* aumenta a distância entre os botões */
+    }
+
+    body {
+        padding-bottom: 120px; /* altura do rodapé */
+    }
+
+}
