@@ -16,6 +16,16 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+
+    margin: 5px;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    min-height: 90vh;
+    line-height: 1.6;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /* ======== NAVBAR ======== */
@@ -43,26 +53,45 @@ body {
     align-items: center;
     gap: 15px;
 }
+
 .menu a {
     text-decoration: none;
     color: #333;
-    font-weight: 500;
+    font-weight: 600;
 }
+
+.menu a:hover {
+    color: #ff751f;
+}
+
 .btn {
-  border: none;
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 10px;
 }
+
 .login {
-  background: #ff8c00;
-  color: white;
+    background-color: #ff751f;
+    color: white;
+    border-color: #ff751f;
 }
+
+.login:hover {
+    background-color: #e65c00;
+}
+
 .criar {
-  background: #6f42c1;
-  color: white;
+    background-color: #430097;
+    color: #ffffff;
+    border-color: #430097;
 }
+
+.criar:hover {
+    background-color: #320075;
+}
+
 .menu-toggle {
   display: none;
   background: none;
@@ -122,10 +151,11 @@ body {
   border-radius: 6px;
 }
 .aplicar {
-  background: #6f42c1;
-  color: white;
-  width: 100%;
-  margin-top: 15px;
+    background-color: #430097;
+    color: #ffffff;
+    border-color: #430097;
+    width: 100%;
+    margin-top: 15px;
 }
 
 /* ======== LISTAGEM ======== */
@@ -187,11 +217,11 @@ body {
 
 .card-content h4 {
   margin: 0;
-  color: #222;
+  color: #000000;
 }
 .card-content p {
   margin: 5px 0;
-  color: #666;
+  color: #000000;
 }
 .card-footer {
   display: flex;
