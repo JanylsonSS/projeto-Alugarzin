@@ -1,6 +1,5 @@
 import { protectRoute, secureLogout } from './auth-guard.js';
 
-
 document.addEventListener('DOMContentLoaded', () => {
   protectRoute();
 
@@ -30,9 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== LOGIN =====
   loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nome = loginForm.querySelector('#loginNomeCompleto').value.trim();
+    
+    // CORRIGIDO: Removido a busca por #loginNomeCompleto que não existe
     const email = loginForm.querySelector('#loginEmail').value.trim();
     const password = loginForm.querySelector('#loginPassword').value.trim();
+    
     if (!email || !password) return showMessage('Preencha todos os campos.');
 
     try {
@@ -45,9 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       showMessage('Login realizado com sucesso!', 'success');
-      window.location.href = '/frontend/index.html';
+      
+      // Redirecionar após 1 segundo
+      setTimeout(() => {
+        window.location.href = '/frontend/index.html';
+      }, 1000);
+      
     } catch (error) {
-      const msg = error.response?.data?.message || 'Falha ao fazer login.';
+      console.error('Erro no login:', error);
+      const msg = error.response?.data?.erro || error.response?.data?.message || 'Falha ao fazer login.';
       showMessage(msg, 'error');
     }
   });
@@ -63,11 +70,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (senha.length < 6) return showMessage('A senha deve ter pelo menos 6 caracteres.');
 
     try {
-      await axios.post('http://localhost:3000/api/usuarios', { nome, email, senha });
+      const response = await axios.post('http://localhost:3000/api/usuarios', { nome, email, senha });
       showMessage('Conta criada com sucesso! Faça login.', 'success');
-      mostrarform('login');
+      
+      // Limpar formulário
+      cadastroForm.reset();
+      
+      // Mudar para tela de login após 2 segundos
+      setTimeout(() => {
+        mostrarform('login');
+      }, 2000);
+      
     } catch (error) {
-      const msg = error.response?.data?.message || 'Erro ao criar conta.';
+      console.error('Erro no cadastro:', error);
+      const msg = error.response?.data?.erro || error.response?.data?.message || 'Erro ao criar conta.';
       showMessage(msg, 'error');
     }
   });
@@ -79,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   fecharModal?.addEventListener('click', () => esqueceuSenhaModal.style.display = 'none');
+  
   window.addEventListener('click', e => {
     if (e.target === esqueceuSenhaModal) esqueceuSenhaModal.style.display = 'none';
   });
@@ -89,12 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!email) return showMessage('Informe seu e-mail.', 'error', modalMessageBox);
 
     try {
-      await axios.post('/api/esqueceu-senha', { email });
+      await axios.post('http://localhost:3000/api/esqueceu-senha', { email });
       showMessage('Instruções enviadas para seu e-mail.', 'success', modalMessageBox);
       esqueceuSenhaForm.reset();
       esqueceuSenhaModal.style.display = 'none';
     } catch (error) {
-      const msg = error.response?.data?.message || 'Erro ao enviar solicitação.';
+      const msg = error.response?.data?.erro || error.response?.data?.message || 'Erro ao enviar solicitação.';
       showMessage(msg, 'error', modalMessageBox);
     }
   });
@@ -108,6 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
     cadastroForm.classList.toggle('active', tipo === 'criarconta');
     loginBtn.classList.toggle('buttonativo', tipo === 'login');
     criarBtn.classList.toggle('buttonativo', tipo === 'criarconta');
+    
+    // Limpar mensagens ao trocar
+    messageBox.style.display = 'none';
   };
 
   document.getElementById('linkToSignup')?.addEventListener('click', e => {
@@ -124,20 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
   mostrarform('login');
 });
 
-    // === Alternar visibilidade da senha ===
-    document.querySelectorAll('.password .toggle-password').forEach(icon => {
-        icon.addEventListener('click', () => {
-            const passwordField = icon.previousElementSibling;
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    });
-
-    
+// === Alternar visibilidade da senha ===
+document.querySelectorAll('.password .toggle-password').forEach(icon => {
+  icon.addEventListener('click', () => {
+    const passwordField = icon.previousElementSibling;
+    if (passwordField.type === 'password') {
+      passwordField.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      passwordField.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  });
+});
