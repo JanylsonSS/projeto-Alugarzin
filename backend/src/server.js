@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 // ========================================
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api", imovelRoutes);
-// app.use('/api', authRoutes);
+app.use('/api', authRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {

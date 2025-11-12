@@ -22,7 +22,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url(/image/ideia.png);
+    background-image: url(/frontend/image/Fundo.png);
 
 
 }
@@ -107,13 +107,13 @@ Caixa de Busca
         linear-gradient(to right, #ff751f, #430097) border-box;
     border: 3px solid transparent;
     border-radius: 10px;
-    height: 400px;
+    height: 488px;
     box-shadow: 0 7px 8px rgba(0, 0, 0, 0.382);
 
 }
 
 .form {
-    margin-top: 55px;
+    margin-top: 11px;
 }
 
 #form {
