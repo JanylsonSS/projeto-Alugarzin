@@ -121,8 +121,8 @@ async function carregarImoveis(filtros = {}) {
         <div class="card-footer">
           <span class="preco">R$ ${imovel.preco.toLocaleString("pt-BR")}${imovel.forma === "ALUGAR" ? ",00 / mês" : ""}</span>
           <div class="icones">
-            <i class="bi bi-whatsapp text-success"></i>
-            <i class="bi bi-bookmark text-warning"></i>
+            <i class="bi bi-whatsapp title="Contato WhatsApp" text-success"></i>
+            <i class="bi bi-bookmark title="Salvar nos favoritos" text-warning"></i>
           </div>
         </div>
       </div>
@@ -156,3 +156,81 @@ window.addEventListener("scroll", () => {
 
   ultimaPosicaoScroll = posicaoAtual;
 });
+
+// --- Redirecionamento dos botões ALUGAR e COMPRAR do cabeçalho ---
+document.querySelectorAll('nav a').forEach(link => {
+  if (link.textContent.trim().toUpperCase() === "ALUGAR") {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "/frontend/imoveis.html?forma=ALUGAR";
+    });
+  }
+
+  if (link.textContent.trim().toUpperCase() === "COMPRAR") {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "/frontend/imoveis.html?forma=COMPRAR";
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById("modal-login");
+  const closeModal = document.querySelector(".modal-close");
+
+  // Simula se o usuário está logado
+  const usuarioLogado = false; // Alterar para true se o back identificar sessão ativa
+
+  // Evento global para ícones de WhatsApp e Favoritos
+  document.body.addEventListener("click", function (e) {
+    // --- ÍCONE WHATSAPP ---
+    if (e.target.classList.contains("bi-whatsapp")) {
+      const numero = e.target.dataset.whatsapp || "5599999999999"; // Substituir pelo número real do anunciante (do back)
+      window.open(`https://wa.me/${numero}`, "_blank");
+    }
+
+    // --- ÍCONE FAVORITOS ---
+    if (e.target.classList.contains("bi-bookmark")) {
+      if (usuarioLogado) {
+        e.target.classList.toggle("favorito-ativo");
+        // Aqui o back deve salvar/remover o imóvel dos favoritos
+        console.log("Imóvel favoritado/desfavoritado (simulação)");
+      } else {
+        modal.style.display = "flex"; // abre o modal
+      }
+    }
+  });
+
+  // Fecha o modal
+  closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // Fecha clicando fora
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+});
+
+// --- BUSCA POR CIDADE, BAIRRO OU TIPO DE IMÓVEL ---
+const searchInput = document.getElementById("search-input");
+
+// Função que filtra os imóveis com base no texto digitado
+searchInput.addEventListener("input", () => {
+  const termo = searchInput.value.toLowerCase().trim();
+  const cards = document.querySelectorAll(".imovel-card");
+
+  cards.forEach(card => {
+    const titulo = card.querySelector("h4")?.textContent.toLowerCase() || "";
+    const localizacao = card.querySelector(".localizacao")?.textContent.toLowerCase() || "";
+    const tipo = card.dataset.tipo?.toLowerCase() || ""; // tipo armazenado no dataset
+
+    // Verifica se o termo aparece em alguma das informações
+    if (titulo.includes(termo) || localizacao.includes(termo) || tipo.includes(termo)) {
+      card.style.display = "flex";
+    } else {
+      card.style.display = "none";
+    }
+  });
+});
+

@@ -73,3 +73,21 @@ document.addEventListener("DOMContentLoaded", function() {
     window.location.href = `/frontend/imoveis.html?${params.toString()}`;
   });
 });
+
+// --- Redirecionamento dos botões ALUGAR e COMPRAR do cabeçalho ---
+document.querySelectorAll('nav a').forEach(link => {
+  if (link.textContent.trim().toUpperCase() === "ALUGAR") {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "/frontend/imoveis.html?forma=ALUGAR";
+    });
+  }
+
+  if (link.textContent.trim().toUpperCase() === "COMPRAR") {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "/frontend/imoveis.html?forma=COMPRAR";
+    });
+  }
+});
+
