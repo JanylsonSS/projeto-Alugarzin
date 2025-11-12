@@ -336,3 +336,46 @@ body {
     display: block;
   }
 }
+
+.filter-buttons button.active {
+    background-color: #430097; /* Roxo */
+    color: white;
+    border-color: #430097;
+    font-weight: bold;
+}
+
+.bi-bookmark-fill.favorito-ativo {
+    color: red !important;
+}
+
+.sem-resultados {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1rem;
+    color: #430097;
+}
+
+@media (max-width: 992px) {
+    .main-container {
+        flex-direction: column;
+        margin-left: 0;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static; 
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      
+    }
+    .imovel-card {
+        flex-direction: column;
+    }
+    .imovel-card img {
+        width: 100%;
+        height: 200px;
+    }
+    .listagem {
+        padding: 20px;
+    }
+}
