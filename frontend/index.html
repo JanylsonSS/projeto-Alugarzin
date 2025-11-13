@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Alugarzin </title>
-    <link rel="stylesheet" href="css/index.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    </head>
+    <title>Alugarzin</title>
+    <link rel="stylesheet" href="/frontend/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon">
+</head>
 <body>
 
     <header class="header-container">
         <div class="header-left">
-            <a href=""><button class="btn-login">LOGIN</button></a>
-            <a href="#"><button class="btn-criar-conta">CRIAR CONTA</button></a>
+            <a href="/frontend/login.html"><button class="btn-login">LOGIN</button></a>
+            <a href="/frontend/login.html"><button class="btn-criar-conta">CRIAR CONTA</button></a>
         </div>
         <div class="header-center">
-            <img src="/image/ARTE.png" width="400px">
+            <a href="/frontend/index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" width="400px"></a>
         </div>
         <div class="header-right">
             <nav class="nav-links">
-                <a href="#">ALUGAR</a>
-                <a href="#">COMPRAR</a>
+                <a href="/frontend/imoveis.html">ALUGAR</a>
+                <a href="/frontend/imoveis.html">COMPRAR</a>
                 <a href="#" class="help-icon"><i class="fa-sharp fa-solid fa-question"></i></a>
             </nav>
         </div>
@@ -32,13 +33,69 @@
         <div class="form">
         <section class="search-box-container">
             <h2 class="search-title">ONDE SEUS <span class="sonhos">SONHOS</span> COMEÇAM?</h2>
-            <form class="search-form">
-                <input type="text" placeholder="ONDE">
-                <input type="text" placeholder="TIPO DE IMÓVEL">
-                <select id="form" >
-                    <option value="COMPRAR">COMPRAR</option>
-                    <option value="ALUGAR">ALUGAR</option>
-                </select>
+            <form id="searchForm" class="search-form">
+                <!-- Campo Estado -->
+                <input list="lista-estados" id="estado" placeholder="ESTADO" required>
+                <datalist id="lista-estados">
+                    <option value="AC">Acre (AC)</option>
+                    <option value="AL">Alagoas (AL)</option>
+                    <option value="AP">Amapá (AP)</option>
+                    <option value="AM">Amazonas (AM)</option>
+                    <option value="BA">Bahia (BA)</option>
+                    <option value="CE">Ceará (CE)</option>
+                    <option value="DF">Distrito Federal (DF)</option>
+                    <option value="ES">Espírito Santo (ES)</option>
+                    <option value="GO">Goiás (GO)</option>
+                    <option value="MA">Maranhão (MA)</option>
+                    <option value="MT">Mato Grosso (MT)</option>
+                    <option value="MS">Mato Grosso do Sul (MS)</option>
+                    <option value="MG">Minas Gerais (MG)</option>
+                    <option value="PA">Pará (PA)</option>
+                    <option value="PB">Paraíba (PB)</option>
+                    <option value="PR">Paraná (PR)</option>
+                    <option value="PE">Pernambuco (PE)</option>
+                    <option value="PI">Piauí (PI)</option>
+                    <option value="RJ">Rio de Janeiro (RJ)</option>
+                    <option value="RN">Rio Grande do Norte (RN)</option>
+                    <option value="RS">Rio Grande do Sul (RS)</option>
+                    <option value="RO">Rondônia (RO)</option>
+                    <option value="RR">Roraima (RR)</option>
+                    <option value="SC">Santa Catarina (SC)</option>
+                    <option value="SP">São Paulo (SP)</option>
+                    <option value="SE">Sergipe (SE)</option>
+                    <option value="TO">Tocantins (TO)</option>
+                </datalist>
+
+                <!-- Campo Cidade -->
+                <input list="lista-cidades" id="cidade" placeholder="CIDADE" disabled required>
+                <datalist id="lista-cidades">
+                    <!-- opções geradas via JS -->
+                </datalist>
+
+                <input list="lista-tipo" id="tipo" placeholder="TIPO DE IMÓVEL">
+                <datalist id="lista-tipo">
+                    <option value="Casa">
+                    <option value="Apartamento">
+                    <option value="Kitnet">
+                    <option value="Cobertura">
+                    <option value="Studio">
+                    <option value="Loft">
+                    <option value="Sobrado">
+                    <option value="Chácara">
+                    <option value="Sítio">
+                    <option value="Fazenda">
+                    <option value="Terreno">
+                    <option value="Galpão">
+                    <option value="Sala Comercial">
+                    <option value="Ponto Comercial">
+                    <option value="Flat">
+                </datalist>
+                
+                <input list="lista-form" id="form" placeholder="FORMA">
+                <datalist id="lista-form">
+                    <option value="COMPRAR">
+                    <option value="ALUGAR">
+                </datalist>
                 <button type="submit" class="btn-buscar">BUSCAR</button>
             </form>
         </section>
@@ -47,8 +104,8 @@
   <div class="carrossel">
     <div class="slides">
 
-      <img src="image/4.png" alt="Imagem 1" class="slide">
-      <img src="image/5.png" alt="Imagem 2" class="slide">
+      <img src="/frontend/image/4.png" alt="Imagem 1" class="slide">
+      <img src="/frontend/image/5.png" alt="Imagem 2" class="slide">
      
 
     </div>
@@ -72,5 +129,5 @@
     </footer>
 
 </body>
-<script src="index.js"></script>
+<script src="/frontend/js/index.js"></script>
 </html>

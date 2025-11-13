@@ -11,21 +11,21 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
     />
 
-    <link rel="stylesheet" href="css/imoveis.css"/>
-    <link rel="shortcut icon" href="/image/ARTE_2.png" type="image/x-icon">
+    <link rel="stylesheet" href="/frontend/css/imoveis.css"/>
+    <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon">
 </head>
 <body>
     <!-- HEADER -->
     <header class="navbar">
         <div class="logo">
-        <img src="/image/ARTE.png" alt="Logo Alugarzin" />
+        <a href="/frontend/index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" alt="Logo Alugarzin" /></a>
         </div>
 
         <nav class="menu">
-        <a href="#">ALUGAR</a>
-        <a href="#">COMPRAR</a>
-        <button class="btn login">LOGIN</button>
-        <button class="btn criar">CRIAR CONTA</button>
+        <a href="/frontend/imoveis.html">ALUGAR</a>
+        <a href="/frontend/imoveis.html">COMPRAR</a>
+        <a href="/frontend/login.html"><button class="btn login">LOGIN</button></a>
+        <a href="/frontend/login.html"><button class="btn criar">CRIAR CONTA</button></a>
         </nav>
 
         <button class="menu-toggle"><i class="bi bi-list"></i></button>
@@ -35,42 +35,59 @@
     <main class="main-container">
         <!-- SIDEBAR FILTROS -->
         <aside class="sidebar">
-        <h3>Tipo de imóvel</h3>
-        <label><input type="checkbox" /> Apartamento</label>
-        <label><input type="checkbox" /> Casa</label>
-        <label><input type="checkbox" /> Kitnet/Conjugado</label>
+            <h3>Tipo de imóvel</h3>
+            <label><input type="checkbox" /> Apartamento</label>
+            <label><input type="checkbox" /> Casa</label>
+            <label><input type="checkbox" /> Kitnet/Conjugado</label>
+            <label><input type="checkbox" /> Cobertura</label>
+            <label><input type="checkbox" /> Terreno</label>
 
-        <h3>Quartos</h3>
-        <div class="filter-buttons">
-            <button>1+</button>
-            <button>2+</button>
-            <button>3+</button>
-            <button>4+</button>
-        </div>
+            <h3>Quartos</h3>
+            <div class="filter-buttons">
+                <button>1+</button>
+                <button>2+</button>
+                <button>3+</button>
+                <button>4+</button>
+            </div>
 
-        <h3>Banheiros</h3>
-        <div class="filter-buttons">
-            <button>1+</button>
-            <button>2+</button>
-            <button>3+</button>
-            <button>4+</button>
-        </div>
+            <h3>Banheiros</h3>
+            <div class="filter-buttons">
+                <button>1+</button>
+                <button>2+</button>
+                <button>3+</button>
+                <button>4+</button>
+            </div>
 
-        <h3>Vagas</h3>
-        <div class="filter-buttons">
-            <button>1+</button>
-            <button>2+</button>
-            <button>3+</button>
-            <button>4+</button>
-        </div>
+            <h3>Vagas</h3>
+            <div class="filter-buttons">
+                <button>1+</button>
+                <button>2+</button>
+                <button>3+</button>
+                <button>4+</button>
+            </div>
 
-        <h3>Preço</h3>
-        <div class="price-inputs">
-            <input type="number" placeholder="Mínimo" />
-            <input type="number" placeholder="Máximo" />
-        </div>
+            <h3>Preço</h3>
+            <div class="price-inputs">
+                <input type="number" placeholder="Mínimo" />
+                <input type="number" placeholder="Máximo" />
+            </div>
 
-        <button id="btn-filtrar" class="btn aplicar">Aplicar filtros</button>
+            <h3>Localização</h3>
+            <input type="text" placeholder="Bairro ou região" />
+
+            <h3>Características</h3>
+            <label><input type="checkbox" /> Mobiliado</label>
+            <label><input type="checkbox" /> Aceita pets</label>
+            <label><input type="checkbox" /> Varanda</label>
+            <label><input type="checkbox" /> Piscina</label>
+            <label><input type="checkbox" /> Portaria 24h</label>
+
+            <div style="margin-top: 10px;">
+                <button id="btn-filtrar" class="btn aplicar">Aplicar filtros</button>
+                <button class="btn" style="width:100%; margin-top:5px; border:1px solid #ccc; background:white;">
+                Limpar filtros
+                </button>
+            </div>
         </aside>
 
         <!-- LISTAGEM -->
@@ -84,12 +101,26 @@
             />
         </div>
 
+        <!-- MODAL LOGIN/CADASTRO -->
+        <div id="modal-login" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close">&times;</button>
+                <h3>Faça login ou cadastre-se</h3>
+                <p>Para salvar imóveis nos favoritos, é necessário ter uma conta.</p>
+                <div class="modal-actions">
+                <a href="/frontend/login.html"><button class="btn login">Login</button></a>
+                <a href="/frontend/login.html"><button class="btn criar">Criar Conta</button></a>
+                </div>
+            </div>
+        </div>
+
+
         <div id="imoveis-lista" class="cards-container">
             <!-- Cards dos imóveis serão inseridos via JS -->
         </div>
         </section>
     </main>
 
-  <script src="imoveis.js"></script>
+  <script src="/frontend/js/imoveis.js"></script>
 </body>
 </html>
