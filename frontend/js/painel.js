@@ -1,3 +1,17 @@
+    function showMessage(msg, type = 'error', container = messageBox) {
+        if (!container) return alert(msg);
+
+        container.textContent = msg;
+        container.style.display = 'block';
+        container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
+        container.style.color = type === 'error' ? '#b30000' : '#006600';
+        container.style.padding = '10px';
+        container.style.borderRadius = '4px';
+        container.style.marginTop = '10px';
+
+        setTimeout(() => { container.style.display = 'none'; }, 5000);
+    }
+
 // ===================================
 // VARIÁVEIS GLOBAIS / CONSTANTES
 // ===================================
@@ -261,6 +275,29 @@ function setupAddAnuncioListeners() {
             console.log("Novo Anúncio →", Object.fromEntries(formData.entries()));
 
             // ... (lógica de envio para o backend)
+            try {
+                const token = localStorage.getItem("token");
+
+                const response = await fetch("/api/imoveis", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    showMessage(result.message || "Erro ao cadastrar o imóvel.");
+                    return;
+                }
+
+                showMessage("Imóvel cadastrado com sucesso!");
+            } catch (erro) {
+                console.error("Erro ao enviar anúncio:", erro);
+                showMessage("Erro inesperado ao conectar com o servidor.");
+            }
 
             fecharModal(addAnuncioModal);
             if (window.clearAnuncioImages) window.clearAnuncioImages();
