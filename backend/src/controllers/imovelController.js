@@ -64,3 +64,47 @@ export const listarImoveis = async (req, res) => {
  * CRIAR IMÓVEL (POST)
  */
 
+export const criarImovel = async (req, res) => {
+  try {
+    console.log("BODY RECEBIDO:", req.body);
+
+    const {
+      titulo,
+      descricao,
+      preco,
+      cidade,
+      tipo,
+      imagem_url,
+      data_cadastro,
+    } = req.body;
+
+    // Validações simples
+    
+
+    // Criar o imóvel
+    const novoImovel = await Imovel.create({
+      titulo,
+      descricao,
+      preco,
+      cidade,
+      tipo,
+      imagem_url: imagem_url || null,
+      data_cadastro: data_cadastro || new Date(),
+    });
+
+    return res.status(201).json({
+      sucesso: true,
+      mensagem: "Imóvel criado com sucesso!",
+      dados: novoImovel,
+    });
+  } catch (erro) {
+    console.error("Erro ao criar imóvel:", erro);
+
+    return res.status(500).json({
+      sucesso: false,
+      mensagem: "Erro interno ao criar imóvel.",
+      detalhes:
+        process.env.NODE_ENV === "development" ? erro.message : undefined,
+    });
+  }
+};
