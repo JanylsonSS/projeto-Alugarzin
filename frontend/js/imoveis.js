@@ -1,4 +1,6 @@
-// Dados de Imóveis Simulados (EXPANDIDOS com mais detalhes para os novos filtros)
+/* =========================
+   Dados Simulados
+   ========================= */
 const IMOVEIS_DATA = [
   {
     id: 1,
@@ -98,6 +100,9 @@ const IMOVEIS_DATA = [
   },
 ];
 
+/* =========================
+   Seletores e Variáveis
+   ========================= */
 const sidebar = document.querySelector(".sidebar");
 const searchInput = document.getElementById("search-input");
 const btnLimparFiltros = document.querySelector(
@@ -105,9 +110,29 @@ const btnLimparFiltros = document.querySelector(
 );
 const navbar = document.querySelector(".navbar");
 
-// Variável para a lógica de esconder/mostrar a navbar
 let ultimaPosicaoScroll = 0;
 
+/* =========================
+   Util: pegar seção da sidebar por título (retorna array de elementos até o próximo H3)
+   ========================= */
+function getSectionElements(title) {
+  if (!sidebar) return [];
+  const headers = Array.from(sidebar.querySelectorAll("h3"));
+  const header = headers.find((h) => h.textContent.trim() === title);
+  if (!header) return [];
+
+  const collected = [];
+  let node = header.nextElementSibling;
+  while (node && node.tagName !== "H3") {
+    collected.push(node);
+    node = node.nextElementSibling;
+  }
+  return collected;
+}
+
+/* =========================
+   DOMContentLoaded -> Inicialização
+   ========================= */
 document.addEventListener("DOMContentLoaded", () => {
   // Lê os parâmetros da URL vindos da index.html
   const params = new URLSearchParams(window.location.search);
@@ -172,7 +197,10 @@ function sincronizarFiltrosUI(filtros) {
     }
 }
 
-// ------------------------------------------------------------------
+  if (btnLimparFiltros) {
+    btnLimparFiltros.addEventListener("click", limparFiltros);
+  }
+});
 
 
 function getFiltrosAtivos() {
@@ -248,8 +276,9 @@ function getFiltrosAtivos() {
   return filtros;
 }
 
-// ------------------------------------------------------------------
-
+/* =========================
+  Carregar e renderizar imóveis (com filtros aplicados)
+   ========================= */
 async function carregarImoveis(filtrosIniciais = {}) {
   const lista = document.getElementById("imoveis-lista");
   // Verifica se o elemento lista existe
@@ -379,8 +408,9 @@ async function carregarImoveis(filtrosIniciais = {}) {
   });
 }
 
-// ------------------------------------------------------------------
-
+/* =========================
+   Aplicar / Limpar filtros
+   ========================= */
 function aplicarFiltros() {
   // Obtém apenas a 'forma' da URL, pois a localização/tipo já estão na UI
   const params = new URLSearchParams(window.location.search);
@@ -413,8 +443,9 @@ function limparFiltros() {
   carregarImoveis({ forma }); 
 }
 
-// ------------------------------------------------------------------
-
+/* =========================
+Interações da sidebar e busca
+   ========================= */
 function setupFiltrosInterativos() {
   sidebar.querySelectorAll(".filter-buttons button").forEach((button) => {
     button.addEventListener("click", function () {
@@ -463,9 +494,9 @@ function setupFiltrosInterativos() {
   });
 }
 
-// ------------------------------------------------------------------
-
-// Oculta a navbar quando o usuário rola para baixo
+/* =========================
+   Navbar: esconder no scroll
+   ========================= */
 window.addEventListener("scroll", () => {
   // Certifique-se que o elemento navbar existe antes de manipular
   if (!navbar) return;
@@ -481,7 +512,9 @@ window.addEventListener("scroll", () => {
   ultimaPosicaoScroll = posicaoAtual;
 });
 
-// --- Redirecionamento dos botões ALUGAR e COMPRAR do cabeçalho ---
+/* =========================
+   Redirecionamento dos links ALUGAR / COMPRAR do header
+   ========================= */
 document.querySelectorAll("nav a").forEach((link) => {
   if (link.textContent.trim().toUpperCase() === "ALUGAR") {
     link.addEventListener("click", (e) => {
@@ -498,8 +531,9 @@ document.querySelectorAll("nav a").forEach((link) => {
   }
 });
 
-// ------------------------------------------------------------------
-
+/* =========================
+   Modal de login e ícones (WhatsApp e Favoritos)
+   ========================= */
 document.addEventListener("DOMContentLoaded", function () {
   const modal = document.getElementById("modal-login");
   const closeModal = document.querySelector(".modal-close");
