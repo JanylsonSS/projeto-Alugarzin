@@ -79,7 +79,13 @@ export const criarImovel = async (req, res) => {
     } = req.body;
 
     // Validações simples
-    
+    if (!titulo || !descricao || !preco || !cidade || !tipo) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem:
+          "Campos obrigatórios: titulo, descricao, preco, cidade, tipo.",
+      });
+    }
 
     // Criar o imóvel
     const novoImovel = await Imovel.create({
