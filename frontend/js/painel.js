@@ -1,35 +1,45 @@
-// painel.js - Versão integrada com auth-guard
-// Integração com backend (Node/Express)
-// Endpoints usados (assumidos):
-// GET  /api/me                 -> retornar dados do usuário autenticado
-// PUT  /api/usuarios/:id       -> atualizar usuário (multipart/form-data com foto_perfil)
-// GET  /api/imoveis/meus       -> listar anúncios do usuário
-// POST /api/imoveis            -> criar anúncio (multipart/form-data com campo 'imagens')
-// DELETE /api/imoveis/:id      -> deletar anúncio
+    function showMessage(msg, type = 'error', container = messageBox) {
+        if (!container) return alert(msg);
 
-import { protectRoute, secureLogout } from './auth-guard.js';
+        container.textContent = msg;
+        container.style.display = 'block';
+        container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
+        container.style.color = type === 'error' ? '#b30000' : '#006600';
+        container.style.padding = '10px';
+        container.style.borderRadius = '4px';
+        container.style.marginTop = '10px';
 
-protectRoute(); // garante que só usuários autenticados acessem este script
+        setTimeout(() => { container.style.display = 'none'; }, 5000);
+    }
 
-const API_BASE = "http://localhost:3000/api";
+// ===================================
+// VARIÁVEIS GLOBAIS / CONSTANTES
+// ===================================
+const editModal = document.getElementById("editmodal");
+const fecharEditModal = document.getElementById("fechareditmodal1");
+const editProfileForm = document.querySelector(".editProfileForm"); 
+const addAnuncioModal = document.getElementById("modaladdanuncio");
+const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
+const addAnuncioForm = document.getElementById("addAnuncioForm");
 
-// ==============================
-// Utilidades DOM pequenas
-// ==============================
-function $(sel) { return document.querySelector(sel); }
-function $all(sel) { return document.querySelectorAll(sel); }
 
-// ==============================
-// Variáveis globais
-// ==============================
-let usuarioLogado = null;
+// ===============================
+// Alternar abas (Anúncios / Favoritos)
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+    const abaAnuncios = document.getElementById("anunciosperfil");
+    const abaFavoritos = document.getElementById("favoritosperfil");
+    const secAnuncio = document.getElementById("anuncio");
+    const secFavoritos = document.getElementById("favoritos");
 
-// ==============================
-// Inicialização
-// ==============================
-document.addEventListener('DOMContentLoaded', () => {
-    initPainel();
-});
+    if (abaAnuncios && abaFavoritos && secAnuncio && secFavoritos) {
+        // Ao clicar em "Anúncios"
+        abaAnuncios.addEventListener("click", () => {
+            abaAnuncios.classList.add("ativo");
+            abaFavoritos.classList.remove("ativo");
+            secAnuncio.classList.remove("hidden");
+            secFavoritos.classList.add("hidden");
+        });
 
 
 // =========================
@@ -338,19 +348,30 @@ function previewAnuncioImages(e) {
     });
 }
 
-// ==============================
-// Helpers: abrir/fechar modal
-// ==============================
-function abrirModal(selector) {
-    const el = document.querySelector(selector);
-    if (!el) return;
-    el.classList.remove('hidden');
-}
-function fecharModal(selector) {
-    const el = document.querySelector(selector);
-    if (!el) return;
-    el.classList.add('hidden');
-}
+            // ... (lógica de envio para o backend)
+            try {
+                const token = localStorage.getItem("token");
+
+                const response = await fetch("/api/imoveis", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    showMessage(result.message || "Erro ao cadastrar o imóvel.");
+                    return;
+                }
+
+                showMessage("Imóvel cadastrado com sucesso!");
+            } catch (erro) {
+                console.error("Erro ao enviar anúncio:", erro);
+                showMessage("Erro inesperado ao conectar com o servidor.");
+            }
 
 // ==============================
 // CRUD Anúncios: deletar / editar (stubs)
