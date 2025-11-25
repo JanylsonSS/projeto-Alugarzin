@@ -1,3 +1,17 @@
+    function showMessage(msg, type = 'error', container = messageBox) {
+        if (!container) return alert(msg);
+
+        container.textContent = msg;
+        container.style.display = 'block';
+        container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
+        container.style.color = type === 'error' ? '#b30000' : '#006600';
+        container.style.padding = '10px';
+        container.style.borderRadius = '4px';
+        container.style.marginTop = '10px';
+
+        setTimeout(() => { container.style.display = 'none'; }, 5000);
+    }
+
 // ===================================
 // VARIÁVEIS GLOBAIS / CONSTANTES
 // ===================================
@@ -27,406 +41,430 @@ document.addEventListener("DOMContentLoaded", () => {
             secFavoritos.classList.add("hidden");
         });
 
-        // Ao clicar em "Favoritos"
-        abaFavoritos.addEventListener("click", () => {
-            abaFavoritos.classList.add("ativo");
-            abaAnuncios.classList.remove("ativo");
-            secFavoritos.classList.remove("hidden");
-            secAnuncio.classList.add("hidden");
-        });
-    }
 
-    // Aplica a máscara de telefone ao campo de número
-    const phoneById = document.getElementById('number');
-    if (phoneById) applyPhoneMaskToInput(phoneById);
-    
-   
-    setupEditModalListeners();
-    setupAddAnuncioListeners();
-    setupLogout();
+// =========================
+//   BUSCAR USUÁRIO LOGADO
+// =========================
+async function carregarUsuario() {
+    const token = localStorage.getItem('token');
 
-    // Carregar painel do usuário ao iniciar
-    carregarPainel();
-});
-
-
-// ===============================
-// Componente Painel + Consumo da API
-// ===============================
-async function carregarPainel() {
-    const token = localStorage.getItem("token");
-
-
-    // Simulação de dados do usuário 
-    const dadosUsuario = {
-        whatsapp_link: "https://wa.me/5541988887777", // Exemplo de link do WhatsApp
-        email: "karina@alugarzin.com" // Exemplo de e-mail
-    };
-
-    // Preenche o link do WhatsApp 
-    const whatsappLinkElement = document.getElementById("whatsappLink");
-    if (whatsappLinkElement && dadosUsuario.whatsapp_link) {
-        whatsappLinkElement.href = dadosUsuario.whatsapp_link;
-        // Opcional: Altera a cor do ícone se o link estiver disponível
-        whatsappLinkElement.querySelector('i').style.color = '#25D366'; 
-    }
-
-    // Preenche o link do E-mail (Tarefa 2)
-    const emailLinkElement = document.getElementById("emailLink");
-    if (emailLinkElement && dadosUsuario.email) {
-        emailLinkElement.href = `mailto:${dadosUsuario.email}`;
+    if (!token) {
+        console.error("Token não encontrado");
+        return window.location.href = "/frontend/login.html";
     }
 
     try {
-        // ... (lógica de carregamento de dados do backend)
-    } catch (erro) {
-        console.error("Erro ao carregar painel:", erro);
-    }
-}
+        const res = await fetch("http://localhost:3000/api/usuarios/me", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-
-// ===============================
-// Modal Editar Perfil (Lógica de Abertura/Fechamento)
-// ===============================
-function abrirEditModal() {
-    if (editModal) editModal.style.display = "flex";
-}
-
-function fecharModal(modal) {
-    if (modal) modal.style.display = "none";
-    if (editProfileForm) editProfileForm.reset();
-    // Reverter preview de imagem para o padrão, se necessário
-    const preview = document.getElementById("previewImage");
-    if (preview) preview.src = '/frontend/image/Karina.jpg'; 
-}
-
-function setupEditModalListeners() {
-    if (fecharEditModal) {
-        fecharEditModal.addEventListener("click", () => fecharModal(editModal));
-    }
-
-    window.addEventListener("click", (event) => {
-        if (event.target === editModal) {
-            fecharModal(editModal);
+        if (!res.ok) {
+            console.error("Erro na API:", res.status);
+            throw new Error("Falha ao buscar usuário");
         }
+
+        const data = await res.json();
+
+        // A API pode retornar {usuario: {...}} ou só {...}
+        const u = data.usuario || data;
+
+        usuarioLogado = u;
+
+        preencherPerfil(u);
+
+    } catch (err) {
+        console.error("Erro carregar usuario:", err);
+        localStorage.removeItem("token");
+        window.location.href = "/frontend/login.html";
+    }
+}
+
+
+carregarUsuario();
+
+
+// =========================
+//         LOGOUT
+// =========================
+document.getElementById("btnLogout").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/frontend/login.html";
+});
+
+async function initPainel() {
+    // Valida token e redireciona se necessário (protectRoute já faz isso, mas conferimos)
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return;
+    }
+
+    // Listeners básicos (aceita btnLogout ou btnlogout)
+    const btnLogout = document.getElementById('btnLogout') || document.getElementById('btnlogout');
+    if (btnLogout) btnLogout.addEventListener('click', logout);
+
+    const btnAbrirAdd = document.getElementById('addbtn');
+    if (btnAbrirAdd) btnAbrirAdd.addEventListener('click', () => abrirModal('#modaladdanuncio'));
+
+    const btnEditar = document.getElementById('btnEditarPerfil');
+    if (btnEditar) btnEditar.addEventListener('click', () => abrirModal('#modalEditarPerfil'));
+
+    const fecharEditar = document.getElementById('fecharEditarPerfil');
+    if (fecharEditar) fecharEditar.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
+
+    const fecharAdd = document.getElementById('fechareditmodal2');
+    if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modalAddAnuncio'));
+
+    const btnCancelarPerfil = document.getElementById('btnCancelarPerfil');
+    if (btnCancelarPerfil) btnCancelarPerfil.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
+
+    const btnCancelarAnuncio = document.getElementById('btnCancelarAnuncio');
+    if (btnCancelarAnuncio) btnCancelarAnuncio.addEventListener('click', () => fecharModal('#modalAddAnuncio'));
+
+    // Previews de imagens
+    const profileImageInput = document.getElementById('profileImageInput');
+    if (profileImageInput) profileImageInput.addEventListener('change', previewProfileImage);
+
+    const imagemInput = document.getElementById('imagemInput');
+    if (imagemInput) imagemInput.addEventListener('change', previewAnuncioImages);
+
+    // Forms
+    const formEditar = document.getElementById('formEditarPerfil');
+    if (formEditar) formEditar.addEventListener('submit', handleEditarPerfil);
+
+    const formAdd = document.getElementById('addAnuncioForm');
+    if (formAdd) formAdd.addEventListener('submit', handleAddAnuncio);
+
+    // Menu abas (meus anúncios / favoritos)
+    $all('.menu-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            $all('.menu-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.dataset.target;
+            $all('.aba').forEach(a => a.classList.add('hidden'));
+            const sel = `#${target}`;
+            const el = document.querySelector(sel);
+            if (el) el.classList.remove('hidden');
+        });
     });
 
-    if (editProfileForm) {
-        editProfileForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+    setupAnuncioImageHelpers();
 
-           
-            const dadosEdicao = {
-                nome: document.getElementById("name").value,
-                telefone: document.getElementById("number").value,
-                link_whatsapp: document.getElementById("whatsapp_link").value, 
-                email: document.getElementById("email").value,
-                cep: document.getElementById("cep").value, 
-                rua: document.getElementById("rua").value, 
-                numero: document.getElementById("numero").value, 
-                bairro: document.getElementById("bairro").value, 
-                cidade: document.getElementById("cidade").value, 
-                estado: document.getElementById("estado").value 
-            };
+    // Carregamento inicial
+    await carregarUsuario();
+    await carregarMeusAnuncios();
+}
 
-            console.log("Editar Perfil →", dadosEdicao);
+function preencherPerfil(u) {
+    if (!u) return;
+    const nome = u.nome || 'Usuário';
+    const local = (u.cidade && u.estado) ? `${u.cidade}, ${u.estado}` : 'Localização não informada';
+
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) userNameEl.textContent = nome;
+
+    const userLocationEl = document.getElementById('userLocation');
+    if (userLocationEl) userLocationEl.textContent = local;
+
+    const profileDisplay = document.getElementById('profileDisplayImage');
+    if (profileDisplay) profileDisplay.src = u.foto_perfil || '/frontend/image/Karina.jpg';
+
+    // preencher formulário
+    const nameIn = document.getElementById('name');
+    if (nameIn) nameIn.value = u.nome || '';
+    const numberIn = document.getElementById('number');
+    if (numberIn) numberIn.value = u.telefone || '';
+    const emailIn = document.getElementById('email');
+    if (emailIn) emailIn.value = u.email || '';
+    const cidadeIn = document.getElementById('cidade_profile') || document.getElementById('cidade');
+    if (cidadeIn) cidadeIn.value = u.cidade || '';
+    const estadoIn = document.getElementById('estado_profile') || document.getElementById('estado');
+    if (estadoIn) estadoIn.value = u.estado || '';
+    const cepIn = document.getElementById('cep_profile') || document.getElementById('cep');
+    if (cepIn) cepIn.value = u.cep || '';
+    const whatsappIn = document.getElementById('whatsapp_link');
+    if (whatsappIn) whatsappIn.value = u.whatsapp_link || '';
+
+    const emailLink = document.getElementById('emailLink');
+    if (emailLink) emailLink.href = `mailto:${u.email}`;
+    const whatsappLink = document.getElementById('whatsappLink');
+    if (whatsappLink && u.whatsapp_link) whatsappLink.href = u.whatsapp_link;
+}
+
+// ==============================
+// Carregar anúncios do usuário (/api/imoveis/meus)
+// ==============================
+async function carregarMeusAnuncios() {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/meus`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) {
+            console.warn('Não foi possível buscar anúncios do usuário:', res.status);
+            const lista = document.getElementById('listaAnuncios');
+            if (lista) lista.innerHTML = '<p>Não foi possível carregar anúncios.</p>';
+            return;
+        }
+
+        const anuncios = await res.json();
+        renderListaAnuncios(anuncios);
+    } catch (err) {
+        console.error('Erro ao carregar anúncios:', err);
+        const lista = document.getElementById('listaAnuncios');
+        if (lista) lista.innerHTML = '<p>Erro ao carregar anúncios.</p>';
+    }
+}
+
+function renderListaAnuncios(anuncios) {
+    const container = document.getElementById('listaAnuncios') || document.getElementById('anuncio');
+    if (!container) return;
+
+    if (!Array.isArray(anuncios) || anuncios.length === 0) {
+        container.innerHTML = '<p>Você não possui anúncios, clique no botão + para criar!</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    anuncios.forEach(a => {
+        const card = document.createElement('article');
+        card.className = 'card-anuncio';
+
+        const imagem = a.imagem_url || (a.imagens && a.imagens.length ? a.imagens[0] : '/frontend/image/placeholder.png');
+
+        card.innerHTML = `
+      <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Anúncio')}" />
+      <div class="card-body">
+        <h3>${escapeHtml(a.titulo)}</h3>
+        <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
+        <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
+        <div class="card-actions">
+          <button class="btn btn-small" data-id="${a.id}" onclick="editarAnuncio(${a.id})">Editar</button>
+          <button class="btn btn-danger btn-small" data-id="${a.id}" onclick="deletarAnuncio(${a.id})">Excluir</button>
+        </div>
+      </div>
+    `;
+
+        container.appendChild(card);
+    });
+}
+
+// ==============================
+// Handlers: Editar Perfil (envia FormData com foto_perfil)
+// ==============================
+async function handleEditarPerfil(e) {
+    e.preventDefault();
+    if (!usuarioLogado) return alert('Usuário não carregado');
+
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('formEditarPerfil');
+    const fd = new FormData(form);
+
+    if (fd.has('name')) { fd.set('nome', fd.get('name')); fd.delete('name'); }
+    if (fd.has('number')) { fd.set('telefone', fd.get('number')); fd.delete('number'); }
+    if (!fd.has('foto_perfil') && document.getElementById('profileImageInput')?.files?.length) {
+        const file = document.getElementById('profileImageInput').files[0];
+        if (file) fd.set('foto_perfil', file);
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/usuarios/${usuarioLogado.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: fd
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.erro || 'Falha ao atualizar perfil');
+
+        alert('Perfil atualizado com sucesso!');
+        await carregarUsuario();
+        fecharModal('#modalEditarPerfil');
+    } catch (err) {
+        console.error('Erro ao salvar perfil:', err);
+        alert('Erro ao salvar perfil: ' + err.message);
+    }
+}
+
+// ==============================
+// Handlers: Adicionar Anúncio (envia FormData com imagens[])
+// ==============================
+async function handleAddAnuncio(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('addAnuncioForm');
+    const fd = new FormData(form);
+
+    try {
+        const res = await fetch(`${API_BASE}/imoveis`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: fd
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.erro || 'Falha ao publicar');
+
+        alert('Anúncio publicado com sucesso!');
+        form.reset();
+        const preview = document.getElementById('previewImagens');
+        if (preview) preview.innerHTML = '';
+        fecharModal('#modalAddAnuncio');
+        await carregarMeusAnuncios();
+    } catch (err) {
+        console.error('Erro publicar anuncio:', err);
+        alert('Erro ao publicar: ' + err.message);
+    }
+}
+
+// ==============================
+// Preview de imagens
+// ==============================
+function previewProfileImage(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('previewImage');
+    if (img) img.src = url;
+}
+
+function previewAnuncioImages(e) {
+    const files = Array.from(e.target.files || []);
+    const preview = document.getElementById('previewImagens');
+    if (!preview) return;
+    preview.innerHTML = '';
+    files.forEach(f => {
+        const url = URL.createObjectURL(f);
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'preview-thumb';
+        preview.appendChild(img);
+    });
+}
 
             // ... (lógica de envio para o backend)
+            try {
+                const token = localStorage.getItem("token");
 
-            fecharModal(editModal);
-        });
-        
-        // ===================================
-        // Implementação da Tarefa 4 (Pré-visualização da Nova Foto)
-        // ===================================
-        const imageInput = document.getElementById("profileImageInput"); // ID corrigido
-        const preview = document.getElementById("previewImage");
+                const response = await fetch("/api/imoveis", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: formData
+                });
 
-        if (imageInput && preview) {
-            imageInput.addEventListener('change', () => {
-                const file = imageInput.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Muda a imagem no modal
-                        preview.src = e.target.result; 
-                        
-                        // Opcional: Se precisar atualizar a imagem no painel principal imediatamente
-                        // document.getElementById("profileDisplayImage").src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    showMessage(result.message || "Erro ao cadastrar o imóvel.");
+                    return;
                 }
-            });
-        }
-        
-        // ===================================
-        // Preenchimento Automático do CEP
-        // ===================================
-        const cepInput = document.getElementById('cep');
-        
-        if (cepInput) {
-            // Máscara de CEP
-            cepInput.addEventListener('input', (e) => {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.slice(0, 8);
-                if (value.length > 5) {
-                    e.target.value = value.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
-                } else {
-                    e.target.value = value;
-                }
-            });
 
-            // Busca do CEP ao perder o foco (blur)
-            cepInput.addEventListener('blur', async (e) => {
-                const cep = e.target.value.replace(/\D/g, '');
-                if (cep.length !== 8) return;
-
-                // Desativa campos enquanto busca
-                document.getElementById('rua').value = '... buscando';
-                document.getElementById('cidade').value = '...';
-                document.getElementById('estado').value = '...';
-                
-                try {
-                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                    const data = await response.json();
-
-                    if (!data.erro) {
-                        document.getElementById('rua').value = data.logradouro || '';
-                        document.getElementById('bairro').value = data.bairro || '';
-                        document.getElementById('cidade').value = data.localidade || '';
-                        document.getElementById('estado').value = data.uf || '';
-
-                        // Foca no campo número, ou na rua se estiver vazia
-                        if (data.logradouro) {
-                           document.getElementById('numero').focus();
-                        } else {
-                           document.getElementById('rua').focus();
-                        }
-                    } else {
-                        console.log("CEP não encontrado.");
-                        document.getElementById('rua').value = '';
-                        document.getElementById('cidade').value = '';
-                        document.getElementById('estado').value = '';
-                    }
-
-                } catch (error) {
-                    console.error("Erro ao buscar CEP:", error);
-                }
-            });
-        }
-    }
-}
-
-
-// ===============================
-// Modal Adicionar Anúncio (Lógica de Abertura/Fechamento)
-// ===============================
-
-// Função para abrir o modal
-function abrirAddAnuncioModal() {
-    addAnuncioModal.style.display = "flex";
-}
-
-function setupAddAnuncioListeners() {
-    // Fecha o modal ao clicar no X
-    if (fecharAddAnuncioModal) {
-        fecharAddAnuncioModal.addEventListener("click", () => {
-            fecharModal(addAnuncioModal);
-            // Limpa pré-visualizações de imagens (adicionado abaixo)
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
-        });
-    }
-
-    // Fecha o modal ao clicar fora dele
-    window.addEventListener("click", (event) => {
-        if (event.target === addAnuncioModal) {
-            fecharModal(addAnuncioModal);
-            // Limpa pré-visualizações de imagens (adicionado abaixo)
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
-        }
-    });
-
-    // Envio do formulário
-    if (addAnuncioForm) {
-        addAnuncioForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            // Certifica-se de que o mínimo de imagens foi atendido antes de prosseguir
-            if (window.verificarMinimoImagensAnuncio && !window.verificarMinimoImagensAnuncio()) {
-                // A função já exibe a mensagem de erro
-                return; 
+                showMessage("Imóvel cadastrado com sucesso!");
+            } catch (erro) {
+                console.error("Erro ao enviar anúncio:", erro);
+                showMessage("Erro inesperado ao conectar com o servidor.");
             }
 
-            const formData = new FormData(addAnuncioForm);
-            console.log("Novo Anúncio →", Object.fromEntries(formData.entries()));
-
-            // ... (lógica de envio para o backend)
-
-            fecharModal(addAnuncioModal);
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
+// ==============================
+// CRUD Anúncios: deletar / editar (stubs)
+// ==============================
+async function deletarAnuncio(id) {
+    if (!confirm('Deseja realmente excluir este anúncio?')) return;
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
         });
+        if (!res.ok) throw new Error('Falha ao excluir');
+        alert('Anúncio excluído');
+        await carregarMeusAnuncios();
+    } catch (err) {
+        console.error('Erro excluir anúncio:', err);
+        alert('Erro ao excluir anúncio');
     }
 }
 
+function editarAnuncio(id) {
+    // Aqui você pode abrir um modal de edição e preencher com os dados do anúncio
+    alert('Função de edição não implementada. Posso adicionar se desejar.');
+}
 
-// ===============================
-// Controle de Imagens no Modal de Anúncio
-// ===============================
-(function() {
-    // ID corrigido no HTML para 'imagemInput' (era 'imagem' no JS antigo)
-    const input = document.getElementById('imagemInput'); 
+window.deletarAnuncio = deletarAnuncio;
+window.editarAnuncio = editarAnuncio;
+
+// ==============================
+// Util: escapeHTML
+// ==============================
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// ==============================
+// Helpers relacionados a imagens do anúncio (reuso parte do seu código)
+// ==============================
+function setupAnuncioImageHelpers() {
+    const input = document.getElementById('imagemInput');
     const preview = document.getElementById('previewImagens');
-    const form = document.getElementById('addAnuncioForm'); 
-    
-    // Armazena as URLs temporárias para poder revogar
-    let objectURLs = []; 
+    if (!input || !preview) return;
+
+    let objectURLs = [];
     const MIN_IMAGENS = 3;
 
-    // Cria ou acha o elemento para mensagens de erro
-    let erroMsg = document.createElement('p');
-    erroMsg.id = 'erro-imagens';
-    erroMsg.style.color = 'red';
-    erroMsg.style.fontSize = '14px';
-    erroMsg.style.marginTop = '8px';
-    erroMsg.style.display = 'none';
-    
-    // Garante que a mensagem seja inserida apenas uma vez
-    if (input && !document.getElementById('erro-imagens')) {
+    const erroMsgId = 'erro-imagens';
+    let erroMsg = document.getElementById(erroMsgId);
+    if (!erroMsg) {
+        erroMsg = document.createElement('p');
+        erroMsg.id = erroMsgId;
+        erroMsg.style.color = 'red';
+        erroMsg.style.fontSize = '14px';
+        erroMsg.style.marginTop = '8px';
+        erroMsg.style.display = 'none';
         input.insertAdjacentElement('afterend', erroMsg);
     }
 
     function renderPreviews() {
-        // Limpa previews antigos e revoga URLs antigas
         preview.innerHTML = '';
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
         objectURLs = [];
 
         const files = Array.from(input.files || []);
-        
         files.forEach((file, index) => {
-            const thumbWrap = document.createElement('div');
-            thumbWrap.className = 'thumb-wrap';
-            thumbWrap.style.position = 'relative';
-            thumbWrap.style.display = 'inline-block';
-            thumbWrap.style.margin = '5px';
-
-            const img = document.createElement('img');
             const url = URL.createObjectURL(file);
             objectURLs.push(url);
+            const img = document.createElement('img');
             img.src = url;
-            img.alt = file.name;
-     
-            img.style.width = '100px'; 
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.innerText = '×';
-            btn.title = 'Remover imagem';
-            // Estilos para o botão de remover
-            btn.style.position = 'absolute';
-            btn.style.top = '-8px';
-            btn.style.right = '-8px';
-            btn.style.width = '26px';
-            btn.style.height = '26px';
-            btn.style.borderRadius = '50%';
-            btn.style.border = 'none';
-            btn.style.background = 'linear-gradient(to right,#ff751f,#430097)';
-            btn.style.color = '#fff';
-            btn.style.cursor = 'pointer';
-            btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
-            btn.style.fontSize = '16px';
-            btn.style.lineHeight = '0.9';
-
-            btn.addEventListener('click', () => {
-                removeImageAtIndex(index);
-            });
-
-            thumbWrap.appendChild(img);
-            thumbWrap.appendChild(btn);
-            preview.appendChild(thumbWrap);
+            img.className = 'preview-thumb';
+            preview.appendChild(img);
         });
 
         verificarMinimoImagens();
     }
 
-   
-    // Antigamente, ele limpava todos os arquivos e adicionava apenas os novos.
-    // Agora ele adiciona os novos arquivos aos antigos.
-    if (input) {
-        input.addEventListener('change', () => {
-            const currentFiles = Array.from(input.files || []);
-            
-            // Cria um array de DataTransfer e adiciona todos os arquivos antigos
-            const dataTransfer = new DataTransfer();
-            
-            // Se houver arquivos existentes, adiciona eles
-            if (input.dataset.existingFiles) {
-                const existingFiles = JSON.parse(input.dataset.existingFiles);
-                existingFiles.forEach(file => dataTransfer.items.add(file));
-            }
-            
-            // Adiciona os novos arquivos
-            currentFiles.forEach(file => dataTransfer.items.add(file));
-
-            // Atualiza o input.files
-            input.files = dataTransfer.files;
-
-            // Armazena os arquivos existentes para a próxima mudança
-            input.dataset.existingFiles = JSON.stringify(Array.from(input.files));
-
-            renderPreviews();
-        });
-    }
-
-
-    function setInputFiles(filesArray) {
-        const dt = new DataTransfer();
-        filesArray.forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        // Atualiza o dataset para persistir a lista
-        input.dataset.existingFiles = JSON.stringify(filesArray);
-    }
-
-    function removeImageAtIndex(indexToRemove) {
-        const files = Array.from(input.files || []);
-        if (indexToRemove < 0 || indexToRemove >= files.length) return;
-        
-        // Revoga a URL do objeto que será removido
-        if (objectURLs[indexToRemove]) {
-            URL.revokeObjectURL(objectURLs[indexToRemove]);
-        }
-        
-        const newFiles = files.filter((_, i) => i !== indexToRemove);
-        setInputFiles(newFiles);
+    input.addEventListener('change', () => {
         renderPreviews();
-    }
-
-    function clearImages() {
-        // Revoga todas as URLs
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
-        objectURLs = [];
-        preview.innerHTML = '';
-        input.value = ''; // Limpa o valor do input (para o navegador)
-        
-        // Limpa a lista de arquivos via DataTransfer e o dataset
-        try { 
-            input.files = new DataTransfer().files; 
-        } catch (e) {
-         
-        }
-        input.dataset.existingFiles = JSON.stringify([]);
-
-        erroMsg.style.display = 'none'; // limpa mensagem
-    }
+    });
 
     function verificarMinimoImagens() {
         const total = input.files ? input.files.length : 0;
         if (total < MIN_IMAGENS) {
             erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/${MIN_IMAGENS})`;
             erroMsg.style.display = 'block';
-            input.style.borderColor = 'red'; 
+            input.style.borderColor = 'red';
             return false;
         } else {
             erroMsg.style.display = 'none';
@@ -435,96 +473,66 @@ function setupAddAnuncioListeners() {
         }
     }
 
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            if (!verificarMinimoImagens()) {
-                e.preventDefault(); // bloqueia envio
-      
-            }
-        });
-    }
-    
-    // Expõe a função para ser chamada no fechamento do modal
-    window.clearAnuncioImages = clearImages;
+    // Expõe para uso externo
+    window.clearAnuncioImages = function () {
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
+        objectURLs = [];
+        preview.innerHTML = '';
+        input.value = '';
+        erroMsg.style.display = 'none';
+    };
+
     window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+}
 
-})();
-
-
-// ===============================
+// ==============================
 // Logout
-// ===============================
-
-function setupLogout() {
-    const btnLogout = document.getElementById("bntlogout");
-
-    if (btnLogout) {
-        btnLogout.addEventListener("click", () => {
-            // Remove token do localStorage
-            localStorage.removeItem("token");
-
-            // Redireciona para index.html (página de login/landing)
-            // Usa replace() para GARANTIR que a página atual seja substituída no histórico
-            // impedindo que o botão "Voltar" do navegador retorne para o painel.html
-            window.location.replace("./index.html"); 
-            
-  
-        });
+// ==============================
+function logout() {
+    if (typeof secureLogout === 'function') {
+        secureLogout(false);
+    } else {
+        localStorage.removeItem('token');
+        window.location.href = '/frontend/login.html';
     }
 }
 
-
-// -----------------------------
-// Máscara de telefone
-// -----------------------------
+// ==============================
+// Máscara de telefone (seu código)
+// ==============================
 function formatPhoneValue(value) {
-    // remove tudo que não é dígito
-    const digits = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
+    const digits = value.replace(/\D/g, '').slice(0, 11);
     if (!digits) return '';
-
-    // (XX) X XXXX-XXXX (9 dígitos) ou (XX) XXXX-XXXX (8 dígitos)
     let out = '';
-    
     if (digits.length > 0) {
         out += `(${digits.slice(0, 2)}`;
     }
     if (digits.length > 2) {
-        out += `) ${digits.slice(2, 3)}`; // Opcional 9º dígito
+        out += `) ${digits.slice(2, 3)}`;
     }
-    
-    // Se tem 9º dígito
     if (digits.length > 3 && digits.length <= 7) {
         out += ` ${digits.slice(3, 7)}`;
     } else if (digits.length > 7) {
         out += ` ${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-    }
-    // Se não tem 9º dígito
-    else if (digits.length > 2 && digits.length <= 6) {
-         out += ` ${digits.slice(2, 6)}`;
+    } else if (digits.length > 2 && digits.length <= 6) {
+        out += ` ${digits.slice(2, 6)}`;
     } else if (digits.length > 6) {
         out += ` ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
     }
-
     return out;
 }
 
-
 function applyPhoneMaskToInput(input) {
     if (!input) return;
-
-    // Garante que o input seja do tipo 'text' para o funcionamento ideal da máscara
-    input.setAttribute('type', 'text'); 
-    
-    // Adicionado o tratamento para o CEP
+    input.setAttribute('type', 'text');
     const onInput = (e) => {
         let value = e.target.value.replace(/\D/g, '').slice(0, 11);
-        
         let formattedValue = '';
         if (value.length > 2) {
             formattedValue += `(${value.slice(0, 2)}) `;
-            if (value.length > 7 && value.length === 11) { // Telefone com 9º dígito
+            if (value.length > 7 && value.length === 11) {
                 formattedValue += `${value.slice(2, 3)} ${value.slice(3, 7)}-${value.slice(7, 11)}`;
-            } else if (value.length > 6) { // Telefone padrão (8 dígitos)
+            } else if (value.length > 6) {
                 formattedValue += `${value.slice(2, 6)}-${value.slice(6, 10)}`;
             } else if (value.length > 2) {
                 formattedValue += value.slice(2);
@@ -532,21 +540,23 @@ function applyPhoneMaskToInput(input) {
         } else {
             formattedValue = value;
         }
-
         e.target.value = formattedValue;
     };
-
     const onPaste = (e) => {
         e.preventDefault();
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         e.target.value = paste;
         e.target.dispatchEvent(new Event('input'));
-        
-      
         const len = input.value.length;
         input.setSelectionRange(len, len);
     };
-
     input.addEventListener('input', onInput);
     input.addEventListener('paste', onPaste);
 }
+
+// Expose functions used in inline handlers (se necessário)
+window.deletarAnuncio = deletarAnuncio;
+window.editarAnuncio = editarAnuncio;
+window.clearAnuncioImages = window.clearAnuncioImages || function () { };
+window.verificarMinimoImagensAnuncio = window.verificarMinimoImagensAnuncio || function () { };
+
