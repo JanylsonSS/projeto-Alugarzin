@@ -60,3 +60,7 @@ export const listarImoveis = async (req, res) => {
     });
   }
 };
+/**
+ * CRIAR IMÓVEL (POST)
+ */
+
