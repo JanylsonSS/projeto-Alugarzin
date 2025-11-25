@@ -18,8 +18,8 @@
       <center><a href="index.html"><img src="image/Alugarzin_roxo_laranja.png" alt="Logo" width="300px"></a></center>
 
       <div class="buttonform">
-        <button id="loginbutton" class="buttonativo" onclick="mostrarform('login')">Entrar</button>
-        <button id="criarbutton" onclick="mostrarform('criarconta')">Cadastrar</button>
+        <button id="loginbutton" onclick="window.location='/frontend/login.html'">LOGIN</button>
+        <button id="criarbutton" onclick="window.location='/frontend/login.html'">CRIAR CONTA</button>
       </div>
 
       <!-- Formulário de Login -->
@@ -67,8 +67,8 @@
   </div>
 
   <script type="module" src="/frontend/js/auth-guard.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script type="module" src="/frontend/js/login.js"></script>
+  <script src="/frontend/js/index-session.js"></script>
 </body>
 
 </html>
