@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import Imovel from "../models/Imovel.js";
+import Usuario from "../models/Usuario.js";
 
 export const listarImoveis = async (req, res) => {
   try {

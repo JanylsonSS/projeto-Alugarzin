@@ -3,7 +3,7 @@ import { listarImoveis, criarImovel  } from "../controllers/imovelController.js"
 
 const router = express.Router();
 
-// GET /api/imoveis
+// GET /api/imoveis - Listar todos
 router.get("/imoveis", listarImoveis);
 
 // POST /api/imoveis

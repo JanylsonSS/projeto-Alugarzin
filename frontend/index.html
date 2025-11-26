@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/frontend/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon">
+    <script type="module" src="/frontend/js/auth-guard.js"></script>
 </head>
 <body>
 
@@ -16,6 +17,7 @@
             <a href="/frontend/login.html"><button class="btn-login">LOGIN</button></a>
             <a href="/frontend/login.html"><button class="btn-criar-conta">CRIAR CONTA</button></a>
         </div>
+        <div id="userBox" style="display:none;"></div>
         <div class="header-center">
             <a href="/frontend/index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" width="400px"></a>
         </div>
@@ -129,5 +131,12 @@
     </footer>
 
 </body>
+<script type="module">
+    import { renderizarHeaderPerfil } from '/frontend/js/auth-handler.js';
+    document.addEventListener('DOMContentLoaded', () => {
+        renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta');
+    });
+</script>
 <script src="/frontend/js/index.js"></script>
+
 </html>

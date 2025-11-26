@@ -27,6 +27,38 @@ const Usuario = sequelize.define(
       type: DataTypes.STRING(20),
       allowNull: true,
     },
+    foto_perfil: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    cep: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    rua: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    numero: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
+    bairro: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    cidade: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    estado: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    whatsapp_link: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     data_cadastro: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

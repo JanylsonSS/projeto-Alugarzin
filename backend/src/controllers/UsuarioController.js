@@ -1,4 +1,4 @@
-import Usuario from "../models/usuario.js";
+import Usuario from "../models/Usuario.js";
 
 class UsuarioController {
   // POST /api/usuarios - Cadastrar novo usuário
@@ -36,10 +36,10 @@ class UsuarioController {
       }
 
       // 5. Verificar se email já existe no banco
-      const usuarioExistente = await Usuario.findOne({ 
-        where: { email: email.toLowerCase() } 
+      const usuarioExistente = await Usuario.findOne({
+        where: { email: email.toLowerCase() }
       });
-      
+
       if (usuarioExistente) {
         return res.status(409).json({
           erro: "E-mail já cadastrado. Deseja recuperar senha?",
@@ -72,7 +72,7 @@ class UsuarioController {
 
     } catch (erro) {
       console.error("Erro ao cadastrar usuário:", erro);
-      
+
       // Tratamento de erro do Sequelize (email duplicado via constraint)
       if (erro.name === "SequelizeUniqueConstraintError") {
         return res.status(409).json({
@@ -95,15 +95,15 @@ class UsuarioController {
         order: [["data_cadastro", "DESC"]],
       });
 
-      return res.status(200).json({ 
+      return res.status(200).json({
         total: usuarios.length,
-        usuarios 
+        usuarios
       });
 
     } catch (erro) {
       console.error("Erro ao listar usuários:", erro);
-      return res.status(500).json({ 
-        erro: "Erro ao listar usuários" 
+      return res.status(500).json({
+        erro: "Erro ao listar usuários"
       });
     }
   }
@@ -115,8 +115,8 @@ class UsuarioController {
 
       // Validar se ID é um número
       if (isNaN(id)) {
-        return res.status(400).json({ 
-          erro: "ID inválido" 
+        return res.status(400).json({
+          erro: "ID inválido"
         });
       }
 
@@ -125,8 +125,8 @@ class UsuarioController {
       });
 
       if (!usuario) {
-        return res.status(404).json({ 
-          erro: "Usuário não encontrado" 
+        return res.status(404).json({
+          erro: "Usuário não encontrado"
         });
       }
 
@@ -134,11 +134,91 @@ class UsuarioController {
 
     } catch (erro) {
       console.error("Erro ao buscar usuário:", erro);
-      return res.status(500).json({ 
-        erro: "Erro ao buscar usuário" 
+      return res.status(500).json({
+        erro: "Erro ao buscar usuário"
       });
     }
   }
+
+  // GET /api/usuarios/me - Retorna os dados do usuário logado
+  static async usuarioLogado(req, res) {
+    try {
+      const id = req.usuario.id; // veio do middleware JWT
+
+      const usuario = await Usuario.findByPk(id, {
+        attributes: {
+          exclude: ["senha_hash"]
+        }
+      });
+
+      if (!usuario) {
+        return res.status(404).json({ erro: "Usuário não encontrado" });
+      }
+
+      return res.status(200).json(usuario);
+
+    } catch (error) {
+      console.error("Erro ao buscar usuário logado:", error);
+      return res.status(500).json({ erro: "Erro ao carregar usuário logado" });
+    }
+  }
+
+  //ATUALIZAR /api/usuarios/:id - Deletar usuário por ID
+  static async atualizar(req, res) {
+    try {
+      const id = req.params.id;
+
+      const {
+        nome,
+        email,
+        telefone,
+        cep,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado,
+        whatsapp_link
+      } = req.body;
+
+      const dados = {
+        nome,
+        email,
+        telefone,
+        cep,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        estado,
+        whatsapp_link
+      };
+
+      // Se recebeu imagem, adiciona caminho dela (padronizado para 'foto_perfil')
+      if (req.file) {
+        // multer salva em uploads/perfis by config; ajustar caminho salvo
+        dados.foto_perfil = `/uploads/perfis/${req.file.filename}`;
+      }
+
+      await Usuario.update(dados, { where: { id } });
+
+      const usuarioAtualizado = await Usuario.findByPk(id, {
+        attributes: { exclude: ["senha_hash"] }
+      });
+
+      return res.status(200).json({
+        mensagem: "Usuário atualizado com sucesso",
+        usuario: usuarioAtualizado
+      });
+
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      res.status(500).json({ erro: "Erro ao atualizar usuário" });
+    }
+  }
+
+
+
 
   // DELETE /api/usuarios/:id - Deletar usuário por ID
   static async deletar(req, res) {
@@ -148,8 +228,8 @@ class UsuarioController {
       const usuario = await Usuario.findByPk(id);
 
       if (!usuario) {
-        return res.status(404).json({ 
-          erro: "Usuário não encontrado" 
+        return res.status(404).json({
+          erro: "Usuário não encontrado"
         });
       }
 
@@ -161,8 +241,8 @@ class UsuarioController {
 
     } catch (erro) {
       console.error("Erro ao deletar usuário:", erro);
-      return res.status(500).json({ 
-        erro: "Erro ao deletar usuário" 
+      return res.status(500).json({
+        erro: "Erro ao deletar usuário"
       });
     }
   }
