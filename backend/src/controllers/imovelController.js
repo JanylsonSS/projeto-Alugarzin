@@ -61,57 +61,19 @@ export const listarImoveis = async (req, res) => {
     });
   }
 };
-/**
- * CRIAR IMÓVEL (POST)
- */
 
-export const criarImovel = async (req, res) => {
+export const buscarImovelPorId = async (req, res) => {
   try {
-    console.log("BODY RECEBIDO:", req.body);
+    const { id } = req.params;
 
-    const {
-      titulo,
-      descricao,
-      preco,
-      cidade,
-      tipo,
-      imagem_url,
-      data_cadastro,
-    } = req.body;
+    const imovel = await Imovel.findByPk(id);
 
-    // Validações simples
-    if (!titulo || !descricao || !preco || !cidade || !tipo) {
-      return res.status(400).json({
-        sucesso: false,
-        mensagem:
-          "Campos obrigatórios: titulo, descricao, preco, cidade, tipo.",
-      });
+    if (!imovel) {
+      return res.status(404).json({ error: "Imóvel não encontrado" });
     }
 
-    // Criar o imóvel
-    const novoImovel = await Imovel.create({
-      titulo,
-      descricao,
-      preco,
-      cidade,
-      tipo,
-      imagem_url: imagem_url || null,
-      data_cadastro: data_cadastro || new Date(),
-    });
-
-    return res.status(201).json({
-      sucesso: true,
-      mensagem: "Imóvel criado com sucesso!",
-      dados: novoImovel,
-    });
-  } catch (erro) {
-    console.error("Erro ao criar imóvel:", erro);
-
-    return res.status(500).json({
-      sucesso: false,
-      mensagem: "Erro interno ao criar imóvel.",
-      detalhes:
-        process.env.NODE_ENV === "development" ? erro.message : undefined,
-    });
+    res.json(imovel);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar imóvel" });
   }
 };
