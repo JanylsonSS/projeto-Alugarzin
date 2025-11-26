@@ -155,7 +155,7 @@ export function processarImagens(imagens) {
 export function renderizarCardImovel(imovel) {
     const imagens = processarImagens(imovel.imagens);
     const imagemUrl = imagens[0] || imovel.imagem_url || '/frontend/image/placeholder.png';
-    const preco = imovel.preco ? `R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : 'Não informado';
+    const preco = imovel.preco ? `R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
     const periodo = imovel.periodo ? `/${imovel.periodo}` : '';
 
     return `

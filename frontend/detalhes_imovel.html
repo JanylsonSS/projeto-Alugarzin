@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>Detalhes</title>
     <!-- Ícones Bootstrap -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/frontend/css/detalhes_imovel.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon">
 </head>
+
 <body>
     <header class="header-container">
         <div class="header-left">
@@ -43,18 +42,18 @@
         <button class="arrow right">&#10095;</button>
     </div>
 
-        <!-- MODAL LOGIN/CADASTRO -->
-        <div id="modal" class="modal-over">
-            <div class="modal-cont">
-                <button class="modal-fechado">&times;</button>
-                <h3>Faça login ou cadastre-se</h3>
-                <p>Para salvar imóveis nos favoritos, é necessário ter uma conta.</p>
-                <div class="modal-ac">
+    <!-- MODAL LOGIN/CADASTRO -->
+    <div id="modal" class="modal-over">
+        <div class="modal-cont">
+            <button class="modal-fechado">&times;</button>
+            <h3>Faça login ou cadastre-se</h3>
+            <p>Para salvar imóveis nos favoritos, é necessário ter uma conta.</p>
+            <div class="modal-ac">
                 <a href="/frontend/login.html"><button class="btn login">Login</button></a>
                 <a href="/frontend/login.html"><button class="btn criar">Criar Conta</button></a>
-                </div>
             </div>
         </div>
+    </div>
 
     <div id="imoveis-detalhe" class="cards-detalhe">
         <!-- Cards dos imóveis serão inseridos via JS -->
@@ -62,6 +61,7 @@
 
     <div id="map-container"></div>
 
-<script type="module" src="/frontend/js/detalhes_imovel.js"></script>
+    <script type="module" src="/frontend/js/detalhes_imovel.js"></script>
 </body>
+
 </html>

@@ -50,8 +50,8 @@ async function seed() {
         quartos: '2',
         banheiros: '1',
         vagas: '1',
-        comodidades: ['Mobiliado','Wi-Fi'],
-        imagens: ['/frontend/image/imovel1.jpg','/frontend/image/imovel2.jpg'],
+        comodidades: ['Mobiliado', 'Wi-Fi'],
+        imagens: ['/frontend/image/imovel1.jpg', '/frontend/image/imovel2.jpg'],
         imagem_url: '/frontend/image/imovel1.jpg'
       },
       {
