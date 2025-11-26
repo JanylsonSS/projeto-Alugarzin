@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         searchInput.addEventListener('input', (e) => {
             const q = (e.target.value || '').trim().toLowerCase();
             const filtrados = IMOVEIS_CACHE.filter(i => {
-                const titulo = (i.titulo||'').toLowerCase();
-                const descricao = (i.descricao||'').toLowerCase();
-                const cidade = (i.cidade||'').toLowerCase();
+                const titulo = (i.titulo || '').toLowerCase();
+                const descricao = (i.descricao || '').toLowerCase();
+                const cidade = (i.cidade || '').toLowerCase();
                 return titulo.includes(q) || descricao.includes(q) || cidade.includes(q);
             });
             renderLista(filtrados);
