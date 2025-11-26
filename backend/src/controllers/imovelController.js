@@ -60,3 +60,19 @@ export const listarImoveis = async (req, res) => {
     });
   }
 };
+
+export const buscarImovelPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const imovel = await Imovel.findByPk(id);
+
+    if (!imovel) {
+      return res.status(404).json({ error: "Imóvel não encontrado" });
+    }
+
+    res.json(imovel);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar imóvel" });
+  }
+};
