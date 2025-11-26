@@ -61,125 +61,57 @@ export const listarImoveis = async (req, res) => {
     });
   }
 };
+/**
+ * CRIAR IMÓVEL (POST)
+ */
 
-// POST /api/imoveis - Criar novo imóvel
 export const criarImovel = async (req, res) => {
   try {
-    const usuario_id = req.usuario.id; // vem do middleware JWT
+    console.log("BODY RECEBIDO:", req.body);
+
     const {
+      titulo,
+      descricao,
       preco,
-      periodo,
-      cep,
-      rua,
-      numero,
-      bairro,
       cidade,
-      estado,
-      tipolocal,
-      tipoanuncio,
-      quartos,
-      banheiros,
-      vagas,
-      comodidades,
+      tipo,
+      imagem_url,
+      data_cadastro,
     } = req.body;
 
-    // Validações básicas
-    if (!preco || !cidade) {
+    // Validações simples
+    if (!titulo || !descricao || !preco || !cidade || !tipo) {
       return res.status(400).json({
-        erro: "Preço e cidade são obrigatórios",
+        sucesso: false,
+        mensagem:
+          "Campos obrigatórios: titulo, descricao, preco, cidade, tipo.",
       });
     }
 
-    // Processa imagens (múltiplas)
-    let imagensArray = [];
-    if (req.files && Array.isArray(req.files)) {
-      imagensArray = req.files.map(f => `/uploads/imoveis/${f.filename}`);
-    }
-
-    // Processa comodidades se for string de formData
-    let comodidadesArray = [];
-    if (comodidades) {
-      if (typeof comodidades === 'string') {
-        comodidadesArray = [comodidades];
-      } else if (Array.isArray(comodidades)) {
-        comodidadesArray = comodidades;
-      }
-    }
-
-    // Criar imóvel
+    // Criar o imóvel
     const novoImovel = await Imovel.create({
-      usuario_id,
-      preco: parseFloat(preco),
-      periodo,
-      cep,
-      rua,
-      numero,
-      bairro,
+      titulo,
+      descricao,
+      preco,
       cidade,
-      estado,
-      tipolocal,
-      tipoanuncio,
-      quartos,
-      banheiros,
-      vagas,
-      comodidades: comodidadesArray,
-      imagens: imagensArray,
-      imagem_url: imagensArray[0] || null,
+      tipo,
+      imagem_url: imagem_url || null,
+      data_cadastro: data_cadastro || new Date(),
     });
 
     return res.status(201).json({
+      sucesso: true,
       mensagem: "Imóvel criado com sucesso!",
-      imovel: novoImovel,
+      dados: novoImovel,
     });
   } catch (erro) {
     console.error("Erro ao criar imóvel:", erro);
+
     return res.status(500).json({
-      erro: "Erro ao criar imóvel",
-      detalhes: process.env.NODE_ENV === "development" ? erro.message : undefined,
+      sucesso: false,
+      mensagem: "Erro interno ao criar imóvel.",
+      detalhes:
+        process.env.NODE_ENV === "development" ? erro.message : undefined,
     });
-  }
-};
-
-// GET /api/imoveis/meus - Listar imóveis do usuário autenticado
-export const listarMeusImoveis = async (req, res) => {
-  try {
-    const usuario_id = req.usuario.id;
-
-    const imoveis = await Imovel.findAll({
-      where: { usuario_id },
-      order: [["data_cadastro", "DESC"]],
-    });
-
-    return res.status(200).json(imoveis);
-  } catch (erro) {
-    console.error("Erro ao listar meus imóveis:", erro);
-    return res.status(500).json({
-      erro: "Erro ao listar imóveis",
-    });
-  }
-};
-
-// DELETE /api/imoveis/:id - Deletar imóvel
-export const deletarImovel = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuario_id = req.usuario.id;
-
-    const imovel = await Imovel.findByPk(id);
-
-    if (!imovel) {
-      return res.status(404).json({ erro: "Imóvel não encontrado" });
-    }
-
-    if (imovel.usuario_id !== usuario_id) {
-      return res.status(403).json({ erro: "Sem permissão para deletar" });
-    }
-
-    await imovel.destroy();
-
-    return res.status(200).json({ mensagem: "Imóvel deletado com sucesso" });
-  } catch (erro) {
-    console.error("Erro ao deletar imóvel:", erro);
-    return res.status(500).json({ erro: "Erro ao deletar imóvel" });
   }
 };
