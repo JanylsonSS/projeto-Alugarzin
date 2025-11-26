@@ -1,4 +1,4 @@
-import Usuario from "../models/usuario.js";
+import Usuario from "../models/Usuario.js";
 
 class UsuarioController {
   // POST /api/usuarios - Cadastrar novo usuário
@@ -177,7 +177,8 @@ class UsuarioController {
         numero,
         bairro,
         cidade,
-        estado
+        estado,
+        whatsapp_link
       } = req.body;
 
       const dados = {
@@ -189,12 +190,14 @@ class UsuarioController {
         numero,
         bairro,
         cidade,
-        estado
+        estado,
+        whatsapp_link
       };
 
-      // Se recebeu imagem, adiciona caminho dela
+      // Se recebeu imagem, adiciona caminho dela (padronizado para 'foto_perfil')
       if (req.file) {
-        dados.foto = `/uploads/usuarios/${req.file.filename}`;
+        // multer salva em uploads/perfis by config; ajustar caminho salvo
+        dados.foto_perfil = `/uploads/perfis/${req.file.filename}`;
       }
 
       await Usuario.update(dados, { where: { id } });

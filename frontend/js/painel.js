@@ -1,23 +1,27 @@
-    function showMessage(msg, type = 'error', container = messageBox) {
-        if (!container) return alert(msg);
+const API_BASE = "http://localhost:3000/api";
+let usuarioLogado = null;
 
-        container.textContent = msg;
-        container.style.display = 'block';
-        container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
-        container.style.color = type === 'error' ? '#b30000' : '#006600';
-        container.style.padding = '10px';
-        container.style.borderRadius = '4px';
-        container.style.marginTop = '10px';
 
-        setTimeout(() => { container.style.display = 'none'; }, 5000);
-    }
+function showMessage(msg, type = 'error', container = messageBox) {
+    if (!container) return alert(msg);
+
+    container.textContent = msg;
+    container.style.display = 'block';
+    container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
+    container.style.color = type === 'error' ? '#b30000' : '#006600';
+    container.style.padding = '10px';
+    container.style.borderRadius = '4px';
+    container.style.marginTop = '10px';
+
+    setTimeout(() => { container.style.display = 'none'; }, 5000);
+}
 
 // ===================================
 // VARIÁVEIS GLOBAIS / CONSTANTES
 // ===================================
 const editModal = document.getElementById("editmodal");
 const fecharEditModal = document.getElementById("fechareditmodal1");
-const editProfileForm = document.querySelector(".editProfileForm"); 
+const editProfileForm = document.querySelector(".editProfileForm");
 const addAnuncioModal = document.getElementById("modaladdanuncio");
 const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
 const addAnuncioForm = document.getElementById("addAnuncioForm");
@@ -40,8 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
             secAnuncio.classList.remove("hidden");
             secFavoritos.classList.add("hidden");
         });
-
-
+    }
+});
 // =========================
 //   BUSCAR USUÁRIO LOGADO
 // =========================
@@ -115,14 +119,14 @@ async function initPainel() {
     const fecharEditar = document.getElementById('fecharEditarPerfil');
     if (fecharEditar) fecharEditar.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
 
-    const fecharAdd = document.getElementById('fechareditmodal2');
-    if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modalAddAnuncio'));
+    const fecharAdd = document.getElementById('fecharEditModal2');
+    if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modaladdanuncio'));
 
     const btnCancelarPerfil = document.getElementById('btnCancelarPerfil');
     if (btnCancelarPerfil) btnCancelarPerfil.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
 
     const btnCancelarAnuncio = document.getElementById('btnCancelarAnuncio');
-    if (btnCancelarAnuncio) btnCancelarAnuncio.addEventListener('click', () => fecharModal('#modalAddAnuncio'));
+    if (btnCancelarAnuncio) btnCancelarAnuncio.addEventListener('click', () => fecharModal('#modaladdanuncio'));
 
     // Previews de imagens
     const profileImageInput = document.getElementById('profileImageInput');
@@ -158,6 +162,11 @@ async function initPainel() {
     await carregarMeusAnuncios();
 }
 
+// Inicializar listeners e comportamentos quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    initPainel().catch(err => console.error('Erro ao iniciar painel:', err));
+});
+
 function preencherPerfil(u) {
     if (!u) return;
     const nome = u.nome || 'Usuário';
@@ -171,6 +180,8 @@ function preencherPerfil(u) {
 
     const profileDisplay = document.getElementById('profileDisplayImage');
     if (profileDisplay) profileDisplay.src = u.foto_perfil || '/frontend/image/Karina.jpg';
+    const previewImg = document.getElementById('previewImage');
+    if (previewImg) previewImg.src = u.foto_perfil || '/frontend/image/Karina.jpg';
 
     // preencher formulário
     const nameIn = document.getElementById('name');
@@ -192,6 +203,29 @@ function preencherPerfil(u) {
     if (emailLink) emailLink.href = `mailto:${u.email}`;
     const whatsappLink = document.getElementById('whatsappLink');
     if (whatsappLink && u.whatsapp_link) whatsappLink.href = u.whatsapp_link;
+}
+
+// Helpers para abrir/fechar modais simples
+function abrirModal(selector) {
+    const modal = document.querySelector(selector);
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    // foco no primeiro input
+    const firstInput = modal.querySelector('input, textarea, select, button');
+    if (firstInput) firstInput.focus();
+    // fechar ao clicar fora do conteúdo
+    modal.addEventListener('click', function onOutsideClick(e) {
+        if (e.target === modal) {
+            fecharModal(selector);
+            modal.removeEventListener('click', onOutsideClick);
+        }
+    });
+}
+
+function fecharModal(selector) {
+    const modal = document.querySelector(selector);
+    if (!modal) return;
+    modal.classList.add('hidden');
 }
 
 // ==============================
@@ -315,7 +349,7 @@ async function handleAddAnuncio(e) {
         form.reset();
         const preview = document.getElementById('previewImagens');
         if (preview) preview.innerHTML = '';
-        fecharModal('#modalAddAnuncio');
+        fecharModal('#modaladdanuncio');
         await carregarMeusAnuncios();
     } catch (err) {
         console.error('Erro publicar anuncio:', err);
@@ -347,31 +381,6 @@ function previewAnuncioImages(e) {
         preview.appendChild(img);
     });
 }
-
-            // ... (lógica de envio para o backend)
-            try {
-                const token = localStorage.getItem("token");
-
-                const response = await fetch("/api/imoveis", {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    showMessage(result.message || "Erro ao cadastrar o imóvel.");
-                    return;
-                }
-
-                showMessage("Imóvel cadastrado com sucesso!");
-            } catch (erro) {
-                console.error("Erro ao enviar anúncio:", erro);
-                showMessage("Erro inesperado ao conectar com o servidor.");
-            }
 
 // ==============================
 // CRUD Anúncios: deletar / editar (stubs)
@@ -559,4 +568,3 @@ window.deletarAnuncio = deletarAnuncio;
 window.editarAnuncio = editarAnuncio;
 window.clearAnuncioImages = window.clearAnuncioImages || function () { };
 window.verificarMinimoImagensAnuncio = window.verificarMinimoImagensAnuncio || function () { };
-

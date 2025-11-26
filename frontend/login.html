@@ -18,8 +18,8 @@
       <center><a href="index.html"><img src="image/Alugarzin_roxo_laranja.png" alt="Logo" width="300px"></a></center>
 
       <div class="buttonform">
-        <button id="loginbutton" onclick="window.location='/frontend/login.html'">LOGIN</button>
-        <button id="criarbutton" onclick="window.location='/frontend/login.html'">CRIAR CONTA</button>
+        <button id="loginbutton" type="button">LOGIN</button>
+        <button id="criarbutton" type="button">CRIAR CONTA</button>
       </div>
 
       <!-- Formulário de Login -->
@@ -67,6 +67,10 @@
   </div>
 
   <script type="module" src="/frontend/js/auth-guard.js"></script>
+  <script type="module">
+    import { redirectToPainelIfLoggedIn } from '/frontend/js/auth-handler.js';
+    redirectToPainelIfLoggedIn();
+  </script>
   <script type="module" src="/frontend/js/login.js"></script>
   <script src="/frontend/js/index-session.js"></script>
 </body>
