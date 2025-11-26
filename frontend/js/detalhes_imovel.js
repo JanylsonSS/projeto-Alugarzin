@@ -1,3 +1,84 @@
+import { renderizarHeaderPerfil, carregarImovelPorId, processarImagens } from '/frontend/js/auth-handler.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Renderiza header com perfil (se houver)
+    try { await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta'); } catch (e) { console.warn(e); }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (!id) {
+        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não especificado.</p>';
+        return;
+    }
+
+    const imovel = await carregarImovelPorId(id);
+    if (!imovel) {
+        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não encontrado.</p>';
+        return;
+    }
+
+    renderDetalhes(imovel);
+    setupCarousel();
+});
+
+function renderDetalhes(imovel) {
+    const container = document.getElementById('imoveis-detalhe');
+    if (!container) return;
+
+    const imagens = processarImagens(imovel.imagens || imovel.imagem_url);
+    const galeria = imagens.map(src => `<div class="slide"><img src="${src}" alt="Foto"></div>`).join('');
+
+    const comodidades = (imovel.comodidades && (Array.isArray(imovel.comodidades) ? imovel.comodidades : JSON.parse(imovel.comodidades || '[]')))
+        .map(c => `<li>${escapeHtml(c)}</li>`).join('') || '<li>Nenhuma comodidade informada</li>';
+
+    container.innerHTML = `
+        <div class="detalhe-top">
+            <div class="galeria" id="carrossel-imagens">${galeria}</div>
+            <div class="info">
+                <h1>${escapeHtml(imovel.titulo || 'Imóvel')}</h1>
+                <p class="local">${escapeHtml(imovel.cidade || '')}${imovel.estado ? ' - ' + escapeHtml(imovel.estado) : ''}</p>
+                <p class="preco">R$ ${escapeHtml(String(imovel.preco || ''))} ${imovel.periodo ? '/' + escapeHtml(imovel.periodo) : ''}</p>
+                <p>${escapeHtml(imovel.descricao || '')}</p>
+                <ul class="comodidades">${comodidades}</ul>
+            </div>
+        </div>
+        <div class="detalhe-bottom">
+            <h3>Endereço</h3>
+            <p>${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')} - ${escapeHtml(imovel.bairro || '')}</p>
+            <p>${escapeHtml(imovel.cidade || '')} - ${escapeHtml(imovel.estado || '')} - CEP: ${escapeHtml(imovel.cep || '')}</p>
+        </div>
+    `;
+}
+
+function setupCarousel() {
+    // simples carrossel: apenas permite navegação com setas já existentes in markup
+    const left = document.querySelector('.arrow.left');
+    const right = document.querySelector('.arrow.right');
+    const wrapper = document.getElementById('carrossel-imagens');
+    if (!wrapper) return;
+
+    let index = 0;
+    const slides = Array.from(wrapper.querySelectorAll('.slide'));
+    if (slides.length === 0) return;
+
+    function show(i) {
+        slides.forEach((s, idx) => s.style.display = idx === i ? 'block' : 'none');
+    }
+
+    show(index);
+    left?.addEventListener('click', () => { index = (index - 1 + slides.length) % slides.length; show(index); });
+    right?.addEventListener('click', () => { index = (index + 1) % slides.length; show(index); });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 /* =================================
    Esconder Header ao Rolar
 ================================= */

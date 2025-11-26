@@ -125,6 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
     messageBox.style.display = 'none';
   };
 
+  // Botão "CRIAR CONTA"
+  document.getElementById('criarbutton')?.addEventListener('click', e => {
+    e.preventDefault();
+    mostrarform('criarconta');
+  });
+
+  // Botão "LOGIN"
+  document.getElementById('loginbutton')?.addEventListener('click', e => {
+    e.preventDefault();
+    mostrarform('login');
+  });
+
   document.getElementById('linkToSignup')?.addEventListener('click', e => {
     e.preventDefault();
     mostrarform('criarconta');

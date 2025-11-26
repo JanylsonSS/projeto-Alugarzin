@@ -3,7 +3,7 @@ import { listarImoveis, buscarImovelPorId } from "../controllers/imovelControlle
 
 const router = express.Router();
 
-// GET /api/imoveis
+// GET /api/imoveis - Listar todos
 router.get("/imoveis", listarImoveis);
 
 // GET /api/imoveis/:id

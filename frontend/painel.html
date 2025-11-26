@@ -58,8 +58,10 @@
         </div>
 
         <section class="feedanuncio" id="anuncio">
-            <div><button onclick="abrirAddAnuncioModal()" id="addbtn"><i class="bi bi-plus-lg"></i></button></div>
-            <p>Você não possui anúncios, clique no botão + para criar!</p>
+            <div><button id="addbtn"><i class="bi bi-plus-lg"></i></button></div>
+            <div id="listaAnuncios">
+                <p>Você não possui anúncios, clique no botão + para criar!</p>
+            </div>
         </section>
 
         <section class="feedfavoritos hidden" id="favoritos">
@@ -135,9 +137,9 @@
 
     <div id="messageBox" style="display:none;"></div>
 
-    <div id="modaladdanuncio" class="modal">
+    <div id="modaladdanuncio" class="modal hidden">
         <div class="modalcontent">
-            <span class="fechar" id="fechareditmodal2">&times;</span>
+            <span id="fecharEditModal2" class="fechar">&times;</span>
             <h2>Adicionar Anúncio</h2>
 
             <form id="addAnuncioForm">

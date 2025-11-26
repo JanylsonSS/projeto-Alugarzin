@@ -28,6 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 // Precisa subir 2 níveis: src -> backend -> projeto-Alugarzin
 app.use('/frontend', express.static(path.join(__dirname, '..', '..', 'frontend')));
 
+// Servir uploads (imagens de perfis e anúncios)
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
 // Log de requisições
 app.use((req, res, next) => {
   console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.path}`);
@@ -95,7 +98,9 @@ const iniciarServidor = async () => {
     await sequelize.authenticate();
     console.log("✅ Conexão com MySQL estabelecida");
 
-    await sequelize.sync({ alter: false });
+    const syncOptions = process.env.NODE_ENV === 'production' ? { alter: false } : { alter: true };
+    console.log(`Synchronizing models with database (alter: ${syncOptions.alter})`);
+    await sequelize.sync(syncOptions);
     console.log("✅ Modelos sincronizados com o banco");
 
     app.listen(PORT, () => {
