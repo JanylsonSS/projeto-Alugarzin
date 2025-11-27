@@ -14,51 +14,73 @@
     padding: 0;
 }
 
-body {
-    font-family: "Work Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    min-height: 100vh;
-    line-height: 1.6;
-    background: #fafafa url(/frontend/image/Fundo.png) no-repeat center center fixed;
-    background-size: cover;
-    color: #222;
-    margin: 0;
-    padding: 100px 0 0 0;
-    /* Apenas padding top para o header */
-}
-
 /* =================================
-Cabeçalho
+Cabeçalho com Animação - CORRIGIDO
 ================================= */
 .header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 5%;
+    padding: 12px 5%;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
     z-index: 1000;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(0);
+    height: 70px;
+    /* Altura fixa */
+    box-sizing: border-box;
 }
 
+/* Logo central menor */
+.header-center img {
+    max-width: 250px !important;
+    /* Força tamanho menor */
+    height: auto;
+    transition: max-width 0.4s ease;
+}
+
+/* Estado quando a navbar está escondida */
+.header-container.hidden {
+    transform: translateY(-100%);
+}
+
+/* Estado quando a navbar está reduzida */
+.header-container.scrolled {
+    padding: 8px 5%;
+    height: 60px;
+    /* Altura ainda menor quando scrolled */
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo ainda menor quando scrolled */
+.header-container.scrolled .header-center img {
+    max-width: 200px !important;
+}
+
+/* Container dos botões alinhados */
 .header-left,
 .header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex: 1;
+    /* Ocupa espaço igual nas laterais */
 }
 
-.header-center img {
-    max-width: 400px;
-    height: auto;
+.header-center {
+    flex: 0 0 auto;
+    /* Não cresce, não encolhe, tamanho automático */
 }
 
+/* Botões alinhados e consistentes */
 .btn-login,
 .btn-criar-conta {
     padding: 8px 16px;
@@ -69,6 +91,8 @@ Cabeçalho
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 .btn-criar-conta {
@@ -78,6 +102,7 @@ Cabeçalho
 
 .btn-criar-conta:hover {
     background-color: #320075;
+    border-color: #320075;
 }
 
 .btn-login:hover {
@@ -85,6 +110,7 @@ Cabeçalho
     color: white;
 }
 
+/* Links de navegação alinhados */
 .nav-links {
     display: flex;
     align-items: center;
@@ -96,6 +122,8 @@ Cabeçalho
     color: #333;
     font-weight: 600;
     transition: color 0.3s ease;
+    white-space: nowrap;
+    font-size: 14px;
 }
 
 .nav-links a:hover {
@@ -103,7 +131,75 @@ Cabeçalho
 }
 
 .help-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+}
+
+/* Ajuste do body para compensar a navbar fixa */
+body {
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    min-height: 100vh;
+    line-height: 1.6;
+    background: #fafafa url(/frontend/image/Fundo.png) no-repeat center center fixed;
+    background-size: cover;
+    color: #222;
+    margin: 0;
+    padding-top: 70px;
+    /* Altura inicial da navbar */
+}
+
+/* Quando a navbar está reduzida, ajusta o padding do body */
+body.navbar-scrolled {
+    padding-top: 60px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .header-container {
+        padding: 10px 4%;
+        height: 60px;
+    }
+
+    .header-center img {
+        max-width: 180px !important;
+    }
+
+    .btn-login,
+    .btn-criar-conta {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        font-size: 13px;
+    }
+
+    body {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-center img {
+        max-width: 150px !important;
+    }
+
+    .btn-login,
+    .btn-criar-conta {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    .nav-links a.btn-imoveis {
+        display: none;
+        /* Esconde "IMÓVEIS" em telas muito pequenas */
+    }
 }
 
 /* =================================
@@ -598,4 +694,95 @@ Responsividade
 
 .valores-box {
     display: none !important;
+}
+
+/* Estilo para mensagem de imóvel não encontrado */
+.imovel-nao-encontrado {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.imovel-nao-encontrado .emoji {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.imovel-nao-encontrado h2 {
+    color: #666;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+.imovel-nao-encontrado p {
+    color: #888;
+    margin-bottom: 30px;
+    line-height: 1.5;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.botoes-acao {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-voltar {
+    background: var(--primary-purple);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-voltar:hover {
+    background: #320075;
+}
+
+.btn-inicio {
+    background: #f0f0f0;
+    color: #666;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    transition: background 0.3s;
+}
+
+.btn-inicio:hover {
+    background: #e0e0e0;
+}
+
+/* Botão estilizado para IMÓVEIS no header */
+.btn-imoveis {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-weight: 800;
+    text-decoration: none;
+    color: white !important;
+    background: linear-gradient(90deg, #ff751f, #430097, #ff751f, #430097);
+    background-size: 300% 100%;
+    background-position: 0%;
+    border: none;
+    box-shadow: 0 6px 18px rgba(67, 0, 151, 0.18);
+    font-size: 16px;
+    transition: transform 0.3s, opacity 0.12s;
+}
+
+.btn-imoveis:hover {
+    animation: moveRight 2s linear infinite;
+    transform: scale(1.04);
+    opacity: 0.95;
 }
