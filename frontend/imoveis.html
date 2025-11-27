@@ -1,163 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alugarzin - Imóveis</title>
 
-    <!-- Ícones Bootstrap -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alugarzin - Imóveis</title>
 
-    <link rel="stylesheet" href="/frontend/css/imoveis.css" />
-    <link
-      rel="shortcut icon"
-      href="/frontend/image/Telhado_laranja.png"
-      type="image/x-icon"
-    />
-  </head>
-  <body>
-    <!-- HEADER -->
-    <header class="navbar">
-      <div class="logo">
-        <a href="/frontend/index.html"
-          ><img
-            src="/frontend/image/Alugarzin_roxo_laranja.png"
-            alt="Logo Alugarzin"
-        /></a>
+  <!-- Ícones Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+  <link rel="stylesheet" href="/frontend/css/imoveis.css" />
+  <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon" />
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="/frontend/index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" alt="Logo Alugarzin" /></a>
+    </div>
+
+    <nav class="menu">
+      <button class="nav-filter" data-value="Aluguel">ALUGAR</button>
+      <button class="nav-filter" data-value="Venda">COMPRAR</button>
+      <a href="/frontend/login.html"><button class="btn btn-login">LOGIN</button></a>
+      <a href="/frontend/login.html"><button class="btn btn-criar-conta">CRIAR CONTA</button></a>
+    </nav>
+
+    <div id="userBox" style="display:none; margin-left: 12px;"></div>
+
+    <button class="menu-toggle"><i class="bi bi-list"></i></button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="main-container">
+    <!-- SIDEBAR FILTROS -->
+
+    <aside class="sidebar">
+      <h3>Tipo de imóvel</h3>
+      <div id="tipos-container">
+        <label><input class="tipo-checkbox" type="checkbox" /> Casa</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Apartamento</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Kitnet/Conjugado</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Cobertura</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Terreno</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Kitnet</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Studio</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Loft</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sobrado</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Chácara</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sítio</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Fazenda</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Galpão</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sala Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Ponto Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Flat</label>
       </div>
 
-      <nav class="menu">
-        <a href="/frontend/imoveis.html">ALUGAR</a>
-        <a href="/frontend/imoveis.html">COMPRAR</a>
-        <a href="/frontend/login.html"
-          ><button class="btn login">LOGIN</button></a
-        >
-        <a href="/frontend/login.html"
-          ><button class="btn criar">CRIAR CONTA</button></a
-        >
-      </nav>
+      <h3>Quartos</h3>
+      <div class="filter-buttons">
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
+      </div>
 
-      <button class="menu-toggle"><i class="bi bi-list"></i></button>
-    </header>
+      <h3>Banheiros</h3>
+      <div class="filter-buttons">
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
+      </div>
 
-    <!-- CONTEÚDO -->
-    <main class="main-container">
-      <!-- SIDEBAR FILTROS -->
+      <h3>Vagas</h3>
+      <div class="filter-buttons">
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
+      </div>
 
-      <aside class="sidebar">
-        <h3>Tipo de imóvel</h3>
-        <label><input type="checkbox" /> Casa</label>
-        <label><input type="checkbox" /> Apartamento</label>
-        <label><input type="checkbox" /> Kitnet/Conjugado</label>
-        <label><input type="checkbox" /> Cobertura</label>
-        <label><input type="checkbox" /> Terreno</label>
-        <label><input type="checkbox" /> Comercial</label>
-        <label><input type="checkbox" /> Kitnet</label>
-        <label><input type="checkbox" /> Studio</label>
-        <label><input type="checkbox" /> Loft</label>
-        <label><input type="checkbox" /> Sobrado</label>
-        <label><input type="checkbox" /> Chácara</label>
-        <label><input type="checkbox" /> Sítio</label>
-        <label><input type="checkbox" /> Fazenda</label>
-        <label><input type="checkbox" /> Galpão</label>
-        <label><input type="checkbox" /> Sala Comercial</label>
-        <label><input type="checkbox" /> Ponto Comercial</label>
-        <label><input type="checkbox" /> Flat</label>
+      <h3>Preço</h3>
+      <div class="price-inputs">
+        <input id="price-min" type="number" placeholder="Mínimo" />
+        <input id="price-max" type="number" placeholder="Máximo" />
+      </div>
 
-        <h3>Quartos</h3>
-        <div class="filter-buttons">
-          <button>1+</button>
-          <button>2+</button>
-          <button>3+</button>
-          <button>4+</button>
-        </div>
+      <h3>Localização</h3>
+      <input id="filter-localizacao" type="text" placeholder="Bairro ou região" />
 
-        <h3>Banheiros</h3>
-        <div class="filter-buttons">
-          <button>1+</button>
-          <button>2+</button>
-          <button>3+</button>
-          <button>4+</button>
-        </div>
+      <h3>Características</h3>
+      <div class="seletor-container">
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Mobiliado</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Aceita pets</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Varanda</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Piscina</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Portaria 24h</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Garagem</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Área Gourmet</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Ar Condicionado</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Wi-Fi</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Academia</label>
+      </div>
 
-        <h3>Vagas</h3>
-        <div class="filter-buttons">
-          <button>1+</button>
-          <button>2+</button>
-          <button>3+</button>
-          <button>4+</button>
-        </div>
+      <div style="margin-top: 10px">
+        <button id="limpar-filtros" class="btn"
+          style="width:100%; margin-top:5px; border:1px solid #ccc; background:white;">
+          Limpar filtros
+        </button>
+      </div>
+    </aside>
 
-        <h3>Preço</h3>
-        <div class="price-inputs">
-          <input type="number" placeholder="Mínimo" />
-          <input type="number" placeholder="Máximo" />
-        </div>
+    <!-- LISTAGEM -->
+    <section class="listagem">
+      <div class="barra-pesquisa">
+        <i class="bi bi-search"></i>
+        <input type="text" id="search-input" placeholder="Busque por cidade, bairro ou tipo de imóvel..." />
+      </div>
 
-        <h3>Localização</h3>
-        <input type="text" placeholder="Bairro ou região" />
-
-        <h3>Características</h3>
-        <label><input type="checkbox" /> Mobiliado</label>
-        <label><input type="checkbox" /> Aceita pets</label>
-        <label><input type="checkbox" /> Varanda</label>
-        <label><input type="checkbox" /> Piscina</label>
-        <label><input type="checkbox" /> Portaria 24h</label>
-
-        <div style="margin-top: 10px">
-          <button
-            class="btn"
-            style="
-              width: 100%;
-              margin-top: 5px;
-              border: 1px solid #ccc;
-              background: white;
-            "
-          >
-            Limpar filtros
-          </button>
-        </div>
-      </aside>
-
-      <!-- LISTAGEM -->
-      <section class="listagem">
-        <div class="barra-pesquisa">
-          <i class="bi bi-search"></i>
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Busque por cidade, bairro ou tipo de imóvel..."
-          />
-        </div>
-
-        <!-- MODAL LOGIN/CADASTRO -->
-        <div id="modal-login" class="modal-overlay">
-          <div class="modal-content">
-            <button class="modal-close">&times;</button>
-            <h3>Faça login ou cadastre-se</h3>
-            <p>
-              Para salvar imóveis nos favoritos, é necessário ter uma conta.
-            </p>
-            <div class="modal-actions">
-              <a href="/frontend/login.html"
-                ><button class="btn login">Login</button></a
-              >
-              <a href="/frontend/login.html"
-                ><button class="btn criar">Criar Conta</button></a
-              >
-            </div>
+      <!-- MODAL LOGIN/CADASTRO -->
+      <div id="modal-login" class="modal-overlay">
+        <div class="modal-content">
+          <button class="modal-close">&times;</button>
+          <h3>Faça login ou cadastre-se</h3>
+          <p>
+            Para salvar imóveis nos favoritos, é necessário ter uma conta.
+          </p>
+          <div class="modal-actions">
+            <a href="/frontend/login.html"><button class="btn login">Login</button></a>
+            <a href="/frontend/login.html"><button class="btn criar">Criar Conta</button></a>
           </div>
         </div>
+      </div>
 
-        <div id="imoveis-lista" class="cards-container">
-          <!-- Cards dos imóveis serão inseridos via JS -->
-        </div>
-      </section>
-    </main>
+      <div id="imoveis-lista" class="cards-container">
+        <!-- Cards dos imóveis serão inseridos via JS -->
+      </div>
+    </section>
+  </main>
 
-    <script src="/frontend/js/imoveis.js"></script>
-  </body>
+  <script type="module" src="/frontend/js/imoveis.js"></script>
+</body>
+
 </html>

@@ -1,552 +1,309 @@
-// Dados de Imóveis Simulados (EXPANDIDOS com mais detalhes para os novos filtros)
-const IMOVEIS_DATA = [
-  {
-    id: 1,
-    titulo: "Vila Nova, São Paulo/SP",
-    preco: 900,
-    imagem: "/frontend/image/imovel1.jpg",
-    descricao: "Casa térrea com 2 quartos, 1 banheiro e 1 vaga.",
-    tipo: "Casa",
-    forma: "ALUGAR",
-    local: "São Paulo (SP)",
-    estado: "SP",
-    cidade: "São Paulo",
-    quartos: 2,
-    banheiros: 1,
-    vagas: 1,
-    caracteristicas: ["Aceita pets"],
-  },
-  {
-    id: 2,
-    titulo: "Jardim das Flores, Curitiba/PR",
-    preco: 1500,
-    imagem: "/frontend/image/imovel2.jpg",
-    descricao: "Sobrado com 4 quartos e área total de 60m².",
-    tipo: "Casa",
-    forma: "ALUGAR",
-    local: "Curitiba (PR)",
-    estado: "PR",
-    cidade: "Curitiba",
-    quartos: 4,
-    banheiros: 2,
-    vagas: 2,
-    caracteristicas: ["Varanda"],
-  },
-  {
-    id: 3,
-    titulo: "Centro, Curitiba/PR",
-    preco: 420000,
-    imagem: "/frontend/image/imovel3.jpg",
-    descricao: "Apartamento moderno, 2 quartos e varanda gourmet.",
-    tipo: "Apartamento",
-    forma: "COMPRAR",
-    local: "Curitiba (PR)",
-    estado: "PR",
-    cidade: "Curitiba",
-    quartos: 2,
-    banheiros: 1,
-    vagas: 1,
-    caracteristicas: ["Portaria 24h"],
-  },
-  {
-    id: 4,
-    titulo: "Zona Sul, São Paulo/SP",
-    preco: 520000,
-    imagem: "/frontend/image/imovel4.jpg",
-    descricao: "Apartamento espaçoso com 3 quartos e garagem.",
-    tipo: "Apartamento",
-    forma: "COMPRAR",
-    local: "São Paulo (SP)",
-    estado: "SP",
-    cidade: "São Paulo",
-    quartos: 3,
-    banheiros: 2,
-    vagas: 2,
-    caracteristicas: ["Piscina", "Mobiliado"],
-  },
-  {
-    id: 5,
-    titulo: "Terreno em Atibaia/SP",
-    preco: 80000,
-    imagem: "/frontend/image/imovel5.jpg",
-    descricao: "Terreno de 500m² para lazer.",
-    tipo: "Terreno",
-    forma: "COMPRAR",
-    local: "Atibaia (SP)",
-    estado: "SP",
-    cidade: "Atibaia",
-    quartos: 0,
-    banheiros: 0,
-    vagas: 0,
-    caracteristicas: [],
-  },
-  {
-    id: 6,
-    titulo: "Kitnet Prox. Metrô, Rio de Janeiro/RJ",
-    preco: 1100,
-    imagem: "/frontend/image/imovel6.jpg",
-    descricao: "Kitnet mobiliada, ideal para estudantes.",
-    tipo: "Kitnet/Conjugado",
-    forma: "ALUGAR",
-    local: "Rio de Janeiro (RJ)",
-    estado: "RJ",
-    cidade: "Rio de Janeiro",
-    quartos: 1,
-    banheiros: 1,
-    vagas: 0,
-    caracteristicas: ["Mobiliado"],
-  },
-];
+import { renderizarHeaderPerfil, carregarImovelsDoBanco, renderizarCardImovel } from '/frontend/js/auth-handler.js';
 
-const sidebar = document.querySelector(".sidebar");
-const searchInput = document.getElementById("search-input");
-const btnLimparFiltros = document.querySelector(
-  '.btn[style*="border:1px solid #ccc"]'
-);
-const navbar = document.querySelector(".navbar");
+let IMOVEIS_CACHE = [];
+let FILTROS_ATIVOS = {
+    tipos: [],
+    tipoanuncio: [],
+    quartos: null,
+    banheiros: null,
+    vagas: null,
+    busca: '',
+    precoMin: null,
+    precoMax: null,
+    localizacao: '',
+    caracteristicas: []
+};
 
-// Variável para a lógica de esconder/mostrar a navbar
-let ultimaPosicaoScroll = 0;
+document.addEventListener('DOMContentLoaded', async () => {
+    try { await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta'); } catch (e) { console.warn('header render:', e); }
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Lê os parâmetros da URL vindos da index.html
-  const params = new URLSearchParams(window.location.search);
-  const estado = params.get("estado") || "";
-  const cidade = params.get("cidade") || "";
-  const tipo = params.get("tipo") || "";
-  const forma = params.get("forma") || "";
+    const listaEl = document.getElementById('imoveis-lista');
+    const searchInput = document.getElementById('search-input');
+    const sidebar = document.querySelector('.sidebar');
+    const navbar = document.querySelector('.navbar');
 
-  // Salva os filtros iniciais (para uso na filtragem e na sincronização)
-  const filtrosIniciais = { estado, cidade, tipo, forma };
+    if (!listaEl) return console.error('#imoveis-lista not found');
 
-  // --- 1. SINCRONIZAÇÃO DA INTERFACE VISUAL (CORREÇÃO APLICADA AQUI) ---
-  sincronizarFiltrosUI(filtrosIniciais);
-  
-  // --- 2. Carrega imóveis já com filtros aplicados ---
-  // Passamos os filtros iniciais para garantir que 'forma' seja considerado.
-  // Os demais filtros já estão na UI e serão lidos por getFiltrosAtivos().
-  carregarImoveis(filtrosIniciais);
+    IMOVEIS_CACHE = await carregarImovelsDoBanco();
+    // If index redirected with basic filters (query params), prefill them
+    const params = new URLSearchParams(window.location.search);
+    const qTipo = params.get('tipo') || '';
+    const qCidade = params.get('cidade') || '';
+    const qEstado = params.get('estado') || '';
+    const qForma = (params.get('forma') || params.get('form') || '').trim();
 
-  setupFiltrosInterativos(); // Configura eventos para filtros da sidebar e busca
-  btnLimparFiltros.addEventListener("click", limparFiltros);
-});
+    // Map basic 'forma' values to backend/display values
+    const formaMap = (v) => {
+        if (!v) return null;
+        const up = v.toUpperCase();
+        if (up.includes('ALUGAR')) return 'Aluguel';
+        if (up.includes('COMPRAR') || up.includes('VENDA')) return 'Venda';
+        if (up === 'ALUGUEL' || up === 'VENDA') return v;
+        return v;
+    };
 
-// ------------------------------------------------------------------
-
-/**
- * NOVO: Sincroniza os filtros iniciais (estado, cidade, tipo)
- * da URL com a interface visual da Sidebar.
- */
-function sincronizarFiltrosUI(filtros) {
-    // Sincroniza Localização (Preenche o input de localização na sidebar)
-    const locInput = Array.from(sidebar.querySelectorAll("h3")).find(
-      (el) => el.textContent === "Localização"
-    )?.nextElementSibling;
-
-    if (locInput) {
-        if (filtros.cidade && filtros.estado) {
-            // Ex: "São Paulo/SP"
-            locInput.value = `${filtros.cidade}/${filtros.estado}`;
-        } else if (filtros.cidade) {
-            locInput.value = filtros.cidade;
-        } else if (filtros.estado) {
-            locInput.value = filtros.estado;
-        }
+    if (qTipo) {
+        // check matching tipo checkbox(es)
+        const tipoCheckboxes = document.querySelectorAll('#tipos-container input.tipo-checkbox');
+        tipoCheckboxes.forEach(cb => {
+            const labelText = cb.parentElement.textContent.trim();
+            if (labelText.toLowerCase() === qTipo.toLowerCase()) cb.checked = true;
+        });
+        FILTROS_ATIVOS.tipos = qTipo ? [qTipo.toLowerCase()] : [];
     }
 
-    // Sincroniza Tipo (Marca o checkbox de Tipo na sidebar)
-    if (filtros.tipo) {
-        const tipoParaMarcar = filtros.tipo.toLowerCase();
-        // Encontra todos os labels de Tipo (primeiro H3)
-        const labelsTipo = sidebar.querySelectorAll(
-          'h3:nth-child(1) ~ label'
-        );
-        
-        labelsTipo.forEach(label => {
-          // Verifica se o texto do label corresponde ao tipo vindo da URL
-          if (label.textContent.trim().toLowerCase() === tipoParaMarcar) {
-            const checkbox = label.querySelector('input[type="checkbox"]');
-            if (checkbox) checkbox.checked = true; // Marca o checkbox
-          }
+    if (qCidade || qEstado) {
+        FILTROS_ATIVOS.localizacao = (qCidade || qEstado).toLowerCase();
+        const localInput = document.getElementById('filter-localizacao'); if (localInput) localInput.value = (qCidade || qEstado);
+    }
+
+    const mappedForma = formaMap(qForma);
+    if (mappedForma) {
+        FILTROS_ATIVOS.tipoanuncio = [mappedForma];
+        // activate top nav filters if present
+        document.querySelectorAll('.nav-filter').forEach(b => {
+            if (b.dataset && b.dataset.value === mappedForma) b.classList.add('active');
+            else b.classList.remove('active');
         });
     }
-}
 
-// ------------------------------------------------------------------
+    // Now apply filters (will render filtered list)
+    aplicarFiltros();
 
+    // Busca por texto
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            FILTROS_ATIVOS.busca = (e.target.value || '').trim().toLowerCase();
+            aplicarFiltros();
+        });
+    }
 
-function getFiltrosAtivos() {
-  const filtros = {};
+    // Sidebar - Tipo de imóvel (only the tipo checkboxes)
+    if (sidebar) {
+        const tipoCheckboxes = sidebar.querySelectorAll('#tipos-container input.tipo-checkbox');
+        tipoCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                FILTROS_ATIVOS.tipos = Array.from(tipoCheckboxes)
+                    .filter(c => c.checked)
+                    .map(c => c.parentElement.textContent.trim().toLowerCase());
+                aplicarFiltros();
+            });
+        });
 
-  // 1. Tipos
-  const tipos = Array.from(
-    sidebar.querySelectorAll(
-      'h3:nth-child(1) ~ label input[type="checkbox"]:checked'
-    )
-  ).map((cb) => cb.parentNode.textContent.trim().toLowerCase());
-  if (tipos.length > 0) filtros.tipos = tipos;
+        // Characteristics checkboxes
+        const caractBoxes = sidebar.querySelectorAll('input.caracteristica-checkbox');
+        caractBoxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                FILTROS_ATIVOS.caracteristicas = Array.from(caractBoxes)
+                    .filter(c => c.checked)
+                    .map(c => c.parentElement.textContent.trim());
+                aplicarFiltros();
+            });
+        });
 
-  // 2. Quartos, Banheiros, Vagas
-  ["Quartos", "Banheiros", "Vagas"].forEach((key) => {
-    const keyLower = key.toLowerCase();
+        // Price inputs
+        const priceMin = document.getElementById('price-min');
+        const priceMax = document.getElementById('price-max');
+        if (priceMin) priceMin.addEventListener('input', () => { FILTROS_ATIVOS.precoMin = priceMin.value ? Number(priceMin.value) : null; aplicarFiltros(); });
+        if (priceMax) priceMax.addEventListener('input', () => { FILTROS_ATIVOS.precoMax = priceMax.value ? Number(priceMax.value) : null; aplicarFiltros(); });
 
-    const h3Element = Array.from(sidebar.querySelectorAll("h3")).find(
-      (el) => el.textContent === key
-    );
-    if (
-      h3Element &&
-      h3Element.nextElementSibling.classList.contains("filter-buttons")
-    ) {
-      const botaoAtivo =
-        h3Element.nextElementSibling.querySelector("button.active");
-      if (botaoAtivo) {
-        // Remove o '+' e converte para número (Ex: "3+" -> 3)
-        filtros[keyLower] = parseInt(botaoAtivo.textContent.replace("+", ""));
-      }
-    }
-  });
+        // Localização input
+        const localInput = document.getElementById('filter-localizacao');
+        if (localInput) localInput.addEventListener('input', (e) => { FILTROS_ATIVOS.localizacao = (e.target.value || '').trim().toLowerCase(); aplicarFiltros(); });
 
-  // 3. Preço
-  const priceInputs = sidebar
-    .querySelector(".price-inputs")
-    ?.querySelectorAll('input[type="number"]');
+        // Clear filters
+        const limparBtn = document.getElementById('limpar-filtros');
+        if (limparBtn) limparBtn.addEventListener('click', () => {
+            // reset FILTROS_ATIVOS
+            FILTROS_ATIVOS = { tipos: [], tipoanuncio: [], quartos: null, banheiros: null, vagas: null, busca: '', precoMin: null, precoMax: null, localizacao: '', caracteristicas: [] };
+            // reset UI
+            tipoCheckboxes.forEach(c => c.checked = false);
+            caractBoxes.forEach(c => c.checked = false);
+            if (priceMin) priceMin.value = '';
+            if (priceMax) priceMax.value = '';
+            if (localInput) localInput.value = '';
+            const activeBtns = sidebar.querySelectorAll('.filter-buttons button.active');
+            activeBtns.forEach(b => b.classList.remove('active'));
+            const search = document.getElementById('search-input'); if (search) search.value = '';
+            // reset top nav filters
+            document.querySelectorAll('.nav-filter.active').forEach(b => b.classList.remove('active'));
+            aplicarFiltros();
+        });
+    }
 
-  let precoMin = NaN;
-  let precoMax = NaN;
+    // Delegated handler for quantity filter buttons (quartos / banheiros / vagas)
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-buttons button');
+            if (!btn) return;
 
-  if (priceInputs && priceInputs.length >= 2) {
-    precoMin = parseFloat(priceInputs[0].value);
-    precoMax = parseFloat(priceInputs[1].value);
-  }
+            const group = btn.closest('.filter-buttons');
+            if (!group) return;
+            const header = group.previousElementSibling;
+            const title = header ? header.textContent.trim() : '';
 
-  if (!isNaN(precoMin)) filtros.precoMin = precoMin;
-  if (!isNaN(precoMax)) filtros.precoMax = precoMax;
+            // Toggle active class in the group
+            group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-  // 4. Localização (Lê o valor preenchido pela sincronização ou pelo usuário)
-  const locInput = Array.from(sidebar.querySelectorAll("h3")).find(
-    (el) => el.textContent === "Localização"
-  )?.nextElementSibling;
-  const localizacao = locInput?.value.trim();
-  if (localizacao) filtros.localizacao = localizacao.toLowerCase();
+            const match = btn.textContent.match(/(\d+)/);
+            const value = match ? parseInt(match[1]) : null;
 
-  // 5. Características
-  const caracteristicas = Array.from(sidebar.querySelectorAll("h3")).find(
-    (el) => el.textContent === "Características"
-  );
-  if (caracteristicas) {
-    const checkedCarac = Array.from(
-      caracteristicas.parentElement.querySelectorAll(
-        'label input[type="checkbox"]:checked'
-      )
-    ).map((cb) => cb.parentNode.textContent.trim());
-    if (checkedCarac.length > 0) filtros.caracteristicas = checkedCarac;
-  }
+            if (title.includes('Quartos')) FILTROS_ATIVOS.quartos = value;
+            else if (title.includes('Banheiros')) FILTROS_ATIVOS.banheiros = value;
+            else if (title.includes('Vagas')) FILTROS_ATIVOS.vagas = value;
 
-  // 6. Busca Geral (Lê o valor do input de busca)
-  filtros.busca = searchInput.value.toLowerCase().trim();
+            aplicarFiltros();
+        });
+    }
 
-  return filtros;
-}
+    // Navbar hide on scroll
+    let ultimaPos = 0;
+    window.addEventListener('scroll', () => {
+        if (!navbar) return;
+        const pos = window.scrollY;
+        navbar.style.top = pos > ultimaPos ? '-80px' : '0';
+        ultimaPos = pos;
+    });
 
-// ------------------------------------------------------------------
-
-async function carregarImoveis(filtrosIniciais = {}) {
-  const lista = document.getElementById("imoveis-lista");
-  // Verifica se o elemento lista existe
-  if (!lista) {
-    console.error("Elemento #imoveis-lista não encontrado no DOM.");
-    return;
-  }
-  lista.innerHTML = "";
-
-  // Mescla os filtros vindos da URL (filtrosIniciais) com os filtros lidos da sidebar
-  const filtrosSidebar = getFiltrosAtivos();
-  const filtros = { ...filtrosIniciais, ...filtrosSidebar };
-
-  // Usa a lista de simulação
-  const imoveis = IMOVEIS_DATA;
-
-  // Filtros feitos diretamente no navegador.
-  const filtrados = imoveis.filter((imovel) => {
-    const imovelTitulo = imovel.titulo.toLowerCase();
-    const imovelDescricao = imovel.descricao.toLowerCase();
-    const imovelLocal = imovel.local.toLowerCase();
-
-    // 1. Filtros Iniciais (Estado, Cidade, Forma)
-    // Estes são mantidos na lógica de filtragem, mesmo que não estejam na sidebar
-    const matchEstado =
-      !filtros.estado ||
-      imovel.estado?.toLowerCase() === filtros.estado.toLowerCase();
-    const matchCidade =
-      !filtros.cidade ||
-      imovel.cidade?.toLowerCase().includes(filtros.cidade.toLowerCase());
-    const matchForma =
-      !filtros.forma ||
-      imovel.forma.toLowerCase() === filtros.forma.toLowerCase();
-
-    // 2. Filtro de Tipo (Lido agora da UI ou da URL)
-    // Se 'filtros.tipos' vier da sidebar, ele é usado. Se 'filtros.tipo' for só da URL, ele é usado.
-    const matchTipos =
-      (!filtros.tipos && !filtros.tipo) || 
-      (filtros.tipos && filtros.tipos.includes(imovel.tipo.toLowerCase())) ||
-      (filtros.tipo && imovel.tipo.toLowerCase() === filtros.tipo.toLowerCase());
-      
-    // Ajustando a lógica de Tipo para priorizar múltiplos tipos da sidebar:
-    const matchTipoFinal = 
-        !filtros.tipos && !filtros.tipo || 
-        (filtros.tipos && filtros.tipos.includes(imovel.tipo.toLowerCase())) ||
-        (filtros.tipo && imovel.tipo.toLowerCase() === filtros.tipo.toLowerCase());
-
-
-    // 3. Filtro de Contagem (Lido da UI)
-    const matchQuartos = !filtros.quartos || imovel.quartos >= filtros.quartos;
-    const matchBanheiros =
-      !filtros.banheiros || imovel.banheiros >= filtros.banheiros;
-    const matchVagas = !filtros.vagas || imovel.vagas >= filtros.vagas;
-
-    // 4. Filtro de Preço (Lido da UI)
-    const matchPrecoMin = !filtros.precoMin || imovel.preco >= filtros.precoMin;
-    const matchPrecoMax = !filtros.precoMax || imovel.preco <= filtros.precoMax;
-
-    // 5. Filtro de Localização (Lido da UI)
-    const matchLocalizacao =
-      !filtros.localizacao || imovelLocal.includes(filtros.localizacao);
-
-    // 6. Filtro de Características (Lido da UI)
-    let matchCaracteristicas = true;
-    if (filtros.caracteristicas) {
-      // Verifica se CADA característica selecionada está presente no imóvel
-      matchCaracteristicas = filtros.caracteristicas.every((caracFiltro) =>
-        imovel.caracteristicas.includes(caracFiltro)
-      );
-    }
-
-    // 7. Busca Geral (Lido da UI)
-    const matchBuscaGeral =
-      !filtros.busca ||
-      imovelTitulo.includes(filtros.busca) ||
-      imovelDescricao.includes(filtros.busca) ||
-      imovelLocal.includes(filtros.busca) ||
-      imovel.tipo.toLowerCase().includes(filtros.busca);
-
-    return (
-      matchEstado &&
-      matchCidade &&
-      matchForma &&
-      matchTipoFinal && // Usando o filtro de tipo final
-      matchQuartos &&
-      matchBanheiros &&
-      matchVagas &&
-      matchPrecoMin &&
-      matchPrecoMax &&
-      matchLocalizacao &&
-      matchCaracteristicas &&
-      matchBuscaGeral
-    );
-  });
-
-  // Mostra os imóveis filtrados na tela.
-  if (filtrados.length === 0) {
-    lista.innerHTML = "<p class='sem-resultados'>Nenhum imóvel encontrado.</p>";
-    return;
-  }
-
-  // Código de renderização (mantido)
-  filtrados.forEach((imovel) => {
-    const card = document.createElement("div");
-    card.className = "imovel-card";
-    card.dataset.tipo = imovel.tipo; 
-
-    card.innerHTML = `
-                <img src="${imovel.imagem}" alt="${imovel.titulo}">
-                <div class="card-content">
-                    <div>
-                        <p>${imovel.descricao}</p>
-                        <h4 class="localizacao">${imovel.titulo}</h4>
-                    </div>
-                    <div class="card-footer">
-                        <span class="preco">R$ ${imovel.preco.toLocaleString(
-                          "pt-BR"
-                        )}${imovel.forma === "ALUGAR" ? ",00 / mês" : ""}</span>
-                        <div class="icones">
-                            <i class="bi bi-whatsapp title="Contato WhatsApp" text-success"></i>
-                            <i class="bi bi-bookmark title="Salvar nos favoritos" text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-            `;
-    lista.appendChild(card);
-  });
-}
-
-// ------------------------------------------------------------------
+    // Icon handlers and modal
+    const modal = document.getElementById('modal-login');
+    const closeModal = document.querySelector('.modal-close');
+    // Top filters (Alugar / Comprar) behave like checkboxes
+    const navFilters = document.querySelectorAll('.nav-filter');
+    if (navFilters && navFilters.length) {
+        navFilters.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                // update FILTROS_ATIVOS.tipoanuncio based on active nav filters
+                FILTROS_ATIVOS.tipoanuncio = Array.from(document.querySelectorAll('.nav-filter.active')).map(b => b.dataset.value);
+                aplicarFiltros();
+            });
+        });
+    }
+    document.body.addEventListener('click', (e) => {
+        const t = e.target;
+        if (!t) return;
+        if (t.classList && (t.classList.contains('bi-whatsapp') || t.closest('.bi-whatsapp'))) {
+            const el = t.closest('[data-whatsapp]') || t;
+            const numero = el.dataset?.whatsapp || '5599999999999';
+            window.open(`https://wa.me/${numero}`, '_blank');
+        }
+        if (t.classList && (t.classList.contains('bi-bookmark') || t.classList.contains('bi-bookmark-fill'))) {
+            const usuarioLogado = !!localStorage.getItem('token');
+            if (!usuarioLogado) { if (modal) modal.style.display = 'flex'; }
+            else { t.classList.toggle('bi-bookmark'); t.classList.toggle('bi-bookmark-fill'); t.classList.toggle('favorito-ativo'); }
+        }
+    });
+    if (closeModal) closeModal.addEventListener('click', () => { if (modal) modal.style.display = 'none'; });
+    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+});
 
 function aplicarFiltros() {
-  // Obtém apenas a 'forma' da URL, pois a localização/tipo já estão na UI
-  const params = new URLSearchParams(window.location.search);
-  const forma = params.get("forma") || "";
-  
-  // Esta função simplifica a aplicação de filtros em resposta a qualquer evento.
-  carregarImoveis({ forma }); // Mantém a forma ativa
+    let filtrados = IMOVEIS_CACHE;
+
+    // Filtro por busca
+    if (FILTROS_ATIVOS.busca) {
+        filtrados = filtrados.filter(i => {
+            const titulo = (i.titulo || '').toLowerCase();
+            const descricao = (i.descricao || '').toLowerCase();
+            const cidade = (i.cidade || '').toLowerCase();
+            return titulo.includes(FILTROS_ATIVOS.busca) ||
+                descricao.includes(FILTROS_ATIVOS.busca) ||
+                cidade.includes(FILTROS_ATIVOS.busca);
+        });
+    }
+
+    // Filtro por tipo
+    if (FILTROS_ATIVOS.tipos && FILTROS_ATIVOS.tipos.length > 0) {
+        filtrados = filtrados.filter(i => {
+            const tipo = (i.tipolocal || '').toLowerCase();
+            return FILTROS_ATIVOS.tipos.some(t => tipo.includes(t));
+        });
+    }
+
+    // Filtro por tipo de anúncio (Aluguel / Venda) vindo dos botões do topo
+    if (FILTROS_ATIVOS.tipoanuncio && FILTROS_ATIVOS.tipoanuncio.length > 0) {
+        filtrados = filtrados.filter(i => {
+            const ta = (i.tipoanuncio || '').trim();
+            return FILTROS_ATIVOS.tipoanuncio.includes(ta);
+        });
+    }
+
+    // Filtro por preço
+    if (FILTROS_ATIVOS.precoMin !== null || FILTROS_ATIVOS.precoMax !== null) {
+        filtrados = filtrados.filter(i => {
+            const preco = Number(i.preco) || 0;
+            if (FILTROS_ATIVOS.precoMin !== null && preco < FILTROS_ATIVOS.precoMin) return false;
+            if (FILTROS_ATIVOS.precoMax !== null && preco > FILTROS_ATIVOS.precoMax) return false;
+            return true;
+        });
+    }
+
+    // Filtro por localização (bairro/cidade)
+    if (FILTROS_ATIVOS.localizacao) {
+        filtrados = filtrados.filter(i => {
+            const cidade = (i.cidade || '').toLowerCase();
+            const bairro = (i.bairro || '').toLowerCase();
+            const rua = (i.rua || '').toLowerCase();
+            return cidade.includes(FILTROS_ATIVOS.localizacao) || bairro.includes(FILTROS_ATIVOS.localizacao) || rua.includes(FILTROS_ATIVOS.localizacao);
+        });
+    }
+
+    // Filtro por características/amenities
+    if (FILTROS_ATIVOS.caracteristicas && FILTROS_ATIVOS.caracteristicas.length > 0) {
+        const selected = FILTROS_ATIVOS.caracteristicas;
+        filtrados = filtrados.filter(i => {
+            const comod = Array.isArray(i.comodidades) ? i.comodidades : (i.comodidades ? (typeof i.comodidades === 'string' ? JSON.parse(i.comodidades || '[]') : []) : []);
+            return selected.every(ch => {
+                // Try boolean flags (snake_case in backend) first
+                const key = ch.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                if (i[key] === true) return true;
+                // fallback to comodidades array match
+                return comod.includes(ch) || (i[key] && String(i[key]) === 'true');
+            });
+        });
+    }
+
+    // Filtro por quartos
+    if (FILTROS_ATIVOS.quartos !== null) {
+        filtrados = filtrados.filter(i => {
+            const quartos = parseInt(i.quartos) || 0;
+            return quartos >= FILTROS_ATIVOS.quartos;
+        });
+    }
+
+    // Filtro por banheiros
+    if (FILTROS_ATIVOS.banheiros !== null) {
+        filtrados = filtrados.filter(i => {
+            const banheiros = parseInt(i.banheiros) || 0;
+            return banheiros >= FILTROS_ATIVOS.banheiros;
+        });
+    }
+
+    // Filtro por vagas
+    if (FILTROS_ATIVOS.vagas !== null) {
+        filtrados = filtrados.filter(i => {
+            const vagas = parseInt(i.vagas) || 0;
+            return vagas >= FILTROS_ATIVOS.vagas;
+        });
+    }
+
+    renderLista(filtrados);
 }
 
-function limparFiltros() {
-  // 1. Limpa Checkboxes e Inputs na UI
-  sidebar
-    .querySelectorAll('input[type="checkbox"]')
-    .forEach((cb) => (cb.checked = false));
-  sidebar
-    .querySelectorAll('input[type="number"], input[type="text"]')
-    .forEach((input) => (input.value = ""));
-  searchInput.value = "";
-
-  // 2. Limpa botões ativos
-  sidebar
-    .querySelectorAll(".filter-buttons button")
-    .forEach((btn) => btn.classList.remove("active"));
-
-  // 3. Obtém apenas a 'forma' da URL para manter o contexto principal (ALUGAR/COMPRAR)
-  const params = new URLSearchParams(window.location.search);
-  const forma = params.get("forma") || "";
-
-  // 4. Recarrega os imóveis, mantendo apenas a forma
-  carregarImoveis({ forma }); 
+function renderLista(lista) {
+    const container = document.getElementById('imoveis-lista');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!Array.isArray(lista) || lista.length === 0) {
+        container.innerHTML = "<p class='sem-resultados'>Nenhum imóvel encontrado.</p>";
+        return;
+    }
+    lista.forEach(imovel => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+        wrapper.innerHTML = renderizarCardImovel(imovel);
+        container.appendChild(wrapper);
+    });
 }
-
-// ------------------------------------------------------------------
-
-function setupFiltrosInterativos() {
-  sidebar.querySelectorAll(".filter-buttons button").forEach((button) => {
-    button.addEventListener("click", function () {
-      const group = this.closest(".filter-buttons");
-
-      if (this.classList.contains("active")) {
-        this.classList.remove("active");
-      } else {
-        group
-          .querySelectorAll("button")
-          .forEach((btn) => btn.classList.remove("active"));
-        this.classList.add("active");
-      }
-
-      // Aplica o filtro após a seleção
-      aplicarFiltros();
-    });
-  });
-
-  sidebar.addEventListener("change", (e) => {
-    if (e.target.type === "checkbox" || e.target.closest(".price-inputs")) {
-      aplicarFiltros();
-    }
-  });
-
-  const locInput = Array.from(sidebar.querySelectorAll("h3")).find(
-    (el) => el.textContent === "Localização"
-  )?.nextElementSibling;
-  if (locInput) {
-    locInput.addEventListener("input", aplicarFiltros);
-  }
-
-  // ===============================================================
-  // BARRA DE PESQUISA GERAL
-  // ===============================================================
-
-  // Aplica filtros ao digitar
-  searchInput.addEventListener("input", aplicarFiltros);
-
-  // Aplica filtros ao pressionar 'Enter'
-  searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Impede o envio de formulário padrão
-      aplicarFiltros();
-    }
-  });
-}
-
-// ------------------------------------------------------------------
-
-// Oculta a navbar quando o usuário rola para baixo
-window.addEventListener("scroll", () => {
-  // Certifique-se que o elemento navbar existe antes de manipular
-  if (!navbar) return;
-
-  const posicaoAtual = window.scrollY;
-
-  if (posicaoAtual > ultimaPosicaoScroll) {
-    navbar.style.top = "-80px";
-  } else {
-    navbar.style.top = "0";
-  }
-
-  ultimaPosicaoScroll = posicaoAtual;
-});
-
-// --- Redirecionamento dos botões ALUGAR e COMPRAR do cabeçalho ---
-document.querySelectorAll("nav a").forEach((link) => {
-  if (link.textContent.trim().toUpperCase() === "ALUGAR") {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.location.href = "/frontend/imoveis.html?forma=ALUGAR";
-    });
-  }
-
-  if (link.textContent.trim().toUpperCase() === "COMPRAR") {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.location.href = "/frontend/imoveis.html?forma=COMPRAR";
-    });
-  }
-});
-
-// ------------------------------------------------------------------
-
-document.addEventListener("DOMContentLoaded", function () {
-  const modal = document.getElementById("modal-login");
-  const closeModal = document.querySelector(".modal-close");
-
-  // Simula se o usuário está logado
-  const usuarioLogado = false; // Alterar para true se o back identificar sessão ativa
-
-  // Evento global para ícones de WhatsApp e Favoritos
-  document.body.addEventListener("click", function (e) {
-    // --- ÍCONE WHATSAPP ---
-    if (e.target.classList.contains("bi-whatsapp")) {
-      const numero = e.target.dataset.whatsapp || "5599999999999"; // Substituir pelo número real do anunciante (do back)
-      window.open(`https://wa.me/${numero}`, "_blank");
-    }
-
-    // --- ÍCONE FAVORITOS ---
-    if (
-      e.target.classList.contains("bi-bookmark") ||
-      e.target.classList.contains("bi-bookmark-fill")
-    ) {
-      if (usuarioLogado) {
-        // Alterna a classe entre bi-bookmark e bi-bookmark-fill, e aplica favorito-ativo
-        e.target.classList.toggle("bi-bookmark");
-        e.target.classList.toggle("bi-bookmark-fill");
-        e.target.classList.toggle("favorito-ativo");
-        // Aqui o back deve salvar/remover o imóvel dos favoritos
-        console.log("Imóvel favoritado/desfavoritado (simulação)");
-      } else {
-        // Verifica se o modal existe antes de tentar abrir
-        if (modal) {
-          modal.style.display = "flex"; // abre o modal
-        }
-      }
-    }
-  });
-
-  // Fecha o modal
-  if (closeModal) {
-    closeModal.addEventListener("click", () => {
-      if (modal) modal.style.display = "none";
-    });
-  }
-
-  // Fecha clicando fora
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) modal.style.display = "none";
-    });
-  }
-});

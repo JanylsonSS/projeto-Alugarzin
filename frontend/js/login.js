@@ -1,7 +1,7 @@
+// login.js
 import { protectRoute, secureLogout } from './auth-guard.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  protectRoute();
 
   const loginForm = document.getElementById('loginform');
   const cadastroForm = document.getElementById('cadastroform');
@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const fecharModal = document.getElementById('fecharesqueceusenhamodal');
   const esqueceuSenhaForm = document.getElementById('esqueceusenhaForm');
 
-  // ===== Função utilitária =====
   function showMessage(msg, type = 'error', container = messageBox) {
     if (!container) return alert(msg);
 
@@ -29,11 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== LOGIN =====
   loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // CORRIGIDO: Removido a busca por #loginNomeCompleto que não existe
+
     const email = loginForm.querySelector('#loginEmail').value.trim();
     const password = loginForm.querySelector('#loginPassword').value.trim();
-    
+
     if (!email || !password) return showMessage('Preencha todos os campos.');
 
     try {
@@ -46,12 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       showMessage('Login realizado com sucesso!', 'success');
-      
-      // Redirecionar após 1 segundo
+
+      // Redirecionar para o painel (alterado conforme sua preferência)
       setTimeout(() => {
-        window.location.href = '/frontend/index.html';
-      }, 1000);
-      
+        window.location.href = '/frontend/painel.html';
+      }, 700);
+
     } catch (error) {
       console.error('Erro no login:', error);
       const msg = error.response?.data?.erro || error.response?.data?.message || 'Falha ao fazer login.';
@@ -72,15 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await axios.post('http://localhost:3000/api/usuarios', { nome, email, senha });
       showMessage('Conta criada com sucesso! Faça login.', 'success');
-      
-      // Limpar formulário
+
       cadastroForm.reset();
-      
-      // Mudar para tela de login após 2 segundos
+
       setTimeout(() => {
         mostrarform('login');
       }, 2000);
-      
+
     } catch (error) {
       console.error('Erro no cadastro:', error);
       const msg = error.response?.data?.erro || error.response?.data?.message || 'Erro ao criar conta.';
@@ -95,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   fecharModal?.addEventListener('click', () => esqueceuSenhaModal.style.display = 'none');
-  
+
   window.addEventListener('click', e => {
     if (e.target === esqueceuSenhaModal) esqueceuSenhaModal.style.display = 'none';
   });
@@ -117,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ===== Alternar entre login e cadastro =====
-  window.mostrarform = function(tipo) {
+  window.mostrarform = function (tipo) {
     const loginBtn = document.getElementById('loginbutton');
     const criarBtn = document.getElementById('criarbutton');
 
@@ -125,22 +121,32 @@ document.addEventListener('DOMContentLoaded', () => {
     cadastroForm.classList.toggle('active', tipo === 'criarconta');
     loginBtn.classList.toggle('buttonativo', tipo === 'login');
     criarBtn.classList.toggle('buttonativo', tipo === 'criarconta');
-    
-    // Limpar mensagens ao trocar
+
     messageBox.style.display = 'none';
   };
 
+  // Botão "CRIAR CONTA"
+  document.getElementById('criarbutton')?.addEventListener('click', e => {
+    e.preventDefault();
+    mostrarform('criarconta');
+  });
+
+  // Botão "LOGIN"
+  document.getElementById('loginbutton')?.addEventListener('click', e => {
+    e.preventDefault();
+    mostrarform('login');
+  });
+
   document.getElementById('linkToSignup')?.addEventListener('click', e => {
-    e.preventDefault(); 
-    mostrarform('criarconta'); 
+    e.preventDefault();
+    mostrarform('criarconta');
   });
 
   document.getElementById('linkToLogin')?.addEventListener('click', e => {
-    e.preventDefault(); 
-    mostrarform('login'); 
+    e.preventDefault();
+    mostrarform('login');
   });
 
-  // Inicializa com login ativo
   mostrarform('login');
 });
 

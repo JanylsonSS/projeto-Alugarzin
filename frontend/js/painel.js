@@ -1,23 +1,33 @@
-    function showMessage(msg, type = 'error', container = messageBox) {
-        if (!container) return alert(msg);
+const API_BASE = "http://localhost:3000/api";
 
-        container.textContent = msg;
-        container.style.display = 'block';
-        container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
-        container.style.color = type === 'error' ? '#b30000' : '#006600';
-        container.style.padding = '10px';
-        container.style.borderRadius = '4px';
-        container.style.marginTop = '10px';
+// Minimal DOM helpers used across scripts
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $all = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+let usuarioLogado = null;
+let EDITING_ANUNCIO_ID = null; // null when creating, set to id when editing
 
-        setTimeout(() => { container.style.display = 'none'; }, 5000);
-    }
+
+function showMessage(msg, type = 'error', container = null) {
+    if (!container) container = document.getElementById('messageBox') || null;
+    if (!container) return alert(msg);
+
+    container.textContent = msg;
+    container.style.display = 'block';
+    container.style.backgroundColor = type === 'error' ? '#ffebeb' : '#e5ffeb';
+    container.style.color = type === 'error' ? '#b30000' : '#006600';
+    container.style.padding = '10px';
+    container.style.borderRadius = '4px';
+    container.style.marginTop = '10px';
+
+    setTimeout(() => { container.style.display = 'none'; }, 5000);
+}
 
 // ===================================
 // VARIÁVEIS GLOBAIS / CONSTANTES
 // ===================================
 const editModal = document.getElementById("editmodal");
 const fecharEditModal = document.getElementById("fechareditmodal1");
-const editProfileForm = document.querySelector(".editProfileForm"); 
+const editProfileForm = document.querySelector(".editProfileForm");
 const addAnuncioModal = document.getElementById("modaladdanuncio");
 const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
 const addAnuncioForm = document.getElementById("addAnuncioForm");
@@ -41,429 +51,653 @@ document.addEventListener("DOMContentLoaded", () => {
             secFavoritos.classList.add("hidden");
         });
 
-        // Ao clicar em "Favoritos"
-        abaFavoritos.addEventListener("click", () => {
+        // Ao clicar em "Favoritos" carrega do backend
+        abaFavoritos.addEventListener("click", async () => {
             abaFavoritos.classList.add("ativo");
             abaAnuncios.classList.remove("ativo");
             secFavoritos.classList.remove("hidden");
             secAnuncio.classList.add("hidden");
+            // carregar favoritos
+            await carregarFavoritos();
         });
     }
-
-    // Aplica a máscara de telefone ao campo de número
-    const phoneById = document.getElementById('number');
-    if (phoneById) applyPhoneMaskToInput(phoneById);
-    
-   
-    setupEditModalListeners();
-    setupAddAnuncioListeners();
-    setupLogout();
-
-    // Carregar painel do usuário ao iniciar
-    carregarPainel();
 });
 
+// ==============================
+// Carregar favoritos do backend
+// ==============================
+async function carregarFavoritos() {
+    const token = localStorage.getItem('token');
+    const favSection = document.getElementById('favoritos');
+    if (!favSection) return;
+    favSection.innerHTML = '<p>Carregando favoritos...</p>';
 
-// ===============================
-// Componente Painel + Consumo da API
-// ===============================
-async function carregarPainel() {
-    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`${API_BASE}/favoritos/me`, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) {
+            favSection.innerHTML = '<p>Não foi possível carregar favoritos.</p>';
+            return;
+        }
+        const imoveis = await res.json();
+        renderListaFavoritos(imoveis);
+    } catch (err) {
+        console.error('Erro ao carregar favoritos:', err);
+        favSection.innerHTML = '<p>Erro ao carregar favoritos.</p>';
+    }
+}
 
-
-    // Simulação de dados do usuário 
-    const dadosUsuario = {
-        whatsapp_link: "https://wa.me/5541988887777", // Exemplo de link do WhatsApp
-        email: "karina@alugarzin.com" // Exemplo de e-mail
-    };
-
-    // Preenche o link do WhatsApp 
-    const whatsappLinkElement = document.getElementById("whatsappLink");
-    if (whatsappLinkElement && dadosUsuario.whatsapp_link) {
-        whatsappLinkElement.href = dadosUsuario.whatsapp_link;
-        // Opcional: Altera a cor do ícone se o link estiver disponível
-        whatsappLinkElement.querySelector('i').style.color = '#25D366'; 
+function renderListaFavoritos(imoveis) {
+    const container = document.getElementById('favoritos');
+    if (!container) return;
+    if (!Array.isArray(imoveis) || imoveis.length === 0) {
+        container.innerHTML = '<p>Seus locais favoritos aparecerão aqui!</p>';
+        return;
     }
 
-    // Preenche o link do E-mail (Tarefa 2)
-    const emailLinkElement = document.getElementById("emailLink");
-    if (emailLinkElement && dadosUsuario.email) {
-        emailLinkElement.href = `mailto:${dadosUsuario.email}`;
+    container.innerHTML = '';
+    imoveis.forEach(a => {
+        const card = document.createElement('article');
+        card.className = 'card-anuncio';
+
+        const imagem = a.imagem_url || (a.imagens && a.imagens.length ? (Array.isArray(a.imagens) ? a.imagens[0] : JSON.parse(a.imagens)[0]) : '/frontend/image/placeholder.png');
+        const shortDesc = a.descricao ? String(a.descricao).slice(0, 140) + (String(a.descricao).length > 140 ? '...' : '') : '';
+
+        card.innerHTML = `
+            <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Favorito')}" />
+            <div class="card-body">
+                <h3>${escapeHtml(a.titulo)}</h3>
+                <p class="descricao">${escapeHtml(shortDesc)}</p>
+                <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
+                <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
+                <div class="card-actions">
+                    <button type="button" class="btn btn-small btn-editar btn-detalhes" data-id="${a.id}">Ver Detalhes</button>
+                    <button type="button" class="btn btn-danger btn-small btn-excluir btn-remover-fav" data-id="${a.id}">Remover</button>
+                </div>
+            </div>
+        `;
+
+        // detalhes (navegar para a página de detalhes)
+        const btnDetalhes = card.querySelector('.btn-detalhes, .btn-editar');
+        if (btnDetalhes) btnDetalhes.addEventListener('click', (e) => { e.stopPropagation(); window.location.href = `/frontend/detalhes_imovel.html?id=${a.id}`; });
+
+        // remover favorito
+        const btnRem = card.querySelector('.btn-remover-fav');
+        if (btnRem) {
+            btnRem.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!confirm('Remover dos favoritos?')) return;
+                const token = localStorage.getItem('token');
+                try {
+                    const res = await fetch(`${API_BASE}/favoritos/${a.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    if (!res.ok) throw new Error('Falha ao remover');
+                    // atualizar lista
+                    await carregarFavoritos();
+                } catch (err) {
+                    console.error('Erro remover favorito:', err);
+                    alert('Erro ao remover favorito');
+                }
+            });
+        }
+
+        container.appendChild(card);
+    });
+}
+// =========================
+//   BUSCAR USUÁRIO LOGADO
+// =========================
+async function carregarUsuario() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        console.error("Token não encontrado");
+        return window.location.href = "/frontend/login.html";
     }
 
     try {
-        // ... (lógica de carregamento de dados do backend)
-    } catch (erro) {
-        console.error("Erro ao carregar painel:", erro);
-    }
-}
+        const res = await fetch("http://localhost:3000/api/usuarios/me", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
 
-
-// ===============================
-// Modal Editar Perfil (Lógica de Abertura/Fechamento)
-// ===============================
-function abrirEditModal() {
-    if (editModal) editModal.style.display = "flex";
-}
-
-function fecharModal(modal) {
-    if (modal) modal.style.display = "none";
-    if (editProfileForm) editProfileForm.reset();
-    // Reverter preview de imagem para o padrão, se necessário
-    const preview = document.getElementById("previewImage");
-    if (preview) preview.src = '/frontend/image/Karina.jpg'; 
-}
-
-function setupEditModalListeners() {
-    if (fecharEditModal) {
-        fecharEditModal.addEventListener("click", () => fecharModal(editModal));
-    }
-
-    window.addEventListener("click", (event) => {
-        if (event.target === editModal) {
-            fecharModal(editModal);
+        if (!res.ok) {
+            console.error("Erro na API:", res.status);
+            throw new Error("Falha ao buscar usuário");
         }
+
+        const data = await res.json();
+
+        // A API pode retornar {usuario: {...}} ou só {...}
+        const u = data.usuario || data;
+
+        usuarioLogado = u;
+
+        preencherPerfil(u);
+
+    } catch (err) {
+        console.error("Erro carregar usuario:", err);
+        localStorage.removeItem("token");
+        window.location.href = "/frontend/login.html";
+    }
+}
+
+
+carregarUsuario();
+
+
+// =========================
+//         LOGOUT
+// =========================
+document.getElementById("btnLogout").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/frontend/login.html";
+});
+
+async function initPainel() {
+    // Valida token e redireciona se necessário (protectRoute já faz isso, mas conferimos)
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/frontend/login.html';
+        return;
+    }
+
+    // Listeners básicos (aceita btnLogout ou btnlogout)
+    const btnLogout = document.getElementById('btnLogout') || document.getElementById('btnlogout');
+    if (btnLogout) btnLogout.addEventListener('click', logout);
+
+    const btnAbrirAdd = document.getElementById('addbtn');
+    if (btnAbrirAdd) btnAbrirAdd.addEventListener('click', () => abrirModal('#modaladdanuncio'));
+
+    const btnEditar = document.getElementById('btnEditarPerfil');
+    if (btnEditar) btnEditar.addEventListener('click', () => abrirModal('#modalEditarPerfil'));
+
+    const fecharEditar = document.getElementById('fecharEditarPerfil');
+    if (fecharEditar) fecharEditar.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
+
+    const fecharAdd = document.getElementById('fecharEditModal2');
+    if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modaladdanuncio'));
+    // Reset editing state when modal closed
+    if (fecharAdd) fecharAdd.addEventListener('click', () => {
+        EDITING_ANUNCIO_ID = null;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio');
+        if (btnSalvar) btnSalvar.textContent = 'Publicar';
+        const formAddLocal = document.getElementById('addAnuncioForm'); if (formAddLocal) formAddLocal.reset();
+        const preview = document.getElementById('previewImagens'); if (preview) preview.innerHTML = '';
     });
 
-    if (editProfileForm) {
-        editProfileForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+    const btnCancelarPerfil = document.getElementById('btnCancelarPerfil');
+    if (btnCancelarPerfil) btnCancelarPerfil.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
 
-           
-            const dadosEdicao = {
-                nome: document.getElementById("name").value,
-                telefone: document.getElementById("number").value,
-                link_whatsapp: document.getElementById("whatsapp_link").value, 
-                email: document.getElementById("email").value,
-                cep: document.getElementById("cep").value, 
-                rua: document.getElementById("rua").value, 
-                numero: document.getElementById("numero").value, 
-                bairro: document.getElementById("bairro").value, 
-                cidade: document.getElementById("cidade").value, 
-                estado: document.getElementById("estado").value 
-            };
+    const btnCancelarAnuncio = document.getElementById('btnCancelarAnuncio');
+    if (btnCancelarAnuncio) btnCancelarAnuncio.addEventListener('click', () => fecharModal('#modaladdanuncio'));
 
-            console.log("Editar Perfil →", dadosEdicao);
+    // Previews de imagens
+    const profileImageInput = document.getElementById('profileImageInput');
+    if (profileImageInput) profileImageInput.addEventListener('change', previewProfileImage);
 
-            // ... (lógica de envio para o backend)
+    const imagemInput = document.getElementById('imagemInput');
+    if (imagemInput) imagemInput.addEventListener('change', previewAnuncioImages);
 
-            fecharModal(editModal);
+    // Forms
+    const formEditar = document.getElementById('formEditarPerfil');
+    if (formEditar) formEditar.addEventListener('submit', handleEditarPerfil);
+
+    const formAdd = document.getElementById('addAnuncioForm');
+    if (formAdd) formAdd.addEventListener('submit', handleAddAnuncio);
+
+    // Menu abas (meus anúncios / favoritos)
+    $all('.menu-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            $all('.menu-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.dataset.target;
+            $all('.aba').forEach(a => a.classList.add('hidden'));
+            const sel = `#${target}`;
+            const el = document.querySelector(sel);
+            if (el) el.classList.remove('hidden');
         });
-        
-        // ===================================
-        // Implementação da Tarefa 4 (Pré-visualização da Nova Foto)
-        // ===================================
-        const imageInput = document.getElementById("profileImageInput"); // ID corrigido
-        const preview = document.getElementById("previewImage");
-
-        if (imageInput && preview) {
-            imageInput.addEventListener('change', () => {
-                const file = imageInput.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Muda a imagem no modal
-                        preview.src = e.target.result; 
-                        
-                        // Opcional: Se precisar atualizar a imagem no painel principal imediatamente
-                        // document.getElementById("profileDisplayImage").src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-        
-        // ===================================
-        // Preenchimento Automático do CEP
-        // ===================================
-        const cepInput = document.getElementById('cep');
-        
-        if (cepInput) {
-            // Máscara de CEP
-            cepInput.addEventListener('input', (e) => {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.slice(0, 8);
-                if (value.length > 5) {
-                    e.target.value = value.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
-                } else {
-                    e.target.value = value;
-                }
-            });
-
-            // Busca do CEP ao perder o foco (blur)
-            cepInput.addEventListener('blur', async (e) => {
-                const cep = e.target.value.replace(/\D/g, '');
-                if (cep.length !== 8) return;
-
-                // Desativa campos enquanto busca
-                document.getElementById('rua').value = '... buscando';
-                document.getElementById('cidade').value = '...';
-                document.getElementById('estado').value = '...';
-                
-                try {
-                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                    const data = await response.json();
-
-                    if (!data.erro) {
-                        document.getElementById('rua').value = data.logradouro || '';
-                        document.getElementById('bairro').value = data.bairro || '';
-                        document.getElementById('cidade').value = data.localidade || '';
-                        document.getElementById('estado').value = data.uf || '';
-
-                        // Foca no campo número, ou na rua se estiver vazia
-                        if (data.logradouro) {
-                           document.getElementById('numero').focus();
-                        } else {
-                           document.getElementById('rua').focus();
-                        }
-                    } else {
-                        console.log("CEP não encontrado.");
-                        document.getElementById('rua').value = '';
-                        document.getElementById('cidade').value = '';
-                        document.getElementById('estado').value = '';
-                    }
-
-                } catch (error) {
-                    console.error("Erro ao buscar CEP:", error);
-                }
-            });
-        }
-    }
-}
-
-
-// ===============================
-// Modal Adicionar Anúncio (Lógica de Abertura/Fechamento)
-// ===============================
-
-// Função para abrir o modal
-function abrirAddAnuncioModal() {
-    addAnuncioModal.style.display = "flex";
-}
-
-function setupAddAnuncioListeners() {
-    // Fecha o modal ao clicar no X
-    if (fecharAddAnuncioModal) {
-        fecharAddAnuncioModal.addEventListener("click", () => {
-            fecharModal(addAnuncioModal);
-            // Limpa pré-visualizações de imagens (adicionado abaixo)
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
-        });
-    }
-
-    // Fecha o modal ao clicar fora dele
-    window.addEventListener("click", (event) => {
-        if (event.target === addAnuncioModal) {
-            fecharModal(addAnuncioModal);
-            // Limpa pré-visualizações de imagens (adicionado abaixo)
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
-        }
     });
 
-    // Envio do formulário
-    if (addAnuncioForm) {
-        addAnuncioForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+    setupAnuncioImageHelpers();
+    // Permite desmarcar as opções de período (clicar novamente desmarca)
+    if (typeof setupPeriodoToggle === 'function') setupPeriodoToggle();
 
-            // Certifica-se de que o mínimo de imagens foi atendido antes de prosseguir
-            if (window.verificarMinimoImagensAnuncio && !window.verificarMinimoImagensAnuncio()) {
-                // A função já exibe a mensagem de erro
-                return; 
-            }
+    // Carregamento inicial
+    await carregarUsuario();
+    await carregarMeusAnuncios();
+}
 
-            const formData = new FormData(addAnuncioForm);
-            console.log("Novo Anúncio →", Object.fromEntries(formData.entries()));
+// Inicializar listeners e comportamentos quando DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    initPainel().catch(err => console.error('Erro ao iniciar painel:', err));
+});
 
-            // ... (lógica de envio para o backend)
-            try {
-                const token = localStorage.getItem("token");
+function preencherPerfil(u) {
+    if (!u) return;
+    const nome = u.nome || 'Usuário';
+    const local = (u.cidade && u.estado) ? `${u.cidade}, ${u.estado}` : 'Localização não informada';
 
-                const response = await fetch("/api/imoveis", {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: formData
-                });
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) userNameEl.textContent = nome;
 
-                const result = await response.json();
+    const userLocationEl = document.getElementById('userLocation');
+    if (userLocationEl) userLocationEl.textContent = local;
 
-                if (!response.ok) {
-                    showMessage(result.message || "Erro ao cadastrar o imóvel.");
-                    return;
-                }
+    const profileDisplay = document.getElementById('profileDisplayImage');
+    if (profileDisplay) profileDisplay.src = u.foto_perfil || '/frontend/image/Karina.jpg';
+    const previewImg = document.getElementById('previewImage');
+    if (previewImg) previewImg.src = u.foto_perfil || '/frontend/image/Karina.jpg';
 
-                showMessage("Imóvel cadastrado com sucesso!");
-            } catch (erro) {
-                console.error("Erro ao enviar anúncio:", erro);
-                showMessage("Erro inesperado ao conectar com o servidor.");
-            }
+    // preencher formulário
+    const nameIn = document.getElementById('name');
+    if (nameIn) nameIn.value = u.nome || '';
+    const numberIn = document.getElementById('number');
+    if (numberIn) numberIn.value = u.telefone || '';
+    const emailIn = document.getElementById('email');
+    if (emailIn) emailIn.value = u.email || '';
+    const cidadeIn = document.getElementById('cidade_profile') || document.getElementById('cidade');
+    if (cidadeIn) cidadeIn.value = u.cidade || '';
+    const estadoIn = document.getElementById('estado_profile') || document.getElementById('estado');
+    if (estadoIn) estadoIn.value = u.estado || '';
+    const cepIn = document.getElementById('cep_profile') || document.getElementById('cep');
+    if (cepIn) cepIn.value = u.cep || '';
+    const whatsappIn = document.getElementById('whatsapp_link');
+    if (whatsappIn) whatsappIn.value = u.whatsapp_link || '';
 
-            fecharModal(addAnuncioModal);
-            if (window.clearAnuncioImages) window.clearAnuncioImages();
+    const emailLink = document.getElementById('emailLink');
+    if (emailLink) emailLink.href = `mailto:${u.email}`;
+    const whatsappLink = document.getElementById('whatsappLink');
+    if (whatsappLink && u.whatsapp_link) whatsappLink.href = u.whatsapp_link;
+}
+
+// Helpers para abrir/fechar modais simples
+function abrirModal(selector) {
+    const modal = document.querySelector(selector);
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    // foco no primeiro input
+    const firstInput = modal.querySelector('input, textarea, select, button');
+    if (firstInput) firstInput.focus();
+    // fechar ao clicar fora do conteúdo
+    modal.addEventListener('click', function onOutsideClick(e) {
+        if (e.target === modal) {
+            fecharModal(selector);
+            modal.removeEventListener('click', onOutsideClick);
+        }
+    });
+}
+
+function fecharModal(selector) {
+    const modal = document.querySelector(selector);
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
+// ==============================
+// Carregar anúncios do usuário (/api/imoveis/meus)
+// ==============================
+async function carregarMeusAnuncios() {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/meus`, {
+            headers: { 'Authorization': 'Bearer ' + token }
         });
+
+        if (!res.ok) {
+            console.warn('Não foi possível buscar anúncios do usuário:', res.status);
+            const lista = document.getElementById('listaAnuncios');
+            if (lista) lista.innerHTML = '<p>Não foi possível carregar anúncios.</p>';
+            return;
+        }
+
+        const payload = await res.json().catch(() => null);
+        // API pode retornar array direto ou objeto com campos variados
+        let anuncios = [];
+        if (Array.isArray(payload)) anuncios = payload;
+        else if (!payload) anuncios = [];
+        else if (Array.isArray(payload.dados)) anuncios = payload.dados;
+        else if (Array.isArray(payload.imoveis)) anuncios = payload.imoveis;
+        else if (Array.isArray(payload.anuncios)) anuncios = payload.anuncios;
+        else if (Array.isArray(payload.data)) anuncios = payload.data;
+        else if (payload && typeof payload === 'object' && (payload.id || payload.usuario_id)) anuncios = [payload];
+        else anuncios = [];
+
+        renderListaAnuncios(anuncios);
+    } catch (err) {
+        console.error('Erro ao carregar anúncios:', err);
+        const lista = document.getElementById('listaAnuncios');
+        if (lista) lista.innerHTML = '<p>Erro ao carregar anúncios.</p>';
     }
 }
 
+function renderListaAnuncios(anuncios) {
+    const container = document.getElementById('listaAnuncios') || document.getElementById('anuncio');
+    if (!container) return;
 
-// ===============================
-// Controle de Imagens no Modal de Anúncio
-// ===============================
-(function() {
-    // ID corrigido no HTML para 'imagemInput' (era 'imagem' no JS antigo)
-    const input = document.getElementById('imagemInput'); 
+    if (!Array.isArray(anuncios) || anuncios.length === 0) {
+        container.innerHTML = '<p>Você não possui anúncios, clique no botão + para criar!</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    anuncios.forEach(a => {
+        const card = document.createElement('article');
+        card.className = 'card-anuncio';
+
+        const imagem = a.imagem_url || (a.imagens && a.imagens.length ? a.imagens[0] : '/frontend/image/placeholder.png');
+
+        const shortDesc = a.descricao ? String(a.descricao).slice(0, 140) + (String(a.descricao).length > 140 ? '...' : '') : '';
+
+        card.innerHTML = `
+            <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Anúncio')}" />
+            <div class="card-body">
+                <h3>${escapeHtml(a.titulo)}</h3>
+                <p class="descricao">${escapeHtml(shortDesc)}</p>
+                <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
+                <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
+                <div class="card-actions">
+                    <button class="btn btn-small btn-editar" data-id="${a.id}">Editar</button>
+                    <button class="btn btn-danger btn-small btn-excluir" data-id="${a.id}">Excluir</button>
+                </div>
+            </div>
+        `;
+
+        // navigate to detalhes when clicking the card (except on action buttons)
+        card.addEventListener('click', () => {
+            window.location.href = `/frontend/detalhes_imovel.html?id=${a.id}`;
+        });
+
+        // stop propagation on action buttons and wire them to existing handlers
+        const btnEditar = card.querySelector('.btn-editar');
+        if (btnEditar) {
+            btnEditar.addEventListener('click', (e) => { e.stopPropagation(); editarAnuncio(a.id); });
+        }
+        const btnExcluir = card.querySelector('.btn-excluir');
+        if (btnExcluir) {
+            btnExcluir.addEventListener('click', (e) => { e.stopPropagation(); deletarAnuncio(a.id); });
+        }
+
+        container.appendChild(card);
+    });
+}
+
+// ==============================
+// Handlers: Editar Perfil (envia FormData com foto_perfil)
+// ==============================
+async function handleEditarPerfil(e) {
+    e.preventDefault();
+    if (!usuarioLogado) return alert('Usuário não carregado');
+
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('formEditarPerfil');
+    const fd = new FormData(form);
+
+    if (fd.has('name')) { fd.set('nome', fd.get('name')); fd.delete('name'); }
+    if (fd.has('number')) { fd.set('telefone', fd.get('number')); fd.delete('number'); }
+    if (!fd.has('foto_perfil') && document.getElementById('profileImageInput')?.files?.length) {
+        const file = document.getElementById('profileImageInput').files[0];
+        if (file) fd.set('foto_perfil', file);
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/usuarios/${usuarioLogado.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: fd
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.erro || 'Falha ao atualizar perfil');
+
+        alert('Perfil atualizado com sucesso!');
+        await carregarUsuario();
+        fecharModal('#modalEditarPerfil');
+    } catch (err) {
+        console.error('Erro ao salvar perfil:', err);
+        alert('Erro ao salvar perfil: ' + err.message);
+    }
+}
+
+// ==============================
+// Handlers: Adicionar Anúncio (envia FormData com imagens[])
+// ==============================
+async function handleAddAnuncio(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('addAnuncioForm');
+    const fd = new FormData(form);
+
+    try {
+        let res;
+        if (EDITING_ANUNCIO_ID) {
+            // editar
+            res = await fetch(`${API_BASE}/imoveis/${EDITING_ANUNCIO_ID}`, {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: fd
+            });
+        } else {
+            // criar
+            res = await fetch(`${API_BASE}/imoveis`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: fd
+            });
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.erro || data.mensagem || 'Falha ao publicar');
+
+        alert(EDITING_ANUNCIO_ID ? 'Anúncio atualizado com sucesso!' : 'Anúncio publicado com sucesso!');
+        form.reset();
+        const preview = document.getElementById('previewImagens');
+        if (preview) preview.innerHTML = '';
+        fecharModal('#modaladdanuncio');
+        EDITING_ANUNCIO_ID = null;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Publicar';
+        await carregarMeusAnuncios();
+    } catch (err) {
+        console.error('Erro publicar anuncio:', err);
+        alert('Erro ao publicar: ' + err.message);
+    }
+}
+
+// Abrir modal de edição, preencher formulário e marcar modo edição
+async function editarAnuncio(id) {
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/${id}`);
+        if (!res.ok) return alert('Não foi possível carregar anúncio para edição');
+        const imovel = await res.json();
+
+        // Preencher campos do formulário
+        const form = document.getElementById('addAnuncioForm');
+        if (!form) return;
+        // texto / selects
+        form.querySelector('#tipolocal_select') && (form.querySelector('#tipolocal_select').value = imovel.tipolocal || '');
+        form.querySelector('#tipoanuncio_select') && (form.querySelector('#tipoanuncio_select').value = imovel.tipoanuncio || '');
+        form.querySelector('#preco') && (form.querySelector('#preco').value = imovel.preco || '');
+        if (imovel.periodo) {
+            const p = imovel.periodo;
+            const radio = form.querySelector(`input[name="periodo"][value="${p}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // If a periodo radio was programmatically checked, mark its wasChecked state
+        form.querySelectorAll('input[name="periodo"]').forEach(r => { if (r.checked) r.wasChecked = true; });
+        form.querySelector('#rua') && (form.querySelector('#rua').value = imovel.rua || '');
+        form.querySelector('#numero') && (form.querySelector('#numero').value = imovel.numero || '');
+        form.querySelector('#bairro') && (form.querySelector('#bairro').value = imovel.bairro || '');
+        form.querySelector('#cidade_anuncio') && (form.querySelector('#cidade_anuncio').value = imovel.cidade || '');
+        form.querySelector('#estado_anuncio') && (form.querySelector('#estado_anuncio').value = imovel.estado || '');
+        // titulo / descricao
+        form.querySelector('#titulo') && (form.querySelector('#titulo').value = imovel.titulo || '');
+        form.querySelector('#descricao') && (form.querySelector('#descricao').value = imovel.descricao || '');
+
+        // Radios quartos/banheiros/vagas
+        if (imovel.quartos !== undefined && imovel.quartos !== null) {
+            const qVal = String(imovel.quartos);
+            const q = form.querySelector(`input[name="quartos"][value="${qVal}"]`);
+            if (q) q.checked = true; else {
+                if (!isNaN(Number(qVal)) && Number(qVal) >= 4) { const q4 = form.querySelector('input[name="quartos"][value="4+"]'); if (q4) q4.checked = true; }
+            }
+        }
+        if (imovel.banheiros !== undefined && imovel.banheiros !== null) {
+            const bVal = String(imovel.banheiros);
+            const b = form.querySelector(`input[name="banheiros"][value="${bVal}"]`);
+            if (b) b.checked = true; else { if (!isNaN(Number(bVal)) && Number(bVal) >= 4) { const b4 = form.querySelector('input[name="banheiros"][value="4+"]'); if (b4) b4.checked = true; } }
+        }
+        if (imovel.vagas !== undefined && imovel.vagas !== null) {
+            const vVal = String(imovel.vagas);
+            const v = form.querySelector(`input[name="vagas"][value="${vVal}"]`);
+            if (v) v.checked = true; else { if (!isNaN(Number(vVal)) && Number(vVal) >= 4) { const v4 = form.querySelector('input[name="vagas"][value="4+"]'); if (v4) v4.checked = true; } }
+        }
+
+        // comodidades checkboxes
+        const comods = imovel.comodidades || [];
+        if (Array.isArray(comods)) {
+            form.querySelectorAll('input[name="comodidades"]').forEach(cb => cb.checked = comods.includes(cb.value));
+        }
+
+        // mostrar imagens existentes como preview (note: uploading new images will replace them)
+        const preview = document.getElementById('previewImagens');
+        if (preview) {
+            preview.innerHTML = '';
+            const imgs = Array.isArray(imovel.imagens) ? imovel.imagens : (imovel.imagens ? JSON.parse(imovel.imagens) : []);
+            const primary = imovel.imagem_url ? [imovel.imagem_url] : [];
+            const all = imgs.length ? imgs : primary;
+            all.forEach(src => {
+                const img = document.createElement('img'); img.src = src; img.className = 'preview-thumb'; preview.appendChild(img);
+            });
+        }
+
+        // set editing state
+        EDITING_ANUNCIO_ID = id;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Salvar';
+        abrirModal('#modaladdanuncio');
+    } catch (err) {
+        console.error('Erro ao abrir edição do anúncio:', err);
+        alert('Erro ao carregar anúncio para edição');
+    }
+}
+
+// ==============================
+// Preview de imagens
+// ==============================
+function previewProfileImage(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = document.getElementById('previewImage');
+    if (img) img.src = url;
+}
+
+function previewAnuncioImages(e) {
+    const files = Array.from(e.target.files || []);
     const preview = document.getElementById('previewImagens');
-    const form = document.getElementById('addAnuncioForm'); 
-    
-    // Armazena as URLs temporárias para poder revogar
-    let objectURLs = []; 
+    if (!preview) return;
+    preview.innerHTML = '';
+    files.forEach(f => {
+        const url = URL.createObjectURL(f);
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'preview-thumb';
+        preview.appendChild(img);
+    });
+}
+
+// ==============================
+// CRUD Anúncios: deletar / editar
+// ==============================
+async function deletarAnuncio(id) {
+    if (!confirm('Deseja realmente excluir este anúncio?')) return;
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('Falha ao excluir');
+        alert('Anúncio excluído');
+        await carregarMeusAnuncios();
+    } catch (err) {
+        console.error('Erro excluir anúncio:', err);
+        alert('Erro ao excluir anúncio');
+    }
+}
+
+// Note: the full `editarAnuncio(id)` implementation appears earlier in this file
+// (it fetches the anuncio and prefills the form). We avoid redefining it here
+// so the real edit flow is preserved.
+
+window.deletarAnuncio = deletarAnuncio;
+
+// ==============================
+// Util: escapeHTML
+// ==============================
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// ==============================
+// Helpers relacionados a imagens do anúncio (reuso parte do seu código)
+// ==============================
+function setupAnuncioImageHelpers() {
+    const input = document.getElementById('imagemInput');
+    const preview = document.getElementById('previewImagens');
+    if (!input || !preview) return;
+
+    let objectURLs = [];
     const MIN_IMAGENS = 3;
 
-    // Cria ou acha o elemento para mensagens de erro
-    let erroMsg = document.createElement('p');
-    erroMsg.id = 'erro-imagens';
-    erroMsg.style.color = 'red';
-    erroMsg.style.fontSize = '14px';
-    erroMsg.style.marginTop = '8px';
-    erroMsg.style.display = 'none';
-    
-    // Garante que a mensagem seja inserida apenas uma vez
-    if (input && !document.getElementById('erro-imagens')) {
+    const erroMsgId = 'erro-imagens';
+    let erroMsg = document.getElementById(erroMsgId);
+    if (!erroMsg) {
+        erroMsg = document.createElement('p');
+        erroMsg.id = erroMsgId;
+        erroMsg.style.color = 'red';
+        erroMsg.style.fontSize = '14px';
+        erroMsg.style.marginTop = '8px';
+        erroMsg.style.display = 'none';
         input.insertAdjacentElement('afterend', erroMsg);
     }
 
     function renderPreviews() {
-        // Limpa previews antigos e revoga URLs antigas
         preview.innerHTML = '';
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
         objectURLs = [];
 
         const files = Array.from(input.files || []);
-        
         files.forEach((file, index) => {
-            const thumbWrap = document.createElement('div');
-            thumbWrap.className = 'thumb-wrap';
-            thumbWrap.style.position = 'relative';
-            thumbWrap.style.display = 'inline-block';
-            thumbWrap.style.margin = '5px';
-
-            const img = document.createElement('img');
             const url = URL.createObjectURL(file);
             objectURLs.push(url);
+            const img = document.createElement('img');
             img.src = url;
-            img.alt = file.name;
-     
-            img.style.width = '100px'; 
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.innerText = '×';
-            btn.title = 'Remover imagem';
-            // Estilos para o botão de remover
-            btn.style.position = 'absolute';
-            btn.style.top = '-8px';
-            btn.style.right = '-8px';
-            btn.style.width = '26px';
-            btn.style.height = '26px';
-            btn.style.borderRadius = '50%';
-            btn.style.border = 'none';
-            btn.style.background = 'linear-gradient(to right,#ff751f,#430097)';
-            btn.style.color = '#fff';
-            btn.style.cursor = 'pointer';
-            btn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
-            btn.style.fontSize = '16px';
-            btn.style.lineHeight = '0.9';
-
-            btn.addEventListener('click', () => {
-                removeImageAtIndex(index);
-            });
-
-            thumbWrap.appendChild(img);
-            thumbWrap.appendChild(btn);
-            preview.appendChild(thumbWrap);
+            img.className = 'preview-thumb';
+            preview.appendChild(img);
         });
 
         verificarMinimoImagens();
     }
 
-   
-    // Antigamente, ele limpava todos os arquivos e adicionava apenas os novos.
-    // Agora ele adiciona os novos arquivos aos antigos.
-    if (input) {
-        input.addEventListener('change', () => {
-            const currentFiles = Array.from(input.files || []);
-            
-            // Cria um array de DataTransfer e adiciona todos os arquivos antigos
-            const dataTransfer = new DataTransfer();
-            
-            // Se houver arquivos existentes, adiciona eles
-            if (input.dataset.existingFiles) {
-                const existingFiles = JSON.parse(input.dataset.existingFiles);
-                existingFiles.forEach(file => dataTransfer.items.add(file));
-            }
-            
-            // Adiciona os novos arquivos
-            currentFiles.forEach(file => dataTransfer.items.add(file));
-
-            // Atualiza o input.files
-            input.files = dataTransfer.files;
-
-            // Armazena os arquivos existentes para a próxima mudança
-            input.dataset.existingFiles = JSON.stringify(Array.from(input.files));
-
-            renderPreviews();
-        });
-    }
-
-
-    function setInputFiles(filesArray) {
-        const dt = new DataTransfer();
-        filesArray.forEach(f => dt.items.add(f));
-        input.files = dt.files;
-        // Atualiza o dataset para persistir a lista
-        input.dataset.existingFiles = JSON.stringify(filesArray);
-    }
-
-    function removeImageAtIndex(indexToRemove) {
-        const files = Array.from(input.files || []);
-        if (indexToRemove < 0 || indexToRemove >= files.length) return;
-        
-        // Revoga a URL do objeto que será removido
-        if (objectURLs[indexToRemove]) {
-            URL.revokeObjectURL(objectURLs[indexToRemove]);
-        }
-        
-        const newFiles = files.filter((_, i) => i !== indexToRemove);
-        setInputFiles(newFiles);
+    input.addEventListener('change', () => {
         renderPreviews();
-    }
-
-    function clearImages() {
-        // Revoga todas as URLs
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch(e){} });
-        objectURLs = [];
-        preview.innerHTML = '';
-        input.value = ''; // Limpa o valor do input (para o navegador)
-        
-        // Limpa a lista de arquivos via DataTransfer e o dataset
-        try { 
-            input.files = new DataTransfer().files; 
-        } catch (e) {
-         
-        }
-        input.dataset.existingFiles = JSON.stringify([]);
-
-        erroMsg.style.display = 'none'; // limpa mensagem
-    }
+    });
 
     function verificarMinimoImagens() {
         const total = input.files ? input.files.length : 0;
         if (total < MIN_IMAGENS) {
             erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/${MIN_IMAGENS})`;
             erroMsg.style.display = 'block';
-            input.style.borderColor = 'red'; 
+            input.style.borderColor = 'red';
             return false;
         } else {
             erroMsg.style.display = 'none';
@@ -472,96 +706,90 @@ function setupAddAnuncioListeners() {
         }
     }
 
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            if (!verificarMinimoImagens()) {
-                e.preventDefault(); // bloqueia envio
-      
+    // Expõe para uso externo
+    window.clearAnuncioImages = function () {
+        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
+        objectURLs = [];
+        preview.innerHTML = '';
+        input.value = '';
+        erroMsg.style.display = 'none';
+    };
+
+    window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+}
+
+// Torna os radios de `name="periodo"` toggleáveis (clicar novamente desmarca)
+function setupPeriodoToggle() {
+    const radios = Array.from(document.querySelectorAll('input[name="periodo"]'));
+    if (!radios.length) return;
+
+    // track previous state per element
+    radios.forEach(r => {
+        r.wasChecked = r.checked;
+        r.addEventListener('click', function (e) {
+            // If it was already checked, uncheck it
+            if (this.wasChecked) {
+                this.checked = false;
+                this.wasChecked = false;
+            } else {
+                // mark others as not-wasChecked and this as wasChecked
+                radios.forEach(rr => rr.wasChecked = false);
+                this.wasChecked = true;
             }
         });
-    }
-    
-    // Expõe a função para ser chamada no fechamento do modal
-    window.clearAnuncioImages = clearImages;
-    window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+        // update state on change (in case changed programmatically)
+        r.addEventListener('change', function () { this.wasChecked = this.checked; });
+    });
+}
 
-})();
-
-
-// ===============================
+// ==============================
 // Logout
-// ===============================
-
-function setupLogout() {
-    const btnLogout = document.getElementById("bntlogout");
-
-    if (btnLogout) {
-        btnLogout.addEventListener("click", () => {
-            // Remove token do localStorage
-            localStorage.removeItem("token");
-
-            // Redireciona para index.html (página de login/landing)
-            // Usa replace() para GARANTIR que a página atual seja substituída no histórico
-            // impedindo que o botão "Voltar" do navegador retorne para o painel.html
-            window.location.replace("./index.html"); 
-            
-  
-        });
+// ==============================
+function logout() {
+    if (typeof secureLogout === 'function') {
+        secureLogout(false);
+    } else {
+        localStorage.removeItem('token');
+        window.location.href = '/frontend/login.html';
     }
 }
 
-
-// -----------------------------
-// Máscara de telefone
-// -----------------------------
+// ==============================
+// Máscara de telefone (seu código)
+// ==============================
 function formatPhoneValue(value) {
-    // remove tudo que não é dígito
-    const digits = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
+    const digits = value.replace(/\D/g, '').slice(0, 11);
     if (!digits) return '';
-
-    // (XX) X XXXX-XXXX (9 dígitos) ou (XX) XXXX-XXXX (8 dígitos)
     let out = '';
-    
     if (digits.length > 0) {
         out += `(${digits.slice(0, 2)}`;
     }
     if (digits.length > 2) {
-        out += `) ${digits.slice(2, 3)}`; // Opcional 9º dígito
+        out += `) ${digits.slice(2, 3)}`;
     }
-    
-    // Se tem 9º dígito
     if (digits.length > 3 && digits.length <= 7) {
         out += ` ${digits.slice(3, 7)}`;
     } else if (digits.length > 7) {
         out += ` ${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-    }
-    // Se não tem 9º dígito
-    else if (digits.length > 2 && digits.length <= 6) {
-         out += ` ${digits.slice(2, 6)}`;
+    } else if (digits.length > 2 && digits.length <= 6) {
+        out += ` ${digits.slice(2, 6)}`;
     } else if (digits.length > 6) {
         out += ` ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
     }
-
     return out;
 }
 
-
 function applyPhoneMaskToInput(input) {
     if (!input) return;
-
-    // Garante que o input seja do tipo 'text' para o funcionamento ideal da máscara
-    input.setAttribute('type', 'text'); 
-    
-    // Adicionado o tratamento para o CEP
+    input.setAttribute('type', 'text');
     const onInput = (e) => {
         let value = e.target.value.replace(/\D/g, '').slice(0, 11);
-        
         let formattedValue = '';
         if (value.length > 2) {
             formattedValue += `(${value.slice(0, 2)}) `;
-            if (value.length > 7 && value.length === 11) { // Telefone com 9º dígito
+            if (value.length > 7 && value.length === 11) {
                 formattedValue += `${value.slice(2, 3)} ${value.slice(3, 7)}-${value.slice(7, 11)}`;
-            } else if (value.length > 6) { // Telefone padrão (8 dígitos)
+            } else if (value.length > 6) {
                 formattedValue += `${value.slice(2, 6)}-${value.slice(6, 10)}`;
             } else if (value.length > 2) {
                 formattedValue += value.slice(2);
@@ -569,21 +797,22 @@ function applyPhoneMaskToInput(input) {
         } else {
             formattedValue = value;
         }
-
         e.target.value = formattedValue;
     };
-
     const onPaste = (e) => {
         e.preventDefault();
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         e.target.value = paste;
         e.target.dispatchEvent(new Event('input'));
-        
-      
         const len = input.value.length;
         input.setSelectionRange(len, len);
     };
-
     input.addEventListener('input', onInput);
     input.addEventListener('paste', onPaste);
 }
+
+// Expose functions used in inline handlers (se necessário)
+window.deletarAnuncio = deletarAnuncio;
+window.editarAnuncio = editarAnuncio;
+window.clearAnuncioImages = window.clearAnuncioImages || function () { };
+window.verificarMinimoImagensAnuncio = window.verificarMinimoImagensAnuncio || function () { };
