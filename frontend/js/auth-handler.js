@@ -113,7 +113,7 @@ export async function carregarImovelsDoBanco(filtros = {}) {
         }
 
         const data = await res.json();
-        return data.dados || data || [];
+        return Array.isArray(data) ? data : (data.dados || data || []);
     } catch (err) {
         console.error('Erro ao carregar imóveis:', err);
         return [];
@@ -125,8 +125,12 @@ export async function carregarImovelsDoBanco(filtros = {}) {
  */
 export async function carregarImovelPorId(id) {
     try {
-        const imoveis = await carregarImovelsDoBanco();
-        return imoveis.find(i => i.id == id) || null;
+        const res = await fetch(`${API_BASE}/imoveis/${id}`);
+        if (!res.ok) {
+            console.error('Erro ao buscar imóvel:', res.status);
+            return null;
+        }
+        return await res.json();
     } catch (err) {
         console.error('Erro ao carregar imóvel:', err);
         return null;

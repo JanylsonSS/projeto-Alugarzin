@@ -7,89 +7,89 @@
 }
 
 body {
-    background-color: #f8f9fa;
-    font-family: "Work Sans", sans-serif;
-    background-image: 
-        url('/frontend/image/Fundo.png');
-            font-family: "Work Sans", sans-serif;
-    background-attachment: fixed;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+  background-color: #f8f9fa;
+  font-family: "Work Sans", sans-serif;
+  background-image:
+    url('/frontend/image/Fundo.png');
+  font-family: "Work Sans", sans-serif;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 
-    margin: 5px;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    min-height: 90vh;
-    line-height: 1.6;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  margin: 5px;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  min-height: 90vh;
+  line-height: 1.6;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ======== NAVBAR ======== */
 .navbar {
-    position: fixed;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 30px;
-    position: sticky;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    transition: top 0.3s ease;
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 30px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  transition: top 0.3s ease;
 }
 
 .logo img {
-    height: 65px;
-    margin-left: 250px;
+  height: 65px;
+  margin-left: 250px;
 }
 
 .menu {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .menu a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
 }
 
 .menu a:hover {
-    color: #ff751f;
+  color: #ff751f;
 }
 
 .btn {
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-right: 10px;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .login {
-    background-color: #ff751f;
-    color: white;
-    border-color: #ff751f;
+  background-color: #ff751f;
+  color: white;
+  border-color: #ff751f;
 }
 
 .login:hover {
-    background-color: #e65c00;
+  background-color: #e65c00;
 }
 
 .criar {
-    background-color: #430097;
-    color: #ffffff;
-    border-color: #430097;
+  background-color: #430097;
+  color: #ffffff;
+  border-color: #430097;
 }
 
 .criar:hover {
-    background-color: #320075;
+  background-color: #320075;
 }
 
 .menu-toggle {
@@ -97,6 +97,28 @@ body {
   background: none;
   border: none;
   font-size: 1.6rem;
+}
+
+/* Top navbar filter buttons (Alugar / Comprar) styled as toggle pills */
+.nav-filter {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box, linear-gradient(to right, #ff751f, #430097) border-box;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #333;
+  transition: transform .12s ease, opacity .12s ease, color .12s ease;
+}
+
+.nav-filter.active {
+  color: #fff;
+  background: linear-gradient(to right, #ff751f, #430097);
+  box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
+}
+
+.nav-filter+.nav-filter {
+  margin-left: 6px;
 }
 
 /* ======== LAYOUT PRINCIPAL ======== */
@@ -120,31 +142,35 @@ body {
 /* ======== SIDEBAR ======== */
 .sidebar {
   position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 260px;
-    background: white;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    overflow-y: auto;
-    z-index: 100;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  background: white;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 100;
 }
+
 .sidebar h3 {
   font-size: 0.9rem;
   color: #555;
   margin: 20px 0 10px;
 }
+
 .sidebar label {
   display: block;
   font-size: 0.9rem;
   margin-bottom: 5px;
 }
+
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
+
 .filter-buttons button {
   padding: 5px 10px;
   border: 1px solid #aaa;
@@ -152,22 +178,25 @@ body {
   background: white;
   cursor: pointer;
 }
+
 .price-inputs {
   display: flex;
   gap: 8px;
 }
+
 .price-inputs input {
   width: 100%;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
+
 .aplicar {
-    background-color: #430097;
-    color: #ffffff;
-    border-color: #430097;
-    width: 100%;
-    margin-top: 15px;
+  background-color: #430097;
+  color: #ffffff;
+  border-color: #430097;
+  width: 100%;
+  margin-top: 15px;
 }
 
 /* ======== LISTAGEM ======== */
@@ -186,6 +215,7 @@ body {
   padding: 10px 20px;
   margin-bottom: 30px;
 }
+
 .barra-pesquisa input {
   flex: 1;
   border: none;
@@ -196,8 +226,8 @@ body {
 
 /* ======== CARDS ======== */
 .cards-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -206,17 +236,48 @@ body {
   flex-direction: row;
   background: white;
   border: 3px solid #6f42c1;
-  border-radius: 15px;
+  border-radius: 12px;
   overflow: hidden;
-  transition: 0.2s;
+  transition: transform 0.2s;
 }
+
 .imovel-card:hover {
-  transform: scale(1.01);
+  transform: translateY(-4px);
 }
 
 .imovel-card img {
-  width: 40%;
+  width: 38%;
+  max-width: 380px;
+  min-width: 180px;
+  height: 240px;
   object-fit: cover;
+  display: block;
+}
+
+/* Compatibility with card markup produced by renderizarCardImovel (card-imovel / card-image) */
+.card-imovel {
+  background: white;
+  border: 3px solid #6f42c1;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.card-imovel:hover {
+  transform: translateY(-4px);
+}
+
+.card-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.card-wrapper {
+  width: 100%;
 }
 
 .card-content {
@@ -231,19 +292,23 @@ body {
   margin: 0;
   color: #000000;
 }
+
 .card-content p {
   margin: 5px 0;
   color: #000000;
 }
+
 .card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .preco {
   font-weight: bold;
   font-size: 1.1rem;
 }
+
 .icones {
   display: flex;
   gap: 15px;
@@ -270,7 +335,7 @@ body {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
   z-index: 9999;
@@ -283,7 +348,7 @@ body {
   width: 350px;
   text-align: center;
   position: relative;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-close {
@@ -314,17 +379,21 @@ body {
   .main-container {
     flex-direction: column;
   }
+
   .sidebar {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
+
   .imovel-card {
     flex-direction: column;
   }
+
   .imovel-card img {
     width: 100%;
     height: 200px;
+    max-width: 100%;
   }
 }
 
@@ -332,50 +401,57 @@ body {
   .menu {
     display: none;
   }
+
   .menu-toggle {
     display: block;
   }
 }
 
 .filter-buttons button.active {
-    background-color: #430097; /* Roxo */
-    color: white;
-    border-color: #430097;
-    font-weight: bold;
+  background-color: #430097;
+  /* Roxo */
+  color: white;
+  border-color: #430097;
+  font-weight: bold;
 }
 
 .bi-bookmark-fill.favorito-ativo {
-    color: red !important;
+  color: red !important;
 }
 
 .sem-resultados {
-    text-align: center;
-    padding: 20px;
-    font-size: 1.1rem;
-    color: #430097;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1rem;
+  color: #430097;
 }
 
 @media (max-width: 992px) {
-    .main-container {
-        flex-direction: column;
-        margin-left: 0;
-    }
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: static; 
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-      
-    }
-    .imovel-card {
-        flex-direction: column;
-    }
-    .imovel-card img {
-        width: 100%;
-        height: 200px;
-    }
-    .listagem {
-        padding: 20px;
-    }
+  .main-container {
+    flex-direction: column;
+    margin-left: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+
+  }
+
+  .imovel-card {
+    flex-direction: column;
+  }
+
+  .imovel-card img {
+    width: 100%;
+    height: 200px;
+    max-width: 100%;
+  }
+
+  .listagem {
+    padding: 20px;
+  }
 }

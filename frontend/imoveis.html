@@ -21,8 +21,8 @@
     </div>
 
     <nav class="menu">
-      <a href="/frontend/imoveis.html">ALUGAR</a>
-      <a href="/frontend/imoveis.html">COMPRAR</a>
+      <button class="nav-filter" data-value="Aluguel">ALUGAR</button>
+      <button class="nav-filter" data-value="Venda">COMPRAR</button>
       <a href="/frontend/login.html"><button class="btn btn-login">LOGIN</button></a>
       <a href="/frontend/login.html"><button class="btn btn-criar-conta">CRIAR CONTA</button></a>
     </nav>
@@ -38,71 +38,76 @@
 
     <aside class="sidebar">
       <h3>Tipo de imóvel</h3>
-      <label><input type="checkbox" /> Casa</label>
-      <label><input type="checkbox" /> Apartamento</label>
-      <label><input type="checkbox" /> Kitnet/Conjugado</label>
-      <label><input type="checkbox" /> Cobertura</label>
-      <label><input type="checkbox" /> Terreno</label>
-      <label><input type="checkbox" /> Comercial</label>
-      <label><input type="checkbox" /> Kitnet</label>
-      <label><input type="checkbox" /> Studio</label>
-      <label><input type="checkbox" /> Loft</label>
-      <label><input type="checkbox" /> Sobrado</label>
-      <label><input type="checkbox" /> Chácara</label>
-      <label><input type="checkbox" /> Sítio</label>
-      <label><input type="checkbox" /> Fazenda</label>
-      <label><input type="checkbox" /> Galpão</label>
-      <label><input type="checkbox" /> Sala Comercial</label>
-      <label><input type="checkbox" /> Ponto Comercial</label>
-      <label><input type="checkbox" /> Flat</label>
+      <div id="tipos-container">
+        <label><input class="tipo-checkbox" type="checkbox" /> Casa</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Apartamento</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Kitnet/Conjugado</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Cobertura</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Terreno</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Kitnet</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Studio</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Loft</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sobrado</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Chácara</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sítio</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Fazenda</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Galpão</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Sala Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Ponto Comercial</label>
+        <label><input class="tipo-checkbox" type="checkbox" /> Flat</label>
+      </div>
 
       <h3>Quartos</h3>
       <div class="filter-buttons">
-        <button>1+</button>
-        <button>2+</button>
-        <button>3+</button>
-        <button>4+</button>
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
       </div>
 
       <h3>Banheiros</h3>
       <div class="filter-buttons">
-        <button>1+</button>
-        <button>2+</button>
-        <button>3+</button>
-        <button>4+</button>
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
       </div>
 
       <h3>Vagas</h3>
       <div class="filter-buttons">
-        <button>1+</button>
-        <button>2+</button>
-        <button>3+</button>
-        <button>4+</button>
+        <button type="button">1+</button>
+        <button type="button">2+</button>
+        <button type="button">3+</button>
+        <button type="button">4+</button>
       </div>
 
       <h3>Preço</h3>
       <div class="price-inputs">
-        <input type="number" placeholder="Mínimo" />
-        <input type="number" placeholder="Máximo" />
+        <input id="price-min" type="number" placeholder="Mínimo" />
+        <input id="price-max" type="number" placeholder="Máximo" />
       </div>
 
       <h3>Localização</h3>
-      <input type="text" placeholder="Bairro ou região" />
+      <input id="filter-localizacao" type="text" placeholder="Bairro ou região" />
 
       <h3>Características</h3>
-      <label><input type="checkbox" /> Mobiliado</label>
-      <label><input type="checkbox" /> Aceita pets</label>
-      <label><input type="checkbox" /> Varanda</label>
-      <label><input type="checkbox" /> Piscina</label>
-      <label><input type="checkbox" /> Portaria 24h</label>
+      <div class="seletor-container">
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Mobiliado</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Aceita pets</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Varanda</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Piscina</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Portaria 24h</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Garagem</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Área Gourmet</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Ar Condicionado</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Wi-Fi</label>
+        <label><input class="caracteristica-checkbox" type="checkbox" /> Academia</label>
+      </div>
 
       <div style="margin-top: 10px">
-        <button class="btn" style="
-              width: 100%;
-              margin-top: 5px;
-              border: 1px solid #ccc;
-              background: white;
-            ">
+        <button id="limpar-filtros" class="btn"
+          style="width:100%; margin-top:5px; border:1px solid #ccc; background:white;">
           Limpar filtros
         </button>
       </div>

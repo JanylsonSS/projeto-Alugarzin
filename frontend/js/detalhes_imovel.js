@@ -1,77 +1,28 @@
-import { renderizarHeaderPerfil, carregarImovelPorId, processarImagens } from '/frontend/js/auth-handler.js';
+import { renderizarHeaderPerfil, carregarImovelPorId, processarImagens, obterUsuarioLogado } from '/frontend/js/auth-handler.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Renderiza header com perfil (se houver)
-    try { await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta'); } catch (e) { console.warn(e); }
+    try { await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta'); } catch (e) { console.warn('header:', e); }
 
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) {
-        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não especificado.</p>';
+        document.getElementById('imoveis-detalhe').innerHTML = '<p>Nenhum imóvel selecionado. <a href="/frontend/imoveis.html">Voltar</a></p>';
         return;
     }
 
     const imovel = await carregarImovelPorId(id);
     if (!imovel) {
-        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não encontrado.</p>';
+        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não encontrado. <a href="/frontend/imoveis.html">Voltar</a></p>';
         return;
     }
 
-    renderDetalhes(imovel);
-    setupCarousel();
+    const usuario = await obterUsuarioLogado();
+    await renderDetalheMarketplace(imovel, usuario);
+    initCarousel();
 });
 
-function renderDetalhes(imovel) {
-    const container = document.getElementById('imoveis-detalhe');
-    if (!container) return;
-
-    const imagens = processarImagens(imovel.imagens || imovel.imagem_url);
-    const galeria = imagens.map(src => `<div class="slide"><img src="${src}" alt="Foto"></div>`).join('');
-
-    const comodidades = (imovel.comodidades && (Array.isArray(imovel.comodidades) ? imovel.comodidades : JSON.parse(imovel.comodidades || '[]')))
-        .map(c => `<li>${escapeHtml(c)}</li>`).join('') || '<li>Nenhuma comodidade informada</li>';
-
-    container.innerHTML = `
-        <div class="detalhe-top">
-            <div class="galeria" id="carrossel-imagens">${galeria}</div>
-            <div class="info">
-                <h1>${escapeHtml(imovel.titulo || 'Imóvel')}</h1>
-                <p class="local">${escapeHtml(imovel.cidade || '')}${imovel.estado ? ' - ' + escapeHtml(imovel.estado) : ''}</p>
-                <p class="preco">R$ ${escapeHtml(String(imovel.preco || ''))} ${imovel.periodo ? '/' + escapeHtml(imovel.periodo) : ''}</p>
-                <p>${escapeHtml(imovel.descricao || '')}</p>
-                <ul class="comodidades">${comodidades}</ul>
-            </div>
-        </div>
-        <div class="detalhe-bottom">
-            <h3>Endereço</h3>
-            <p>${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')} - ${escapeHtml(imovel.bairro || '')}</p>
-            <p>${escapeHtml(imovel.cidade || '')} - ${escapeHtml(imovel.estado || '')} - CEP: ${escapeHtml(imovel.cep || '')}</p>
-        </div>
-    `;
-}
-
-function setupCarousel() {
-    // simples carrossel: apenas permite navegação com setas já existentes in markup
-    const left = document.querySelector('.arrow.left');
-    const right = document.querySelector('.arrow.right');
-    const wrapper = document.getElementById('carrossel-imagens');
-    if (!wrapper) return;
-
-    let index = 0;
-    const slides = Array.from(wrapper.querySelectorAll('.slide'));
-    if (slides.length === 0) return;
-
-    function show(i) {
-        slides.forEach((s, idx) => s.style.display = idx === i ? 'block' : 'none');
-    }
-
-    show(index);
-    left?.addEventListener('click', () => { index = (index - 1 + slides.length) % slides.length; show(index); });
-    right?.addEventListener('click', () => { index = (index + 1) % slides.length; show(index); });
-}
-
 function escapeHtml(str) {
-    if (!str) return '';
+    if (!str && str !== 0) return '';
     return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -79,169 +30,267 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
-/* =================================
-   Esconder Header ao Rolar
-================================= */
-let lastScroll = 0;
 
-window.addEventListener("scroll", () => {
-    const currentScroll = window.pageYOffset;
-    const header = document.querySelector(".header-container");
+async function renderDetalheMarketplace(imovel, usuario) {
+    const imagens = processarImagens(imovel.imagens || []);
+    if (!imagens.length && imovel.imagem_url) imagens.push(imovel.imagem_url);
 
-    if (currentScroll > lastScroll && currentScroll > 80) {
-        header.classList.add("header-hidden");
-    } else {
-        header.classList.remove("header-hidden");
+    const container = document.getElementById('imoveis-detalhe');
+    const preco = imovel.preco ? `R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
+    const periodo = imovel.periodo ? `/${imovel.periodo}` : '';
+
+    // determine favorite state (if logged)
+    let isFavorito = false;
+    if (usuario) {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/favoritos/me', { headers: { 'Authorization': 'Bearer ' + token } });
+            if (res.ok) {
+                const favs = await res.json();
+                isFavorito = Array.isArray(favs) && favs.some(f => String(f.id) === String(imovel.id));
+            }
+        } catch (err) {
+            console.warn('Erro ao obter favoritos do usuário', err);
+        }
     }
 
-    lastScroll = currentScroll;
-});
+    const showBookmark = usuario && usuario.id && String(usuario.id) !== String(imovel.usuario_id);
 
+    container.innerHTML = `
+        <div class="detalhe-grid">
+            <div class="main-col">
+                <div class="galeria">
+                    <div id="carrossel-imagens" class="carrossel-inner"></div>
+                    <div class="arrows">
+                        <button class="arrow left">‹</button>
+                        <button class="arrow right">›</button>
+                    </div>
+                </div>
 
-/* ============================================================
-    LER O ID DA URL
-===============================================================*/
-function getIdFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("id");
-}
+                <div class="detalhes">
+                    <h1>${escapeHtml(imovel.titulo || 'Imóvel')}</h1>
+                    <p class="local">${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')} - ${escapeHtml(imovel.bairro || '')} • ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</p>
+                    <p class="preco">${preco}${periodo}</p>
 
-const IMOVEL_ID = getIdFromURL() || 1; // simulação
+                    <div class="acoes">
+                        ${showBookmark ? `<button id="bookmarkBtn" class="bookmark ${isFavorito ? 'favorited' : ''}" title="Favoritar">` + (isFavorito ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-bookmark"></i>') + `</button>` : ''}
+                        <a class="contato-whatsapp" href="https://wa.me/55${imovel.telefone || '999999999'}" target="_blank" title="WhatsApp do anunciante"><i class="bi bi-whatsapp"></i></a>
+                    </div>
 
+                    <div class="valores-box" style="display:flex; gap:12px; margin:12px 0;">
+                        <div style="flex:1; background:#fafafa; padding:10px; border-radius:8px;"> <strong>Venda</strong><div style="margin-top:6px; color:#333">${imovel.preco_venda ? `R$ ${Number(imovel.preco_venda).toLocaleString('pt-BR')}` : '—'}</div></div>
+                        <div style="flex:1; background:#fafafa; padding:10px; border-radius:8px;"> <strong>Aluguel</strong><div style="margin-top:6px; color:#333">${imovel.preco_aluguel ? `R$ ${Number(imovel.preco_aluguel).toLocaleString('pt-BR')}/mês` : '—'}</div></div>
+                    </div>
 
-/* ============================================================
-    FUNÇÃO PARA BUSCAR O IMÓVEL NO BACK-END
-    back deve implementar GET /api/imoveis/:id
-===============================================================*/
-async function carregarImovelDoBack(id) {
-    try {
-        const response = await fetch(`/api/imoveis/${id}`);
-        if (!response.ok) throw new Error("Erro ao buscar imóvel");
+                    <div class="bloco-dados">
+                        <h3>Descrição</h3>
+                        <p id="descricaoResumo">${escapeHtml(imovel.descricao || '')}</p>
+                        <button id="toggleDescricao" class="btn" style="background:transparent; color:var(--primary-purple); border:none; padding:0; margin-top:6px; cursor:pointer;">Mostrar descrição completa</button>
+                        <h4 style="margin-top:16px">Características</h4>
+                        <ul class="caracteristicas">
+                            ${imovel.quartos ? `<li>🛏 ${imovel.quartos} quarto(s)</li>` : ''}
+                            ${imovel.banheiros ? `<li>🚿 ${imovel.banheiros} banheiro(s)</li>` : ''}
+                            ${imovel.vagas ? `<li>🅿 ${imovel.vagas} vaga(s)</li>` : ''}
+                            ${imovel.comodidades ? imovel.comodidades.split(',').map(c => `<li>${escapeHtml(c.trim())}</li>`).join('') : ''}
+                        </ul>
+                    </div>
 
-        const data = await response.json();
-        return data; // imóvel completo
+                    <div id="proprietario" class="proprietario-card"></div>
+                </div>
+            </div>
 
-    } catch (e) {
-        console.warn("⚠ Usando SIMULAÇÃO porque o back não respondeu:");
-        return SIMULACAO_IMOVEL; // fallback abaixo
+            <aside class="sidebar">
+                <div class="contact-card">
+                    <h4>Envie uma mensagem</h4>
+                    <label for="contact_name">Insira seu nome</label>
+                    <input id="contact_name" type="text" placeholder="Seu nome">
+
+                    <label for="contact_email">Insira seu e-mail</label>
+                    <input id="contact_email" type="email" placeholder="seuemail@exemplo.com">
+
+                    <label for="contact_phone">Insira seu telefone</label>
+                    <input id="contact_phone" type="text" placeholder="(00) 0 0000-0000">
+
+                    <label for="contact_message">Mensagem</label>
+                    <textarea id="contact_message">Olá, gostaria de ter mais informações sobre: ${escapeHtml(imovel.titulo || '')} — ${preco} — ${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')}, ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</textarea>
+
+                    <div class="send-row">
+                        <button id="send_msg" class="btn-send">Enviar mensagem</button>
+                        <button id="send_whatsapp" class="btn-whatsapp">WhatsApp</button>
+                    </div>
+
+                    <div class="phone-line">
+                        <span>Fale com o anunciante</span>
+                        <a id="show_phone" href="#">Ver telefone</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    `;
+
+    // monta proprietário
+    const propContainer = document.getElementById('proprietario');
+    if (imovel.usuario) {
+        const user = imovel.usuario;
+        propContainer.innerHTML = `
+            <div class="prop-flex">
+                <img src="${escapeHtml(user.foto_perfil || '/frontend/image/Karina.jpg')}" alt="Foto do anunciante">
+                <div>
+                    <strong>${escapeHtml(user.nome || 'Anunciante')}</strong>
+                    <p>${escapeHtml(user.cidade || '')} • ${escapeHtml(user.estado || '')}</p>
+                </div>
+            </div>
+        `;
+    } else if (imovel.proprietario) {
+        const p = imovel.proprietario;
+        propContainer.innerHTML = `
+            <div class="prop-flex">
+                <img src="${escapeHtml(p.foto || '/frontend/image/Karina.jpg')}" alt="Foto do anunciante">
+                <div>
+                    <strong>${escapeHtml(p.nome || 'Anunciante')}</strong>
+                    <p>${escapeHtml(p.cidade || '')} • ${escapeHtml(p.estado || '')}</p>
+                </div>
+            </div>
+        `;
     }
-}
 
+    // bookmark behavior
+    const bookmarkBtn = document.getElementById('bookmarkBtn');
+    if (bookmarkBtn) {
+        bookmarkBtn.addEventListener('click', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = '/frontend/login.html'; return; }
 
-/* ============================================================
-    SIMULAÇÃO DOS DADOS
-===============================================================*/
-const SIMULACAO_IMOVEL = {
-    id: 1,
-    titulo: "Vila Nova, São Paulo/SP",
-    preco: 900,
-    descricao: "Casa térrea com 2 quartos, 1 banheiro e 1 vaga.",
-    tipo: "Casa",
-    forma: "ALUGAR",
-
-    local: {
-        estado: "SP",
-        cidade: "São Paulo",
-        bairro: "Vila Nova",
-        rua: "Rua das Flores",
-        numero: 123
-    },
-
-    quartos: 2,
-    banheiros: 1,
-    suites: 0,
-    vagas: 1,
-
-    ambientes: [
-        "Sala de estar",
-        "Cozinha planejada",
-        "Área de serviço",
-        "Quintal"
-    ],
-
-    caracteristicas: ["Aceita pets"],
-
-    imagens: [
-        "/frontend/teste_carrossel/casa.jpg",
-        "/frontend/teste_carrossel/cozinha.jpg",
-        "/frontend/teste_carrossel/quarto.jpg",
-        "/frontend/teste_carrossel/banheiro.jpg"
-    ],
-
-    proprietario: {
-        idUsuario: 42,
-        nome: "Katarina das Neves",
-        foto: "/frontend/image/Karina.jpg",
-        cidade: "São Paulo",
-        estado: "SP"
-    }
-};
-
-
-/* ============================================================
-    INICIAR PÁGINA
-===============================================================*/
-(async function iniciarPagina() {
-    const imovel = await carregarImovelDoBack(IMOVEL_ID);
-    montarCarrossel(imovel.imagens);
-    montarCardDetalhes(imovel);
-    carregarMapa({
-        endereco: `${imovel.local.rua}, ${imovel.local.numero}, ${imovel.local.cidade} - ${imovel.local.estado}`
-    });
-    montarProprietario(imovel.proprietario);
-})();
-
-
-/* ============================================================
-    CARROSSEL
-===============================================================*/
-function montarCarrossel(listaImagens) {
-    const carrosselContainer = document.getElementById("carrossel-imagens");
-    carrosselContainer.innerHTML = "";
-
-    listaImagens.forEach(src => {
-        const img = document.createElement("img");
-        img.classList.add("item");
-        img.src = src;
-        carrosselContainer.appendChild(img);
-    });
-
-    const items = document.querySelectorAll(".coverflow .item");
-    let current = 0;
-
-    function updateCoverflow() {
-        items.forEach((item, index) => {
-            const offset = index - current;
-
-            if (offset === 0) {
-                item.style.transform = "translateX(0) scale(1)";
-                item.style.opacity = "1";
-                item.style.zIndex = "10";
+            if (bookmarkBtn.classList.contains('favorited')) {
+                // remover
+                const res = await fetch(`/api/favoritos/${imovel.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                if (res.ok) {
+                    bookmarkBtn.classList.remove('favorited');
+                    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark"></i>';
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.erro || 'Erro ao remover favorito');
+                }
             } else {
-                const direction = offset > 0 ? 1 : -1;
-                item.style.transform =
-                    `translateX(${220 * offset}px) scale(0.7) rotateY(${direction * -35}deg)`;
-                item.style.opacity = "0.7";
-                item.style.zIndex = "5";
+                // adicionar
+                const res = await fetch('/api/favoritos', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ imovel_id: imovel.id }) });
+                if (res.ok) {
+                    bookmarkBtn.classList.add('favorited');
+                    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.erro || 'Erro ao favoritar');
+                }
+            }
+
+            // Populate gallery AFTER container markup exists
+            const carrosselEl = document.getElementById('carrossel-imagens');
+            if (carrosselEl) {
+                carrosselEl.innerHTML = '';
+                (imagens || []).forEach((src, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'slide' + (idx === 0 ? ' active' : '');
+                    div.innerHTML = `<img src="${escapeHtml(src)}" alt="Imagem do imóvel">`;
+                    carrosselEl.appendChild(div);
+                });
+            }
+
+            // Description toggle (mostrar descrição completa)
+            const descricaoEl = document.getElementById('descricaoResumo');
+            const toggleBtn = document.getElementById('toggleDescricao');
+            if (descricaoEl && toggleBtn) {
+                const fullText = descricaoEl.textContent || '';
+                const limit = 400;
+                if (fullText.length > limit) {
+                    descricaoEl.textContent = fullText.slice(0, limit) + '...';
+                    let expanded = false;
+                    toggleBtn.addEventListener('click', () => {
+                        if (!expanded) {
+                            descricaoEl.textContent = fullText;
+                            toggleBtn.textContent = 'Mostrar menos';
+                        } else {
+                            descricaoEl.textContent = fullText.slice(0, limit) + '...';
+                            toggleBtn.textContent = 'Mostrar descrição completa';
+                        }
+                        expanded = !expanded;
+                    });
+                } else {
+                    toggleBtn.style.display = 'none';
+                }
+            }
+
+            // Contact card handlers
+            const sendBtn = document.getElementById('send_msg');
+            const waBtn = document.getElementById('send_whatsapp');
+            const contactMsg = document.getElementById('contact_message');
+            const contactName = document.getElementById('contact_name');
+            const contactEmail = document.getElementById('contact_email');
+            const contactPhone = document.getElementById('contact_phone');
+
+            const anunciantePhoneRaw = (imovel.telefone || (imovel.usuario && (imovel.usuario.telefone || imovel.usuario.whatsapp_link)) || '');
+            const anunciantePhone = String(anunciantePhoneRaw).replace(/\D/g, '');
+
+            const showPhone = document.getElementById('show_phone');
+            if (showPhone) {
+                if (anunciantePhone) showPhone.textContent = anunciantePhoneRaw;
+                else showPhone.textContent = 'Telefone não informado';
+            }
+
+            const buildMessage = () => {
+                return (contactMsg && contactMsg.value) ? contactMsg.value : `Olá, tenho interesse no imóvel: ${imovel.titulo || ''} (${preco})`;
+            };
+
+            if (sendBtn) {
+                sendBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const msg = buildMessage();
+                    // Prefer WhatsApp if anunciantePhone exists
+                    if (anunciantePhone) {
+                        const waLink = `https://wa.me/55${anunciantePhone}?text=${encodeURIComponent(msg)}`;
+                        window.open(waLink, '_blank');
+                        return;
+                    }
+                    // fallback to mailto if email present
+                    const to = (imovel.usuario && imovel.usuario.email) || '';
+                    if (to) {
+                        const subject = `Interesse no imóvel: ${imovel.titulo || ''}`;
+                        window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+                        return;
+                    }
+                    alert('Contato do anunciante não disponível para envio via WhatsApp ou E-mail.');
+                });
+            }
+
+            if (waBtn) {
+                waBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const msg = buildMessage();
+                    if (anunciantePhone) {
+                        const waLink = `https://wa.me/55${anunciantePhone}?text=${encodeURIComponent(msg)}`;
+                        window.open(waLink, '_blank');
+                    } else {
+                        alert('Número do anunciante não disponível.');
+                    }
+                });
             }
         });
     }
+}
 
-    function next() {
-        current = (current + 1) % items.length;
-        updateCoverflow();
+function initCarousel() {
+    const wrapper = document.getElementById('carrossel-imagens');
+    if (!wrapper) return;
+    const slides = Array.from(wrapper.querySelectorAll('.slide'));
+    if (slides.length === 0) return;
+    let current = 0;
+
+    function show(i) {
+        slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
     }
 
-    function prev() {
-        current = (current - 1 + items.length) % items.length;
-        updateCoverflow();
-    }
-
-    document.querySelector(".right").addEventListener("click", next);
-    document.querySelector(".left").addEventListener("click", prev);
-
-    setInterval(next, 4000);
-    updateCoverflow();
+    document.querySelectorAll('.arrow.left').forEach(btn => btn.addEventListener('click', () => { current = (current - 1 + slides.length) % slides.length; show(current); }));
+    document.querySelectorAll('.arrow.right').forEach(btn => btn.addEventListener('click', () => { current = (current + 1) % slides.length; show(current); }));
+    show(current);
 }
 
 

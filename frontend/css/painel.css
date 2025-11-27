@@ -38,11 +38,11 @@ body {
 
 .paineldeusuario {
     width: 1500px;
-    height: 700px;
+    max-height: calc(100vh - 40px);
     margin: 0 auto;
     background: #fff;
     border-radius: 10px;
-    overflow: hidden;
+    overflow-y: auto;
     box-shadow: 0 5px 40px rgba(0, 0, 0, 0.6);
 }
 
@@ -196,6 +196,68 @@ body {
 .feedfavoritos {
     text-align: center;
     padding: 40px 20px;
+}
+
+/* Thumbnails/layout for user's anuncios in painel */
+.card-anuncio {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 12px auto;
+    max-width: 1100px;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.18s ease;
+}
+
+.card-anuncio {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+    cursor: pointer;
+}
+
+.card-anuncio:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    border-color: #6f42c1;
+    /* borda roxa ao passar o mouse */
+}
+
+.card-anuncio img {
+    width: 180px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.card-anuncio .card-body {
+    text-align: left;
+    flex: 1;
+}
+
+.card-anuncio .card-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.card-anuncio h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+}
+
+.card-anuncio .local {
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.card-anuncio .preco {
+    color: #ff6b35;
+    font-weight: 700;
 }
 
 .hidden {
@@ -370,7 +432,8 @@ body {
     box-shadow: 0 0 8px rgba(67, 0, 151, 0.3);
 }
 
-#btnsalvar {
+/* Perfil salvar button styling */
+#btnSalvarPerfil {
     background: linear-gradient(to right, #ff751f, #430097);
     color: white;
     font-size: 1rem;
@@ -382,7 +445,7 @@ body {
     transition: 0.3s;
 }
 
-#btnsalvar:hover {
+#btnSalvarPerfil:hover {
     transform: translateY(-2px);
 }
 
@@ -425,6 +488,30 @@ body {
     object-fit: cover;
     border-radius: 10px;
     border: 2px solid #ddd;
+}
+
+/* Estilização mais apresentável para a caixa de descrição */
+#descricao {
+    min-height: 140px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #e6e6e6;
+    background: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: vertical;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+#descricao:focus {
+    outline: none;
+    border-color: #430097;
+    box-shadow: 0 0 0 6px rgba(67, 0, 151, 0.06);
+}
+
+#descricao::placeholder {
+    color: #9a9a9a;
 }
 
 /* === PREÇO E LOCALIZAÇÃO === */
@@ -570,7 +657,8 @@ body {
 }
 
 /* === BOTÃO PUBLICAR === */
-#addAnuncioForm #btnsalvar {
+/* Botão Publicar/Salvar do formulário de anúncio */
+#addAnuncioForm #btnSalvarAnuncio {
     align-self: center;
     background: linear-gradient(to right, #ff751f, #430097);
     color: white;
@@ -585,8 +673,35 @@ body {
     width: auto;
 }
 
-#addAnuncioForm #btnsalvar:hover {
+#addAnuncioForm #btnSalvarAnuncio:hover {
     transform: translateY(-2px);
+}
+
+/* Edit/Delete action buttons in the card */
+.card-anuncio .btn-editar {
+    background: #6f3bd6;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.card-anuncio .btn-editar:hover {
+    opacity: 0.95;
+}
+
+.card-anuncio .btn-excluir {
+    background: #d94b4b;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.card-anuncio .btn-excluir:hover {
+    opacity: 0.95;
 }
 
 
@@ -638,17 +753,13 @@ body {
     }
 
     .paineldeusuario {
-        width: 100%;
-        min-height: auto;
-        height: auto;
-        margin-top: 0;
-    }
-
-    .logo {
-        position: static;
-        margin: 0 auto 20px auto;
-        width: 180px;
-        display: block;
+        width: 1500px;
+        max-height: calc(100vh - 40px);
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 10px;
+        overflow-y: auto;
+        box-shadow: 0 5px 40px rgba(0, 0, 0, 0.6);
     }
 
     /* --- CABEÇALHO / PERFIL --- */
@@ -700,6 +811,20 @@ body {
     .botaoeditarperfil button {
         width: 100%;
         padding: 12px 0;
+    }
+
+    /* Painel - anúncios responsivos */
+    .card-anuncio {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 95%;
+    }
+
+    .card-anuncio img {
+        width: 100%;
+        height: 180px;
+        margin: 0 auto 12px auto;
+        border-radius: 8px;
     }
 
     /* --- ABAS --- */

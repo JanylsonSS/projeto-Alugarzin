@@ -1,8 +1,14 @@
 const API_BASE = "http://localhost:3000/api";
+
+// Minimal DOM helpers used across scripts
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $all = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 let usuarioLogado = null;
+let EDITING_ANUNCIO_ID = null; // null when creating, set to id when editing
 
 
-function showMessage(msg, type = 'error', container = messageBox) {
+function showMessage(msg, type = 'error', container = null) {
+    if (!container) container = document.getElementById('messageBox') || null;
     if (!container) return alert(msg);
 
     container.textContent = msg;
@@ -44,8 +50,98 @@ document.addEventListener("DOMContentLoaded", () => {
             secAnuncio.classList.remove("hidden");
             secFavoritos.classList.add("hidden");
         });
+
+        // Ao clicar em "Favoritos" carrega do backend
+        abaFavoritos.addEventListener("click", async () => {
+            abaFavoritos.classList.add("ativo");
+            abaAnuncios.classList.remove("ativo");
+            secFavoritos.classList.remove("hidden");
+            secAnuncio.classList.add("hidden");
+            // carregar favoritos
+            await carregarFavoritos();
+        });
     }
 });
+
+// ==============================
+// Carregar favoritos do backend
+// ==============================
+async function carregarFavoritos() {
+    const token = localStorage.getItem('token');
+    const favSection = document.getElementById('favoritos');
+    if (!favSection) return;
+    favSection.innerHTML = '<p>Carregando favoritos...</p>';
+
+    try {
+        const res = await fetch(`${API_BASE}/favoritos/me`, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) {
+            favSection.innerHTML = '<p>Não foi possível carregar favoritos.</p>';
+            return;
+        }
+        const imoveis = await res.json();
+        renderListaFavoritos(imoveis);
+    } catch (err) {
+        console.error('Erro ao carregar favoritos:', err);
+        favSection.innerHTML = '<p>Erro ao carregar favoritos.</p>';
+    }
+}
+
+function renderListaFavoritos(imoveis) {
+    const container = document.getElementById('favoritos');
+    if (!container) return;
+    if (!Array.isArray(imoveis) || imoveis.length === 0) {
+        container.innerHTML = '<p>Seus locais favoritos aparecerão aqui!</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    imoveis.forEach(a => {
+        const card = document.createElement('article');
+        card.className = 'card-anuncio';
+
+        const imagem = a.imagem_url || (a.imagens && a.imagens.length ? (Array.isArray(a.imagens) ? a.imagens[0] : JSON.parse(a.imagens)[0]) : '/frontend/image/placeholder.png');
+        const shortDesc = a.descricao ? String(a.descricao).slice(0, 140) + (String(a.descricao).length > 140 ? '...' : '') : '';
+
+        card.innerHTML = `
+            <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Favorito')}" />
+            <div class="card-body">
+                <h3>${escapeHtml(a.titulo)}</h3>
+                <p class="descricao">${escapeHtml(shortDesc)}</p>
+                <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
+                <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
+                <div class="card-actions">
+                    <button type="button" class="btn btn-small btn-editar btn-detalhes" data-id="${a.id}">Ver Detalhes</button>
+                    <button type="button" class="btn btn-danger btn-small btn-excluir btn-remover-fav" data-id="${a.id}">Remover</button>
+                </div>
+            </div>
+        `;
+
+        // detalhes (navegar para a página de detalhes)
+        const btnDetalhes = card.querySelector('.btn-detalhes, .btn-editar');
+        if (btnDetalhes) btnDetalhes.addEventListener('click', (e) => { e.stopPropagation(); window.location.href = `/frontend/detalhes_imovel.html?id=${a.id}`; });
+
+        // remover favorito
+        const btnRem = card.querySelector('.btn-remover-fav');
+        if (btnRem) {
+            btnRem.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!confirm('Remover dos favoritos?')) return;
+                const token = localStorage.getItem('token');
+                try {
+                    const res = await fetch(`${API_BASE}/favoritos/${a.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    if (!res.ok) throw new Error('Falha ao remover');
+                    // atualizar lista
+                    await carregarFavoritos();
+                } catch (err) {
+                    console.error('Erro remover favorito:', err);
+                    alert('Erro ao remover favorito');
+                }
+            });
+        }
+
+        container.appendChild(card);
+    });
+}
 // =========================
 //   BUSCAR USUÁRIO LOGADO
 // =========================
@@ -121,6 +217,14 @@ async function initPainel() {
 
     const fecharAdd = document.getElementById('fecharEditModal2');
     if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modaladdanuncio'));
+    // Reset editing state when modal closed
+    if (fecharAdd) fecharAdd.addEventListener('click', () => {
+        EDITING_ANUNCIO_ID = null;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio');
+        if (btnSalvar) btnSalvar.textContent = 'Publicar';
+        const formAddLocal = document.getElementById('addAnuncioForm'); if (formAddLocal) formAddLocal.reset();
+        const preview = document.getElementById('previewImagens'); if (preview) preview.innerHTML = '';
+    });
 
     const btnCancelarPerfil = document.getElementById('btnCancelarPerfil');
     if (btnCancelarPerfil) btnCancelarPerfil.addEventListener('click', () => fecharModal('#modalEditarPerfil'));
@@ -156,6 +260,8 @@ async function initPainel() {
     });
 
     setupAnuncioImageHelpers();
+    // Permite desmarcar as opções de período (clicar novamente desmarca)
+    if (typeof setupPeriodoToggle === 'function') setupPeriodoToggle();
 
     // Carregamento inicial
     await carregarUsuario();
@@ -245,7 +351,18 @@ async function carregarMeusAnuncios() {
             return;
         }
 
-        const anuncios = await res.json();
+        const payload = await res.json().catch(() => null);
+        // API pode retornar array direto ou objeto com campos variados
+        let anuncios = [];
+        if (Array.isArray(payload)) anuncios = payload;
+        else if (!payload) anuncios = [];
+        else if (Array.isArray(payload.dados)) anuncios = payload.dados;
+        else if (Array.isArray(payload.imoveis)) anuncios = payload.imoveis;
+        else if (Array.isArray(payload.anuncios)) anuncios = payload.anuncios;
+        else if (Array.isArray(payload.data)) anuncios = payload.data;
+        else if (payload && typeof payload === 'object' && (payload.id || payload.usuario_id)) anuncios = [payload];
+        else anuncios = [];
+
         renderListaAnuncios(anuncios);
     } catch (err) {
         console.error('Erro ao carregar anúncios:', err);
@@ -270,18 +387,36 @@ function renderListaAnuncios(anuncios) {
 
         const imagem = a.imagem_url || (a.imagens && a.imagens.length ? a.imagens[0] : '/frontend/image/placeholder.png');
 
+        const shortDesc = a.descricao ? String(a.descricao).slice(0, 140) + (String(a.descricao).length > 140 ? '...' : '') : '';
+
         card.innerHTML = `
-      <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Anúncio')}" />
-      <div class="card-body">
-        <h3>${escapeHtml(a.titulo)}</h3>
-        <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
-        <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
-        <div class="card-actions">
-          <button class="btn btn-small" data-id="${a.id}" onclick="editarAnuncio(${a.id})">Editar</button>
-          <button class="btn btn-danger btn-small" data-id="${a.id}" onclick="deletarAnuncio(${a.id})">Excluir</button>
-        </div>
-      </div>
-    `;
+            <img src="${escapeHtml(imagem)}" alt="${escapeHtml(a.titulo || 'Anúncio')}" />
+            <div class="card-body">
+                <h3>${escapeHtml(a.titulo)}</h3>
+                <p class="descricao">${escapeHtml(shortDesc)}</p>
+                <p class="local">${escapeHtml(a.cidade || '')} ${a.estado ? ' - ' + escapeHtml(a.estado) : ''}</p>
+                <p class="preco">R$ ${escapeHtml(String(a.preco || ''))}</p>
+                <div class="card-actions">
+                    <button class="btn btn-small btn-editar" data-id="${a.id}">Editar</button>
+                    <button class="btn btn-danger btn-small btn-excluir" data-id="${a.id}">Excluir</button>
+                </div>
+            </div>
+        `;
+
+        // navigate to detalhes when clicking the card (except on action buttons)
+        card.addEventListener('click', () => {
+            window.location.href = `/frontend/detalhes_imovel.html?id=${a.id}`;
+        });
+
+        // stop propagation on action buttons and wire them to existing handlers
+        const btnEditar = card.querySelector('.btn-editar');
+        if (btnEditar) {
+            btnEditar.addEventListener('click', (e) => { e.stopPropagation(); editarAnuncio(a.id); });
+        }
+        const btnExcluir = card.querySelector('.btn-excluir');
+        if (btnExcluir) {
+            btnExcluir.addEventListener('click', (e) => { e.stopPropagation(); deletarAnuncio(a.id); });
+        }
 
         container.appendChild(card);
     });
@@ -336,24 +471,115 @@ async function handleAddAnuncio(e) {
     const fd = new FormData(form);
 
     try {
-        const res = await fetch(`${API_BASE}/imoveis`, {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + token },
-            body: fd
-        });
+        let res;
+        if (EDITING_ANUNCIO_ID) {
+            // editar
+            res = await fetch(`${API_BASE}/imoveis/${EDITING_ANUNCIO_ID}`, {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: fd
+            });
+        } else {
+            // criar
+            res = await fetch(`${API_BASE}/imoveis`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: fd
+            });
+        }
 
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.erro || 'Falha ao publicar');
+        if (!res.ok) throw new Error(data.erro || data.mensagem || 'Falha ao publicar');
 
-        alert('Anúncio publicado com sucesso!');
+        alert(EDITING_ANUNCIO_ID ? 'Anúncio atualizado com sucesso!' : 'Anúncio publicado com sucesso!');
         form.reset();
         const preview = document.getElementById('previewImagens');
         if (preview) preview.innerHTML = '';
         fecharModal('#modaladdanuncio');
+        EDITING_ANUNCIO_ID = null;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Publicar';
         await carregarMeusAnuncios();
     } catch (err) {
         console.error('Erro publicar anuncio:', err);
         alert('Erro ao publicar: ' + err.message);
+    }
+}
+
+// Abrir modal de edição, preencher formulário e marcar modo edição
+async function editarAnuncio(id) {
+    try {
+        const res = await fetch(`${API_BASE}/imoveis/${id}`);
+        if (!res.ok) return alert('Não foi possível carregar anúncio para edição');
+        const imovel = await res.json();
+
+        // Preencher campos do formulário
+        const form = document.getElementById('addAnuncioForm');
+        if (!form) return;
+        // texto / selects
+        form.querySelector('#tipolocal_select') && (form.querySelector('#tipolocal_select').value = imovel.tipolocal || '');
+        form.querySelector('#tipoanuncio_select') && (form.querySelector('#tipoanuncio_select').value = imovel.tipoanuncio || '');
+        form.querySelector('#preco') && (form.querySelector('#preco').value = imovel.preco || '');
+        if (imovel.periodo) {
+            const p = imovel.periodo;
+            const radio = form.querySelector(`input[name="periodo"][value="${p}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // If a periodo radio was programmatically checked, mark its wasChecked state
+        form.querySelectorAll('input[name="periodo"]').forEach(r => { if (r.checked) r.wasChecked = true; });
+        form.querySelector('#rua') && (form.querySelector('#rua').value = imovel.rua || '');
+        form.querySelector('#numero') && (form.querySelector('#numero').value = imovel.numero || '');
+        form.querySelector('#bairro') && (form.querySelector('#bairro').value = imovel.bairro || '');
+        form.querySelector('#cidade_anuncio') && (form.querySelector('#cidade_anuncio').value = imovel.cidade || '');
+        form.querySelector('#estado_anuncio') && (form.querySelector('#estado_anuncio').value = imovel.estado || '');
+        // titulo / descricao
+        form.querySelector('#titulo') && (form.querySelector('#titulo').value = imovel.titulo || '');
+        form.querySelector('#descricao') && (form.querySelector('#descricao').value = imovel.descricao || '');
+
+        // Radios quartos/banheiros/vagas
+        if (imovel.quartos !== undefined && imovel.quartos !== null) {
+            const qVal = String(imovel.quartos);
+            const q = form.querySelector(`input[name="quartos"][value="${qVal}"]`);
+            if (q) q.checked = true; else {
+                if (!isNaN(Number(qVal)) && Number(qVal) >= 4) { const q4 = form.querySelector('input[name="quartos"][value="4+"]'); if (q4) q4.checked = true; }
+            }
+        }
+        if (imovel.banheiros !== undefined && imovel.banheiros !== null) {
+            const bVal = String(imovel.banheiros);
+            const b = form.querySelector(`input[name="banheiros"][value="${bVal}"]`);
+            if (b) b.checked = true; else { if (!isNaN(Number(bVal)) && Number(bVal) >= 4) { const b4 = form.querySelector('input[name="banheiros"][value="4+"]'); if (b4) b4.checked = true; } }
+        }
+        if (imovel.vagas !== undefined && imovel.vagas !== null) {
+            const vVal = String(imovel.vagas);
+            const v = form.querySelector(`input[name="vagas"][value="${vVal}"]`);
+            if (v) v.checked = true; else { if (!isNaN(Number(vVal)) && Number(vVal) >= 4) { const v4 = form.querySelector('input[name="vagas"][value="4+"]'); if (v4) v4.checked = true; } }
+        }
+
+        // comodidades checkboxes
+        const comods = imovel.comodidades || [];
+        if (Array.isArray(comods)) {
+            form.querySelectorAll('input[name="comodidades"]').forEach(cb => cb.checked = comods.includes(cb.value));
+        }
+
+        // mostrar imagens existentes como preview (note: uploading new images will replace them)
+        const preview = document.getElementById('previewImagens');
+        if (preview) {
+            preview.innerHTML = '';
+            const imgs = Array.isArray(imovel.imagens) ? imovel.imagens : (imovel.imagens ? JSON.parse(imovel.imagens) : []);
+            const primary = imovel.imagem_url ? [imovel.imagem_url] : [];
+            const all = imgs.length ? imgs : primary;
+            all.forEach(src => {
+                const img = document.createElement('img'); img.src = src; img.className = 'preview-thumb'; preview.appendChild(img);
+            });
+        }
+
+        // set editing state
+        EDITING_ANUNCIO_ID = id;
+        const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Salvar';
+        abrirModal('#modaladdanuncio');
+    } catch (err) {
+        console.error('Erro ao abrir edição do anúncio:', err);
+        alert('Erro ao carregar anúncio para edição');
     }
 }
 
@@ -383,7 +609,7 @@ function previewAnuncioImages(e) {
 }
 
 // ==============================
-// CRUD Anúncios: deletar / editar (stubs)
+// CRUD Anúncios: deletar / editar
 // ==============================
 async function deletarAnuncio(id) {
     if (!confirm('Deseja realmente excluir este anúncio?')) return;
@@ -402,13 +628,11 @@ async function deletarAnuncio(id) {
     }
 }
 
-function editarAnuncio(id) {
-    // Aqui você pode abrir um modal de edição e preencher com os dados do anúncio
-    alert('Função de edição não implementada. Posso adicionar se desejar.');
-}
+// Note: the full `editarAnuncio(id)` implementation appears earlier in this file
+// (it fetches the anuncio and prefills the form). We avoid redefining it here
+// so the real edit flow is preserved.
 
 window.deletarAnuncio = deletarAnuncio;
-window.editarAnuncio = editarAnuncio;
 
 // ==============================
 // Util: escapeHTML
@@ -492,6 +716,30 @@ function setupAnuncioImageHelpers() {
     };
 
     window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+}
+
+// Torna os radios de `name="periodo"` toggleáveis (clicar novamente desmarca)
+function setupPeriodoToggle() {
+    const radios = Array.from(document.querySelectorAll('input[name="periodo"]'));
+    if (!radios.length) return;
+
+    // track previous state per element
+    radios.forEach(r => {
+        r.wasChecked = r.checked;
+        r.addEventListener('click', function (e) {
+            // If it was already checked, uncheck it
+            if (this.wasChecked) {
+                this.checked = false;
+                this.wasChecked = false;
+            } else {
+                // mark others as not-wasChecked and this as wasChecked
+                radios.forEach(rr => rr.wasChecked = false);
+                this.wasChecked = true;
+            }
+        });
+        // update state on change (in case changed programmatically)
+        r.addEventListener('change', function () { this.wasChecked = this.checked; });
+    });
 }
 
 // ==============================
