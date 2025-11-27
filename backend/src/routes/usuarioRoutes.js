@@ -1,9 +1,7 @@
 import express from "express";
 import UsuarioController from "../controllers/UsuarioController.js";
-import autenticar from "../middlewares/autenticar.js";
-
 import uploadUsuario from "../config/multerUsuario.js";
-import verifyToken from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -14,7 +12,7 @@ router.post("/", UsuarioController.cadastrar);
 router.get("/", UsuarioController.listarTodos);
 
 //Rota protegida para retornar usuário logado
-router.get("/me", autenticar, UsuarioController.usuarioLogado);
+router.get("/me", verifyToken, UsuarioController.usuarioLogado);
 
 // GET /api/usuarios/:id - Buscar usuário por ID
 router.get("/:id", UsuarioController.buscarPorId);

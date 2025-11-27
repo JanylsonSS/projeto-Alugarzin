@@ -9,6 +9,10 @@ import sequelize from "./database/connection.js";
 import usuarioRoutes from "./routes/usuarioRoutes.js";
 import imovelRoutes from "./routes/imovelRoutes.js";
 import authRoutes from './routes/authRoutes.js';
+import favoritoRoutes from './routes/favoritoRoutes.js';
+// Importar modelos para associações
+import Usuario from "./models/Usuario.js";
+import Imovel from "./models/Imovel.js";
 
 // Configurar __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -42,6 +46,7 @@ app.use((req, res, next) => {
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api", imovelRoutes);
 app.use('/api', authRoutes);
+app.use('/api', favoritoRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
@@ -97,7 +102,14 @@ const iniciarServidor = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ Conexão com MySQL estabelecida");
-
+    // Configurar associações entre modelos
+    try {
+      Usuario.hasMany(Imovel, { foreignKey: 'usuario_id' });
+      Imovel.belongsTo(Usuario, { foreignKey: 'usuario_id' });
+      console.log('🔗 Associações entre Usuario <-> Imovel configuradas');
+    } catch (assocErr) {
+      console.warn('⚠️ Falha ao configurar associações:', assocErr.message);
+    }
     const syncOptions = process.env.NODE_ENV === 'production' ? { alter: false } : { alter: true };
     console.log(`Synchronizing models with database (alter: ${syncOptions.alter})`);
     await sequelize.sync(syncOptions);
