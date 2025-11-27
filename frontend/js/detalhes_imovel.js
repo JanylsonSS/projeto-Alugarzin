@@ -14,9 +14,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    const imovel = await carregarImovelPorId(id);
-    if (!imovel) {
-        document.getElementById('imoveis-detalhe').innerHTML = '<p>Imóvel não encontrado. <a href="/frontend/imoveis.html">Voltar</a></p>';
+    let imovel;
+    try {
+        imovel = await carregarImovelPorId(id);
+
+        // Verifica se o imóvel existe e não é um objeto de erro
+        if (!imovel || imovel.error || (imovel.id && String(imovel.id) !== String(id))) {
+            throw new Error('Imóvel não encontrado');
+        }
+
+    } catch (error) {
+        console.error('Erro ao carregar imóvel:', error);
+        document.getElementById('imoveis-detalhe').innerHTML = `
+        <div style="text-align: center; padding: 80px 20px;">
+            <div style="font-size: 64px; color: #ddd; margin-bottom: 20px;">❌</div>
+            <h2 style="color: #666; margin-bottom: 16px; font-size: 24px;">Imóvel não encontrado</h2>
+            <p style="color: #888; margin-bottom: 30px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+                O imóvel com ID <strong>${escapeHtml(id)}</strong> não existe, foi removido<br>
+                ou você não tem permissão para acessá-lo.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="/frontend/imoveis.html" style="
+                    background: var(--primary-purple); 
+                    color: white; 
+                    padding: 12px 24px; 
+                    border-radius: 8px; 
+                    text-decoration: none; 
+                    font-weight: 600;
+                    display: inline-block;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#320075'" 
+                  onmouseout="this.style.background='var(--primary-purple)'">
+                    ↩️ Voltar para imóveis
+                </a>
+                <a href="/frontend/index.html" style="
+                    background: #f0f0f0; 
+                    color: #666; 
+                    padding: 12px 24px; 
+                    border-radius: 8px; 
+                    text-decoration: none; 
+                    font-weight: 600;
+                    display: inline-block;
+                    border: 1px solid #ddd;
+                    transition: background 0.3s;
+                " onmouseover="this.style.background='#e0e0e0'" 
+                  onmouseout="this.style.background='#f0f0f0'">
+                    🏠 Página inicial
+                </a>
+            </div>
+        </div>
+    `;
         return;
     }
 
@@ -431,3 +478,84 @@ function montarProprietario(dados) {
 
     document.querySelector(".cards-detalhe").appendChild(div);
 }
+
+// Controle da navbar animada
+class NavbarAnimator {
+    constructor() {
+        this.header = document.getElementById('mainHeader');
+        this.lastScrollY = window.scrollY;
+        this.scrollDirection = 'down';
+        this.scrollThreshold = 100; // Quantos pixels rolar antes de esconder
+        this.isHidden = false;
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.header) return;
+        
+        window.addEventListener('scroll', this.handleScroll.bind(this));
+        window.addEventListener('resize', this.handleResize.bind(this));
+        
+        // Inicializa o estado
+        this.updateNavbarState();
+    }
+    
+    handleScroll() {
+        const currentScrollY = window.scrollY;
+        
+        // Determina a direção do scroll
+        this.scrollDirection = currentScrollY > this.lastScrollY ? 'down' : 'up';
+        
+        this.updateNavbarState();
+        
+        this.lastScrollY = currentScrollY;
+    }
+    
+    handleResize() {
+        // Recalcula posições em caso de resize
+        this.updateNavbarState();
+    }
+    
+    updateNavbarState() {
+        const scrollY = window.scrollY;
+        
+        // No topo da página - mostra navbar completa
+        if (scrollY <= 50) {
+            this.showNavbar();
+            document.body.classList.remove('navbar-scrolled');
+            return;
+        }
+        
+        // Adiciona classe reduzida quando scroll beyond threshold
+        if (scrollY > 100) {
+            this.header.classList.add('scrolled');
+            document.body.classList.add('navbar-scrolled');
+        } else {
+            this.header.classList.remove('scrolled');
+            document.body.classList.remove('navbar-scrolled');
+        }
+        
+        // Esconde/mostra baseado na direção do scroll
+        if (this.scrollDirection === 'down' && scrollY > this.scrollThreshold && !this.isHidden) {
+            this.hideNavbar();
+        } else if (this.scrollDirection === 'up' && this.isHidden) {
+            this.showNavbar();
+        }
+    }
+    
+    hideNavbar() {
+        this.header.classList.add('hidden');
+        this.isHidden = true;
+    }
+    
+    showNavbar() {
+        this.header.classList.remove('hidden');
+        this.isHidden = false;
+    }
+}
+
+// Inicializa quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', () => {
+    new NavbarAnimator();
+});
