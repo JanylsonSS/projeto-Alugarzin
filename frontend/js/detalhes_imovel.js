@@ -1,7 +1,11 @@
 import { renderizarHeaderPerfil, carregarImovelPorId, processarImagens, obterUsuarioLogado } from '/frontend/js/auth-handler.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    try { await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta'); } catch (e) { console.warn('header:', e); }
+    try {
+        await renderizarHeaderPerfil('#userBox', '.btn-login', '.btn-criar-conta');
+    } catch (e) {
+        console.warn('header:', e);
+    }
 
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
@@ -18,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const usuario = await obterUsuarioLogado();
     await renderDetalheMarketplace(imovel, usuario);
-    initCarousel();
+    // initCarousel() NÃO é mais chamado aqui - será chamado dentro de renderDetalheMarketplace
 });
 
 function escapeHtml(str) {
@@ -34,6 +38,11 @@ function escapeHtml(str) {
 async function renderDetalheMarketplace(imovel, usuario) {
     const imagens = processarImagens(imovel.imagens || []);
     if (!imagens.length && imovel.imagem_url) imagens.push(imovel.imagem_url);
+
+    // Fallback se ainda não tiver imagens
+    if (!imagens.length) {
+        imagens.push('/frontend/image/placeholder-imovel.jpg'); // Adicione uma imagem padrão
+    }
 
     const container = document.getElementById('imoveis-detalhe');
     const preco = imovel.preco ? `R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado';
@@ -57,76 +66,96 @@ async function renderDetalheMarketplace(imovel, usuario) {
     const showBookmark = usuario && usuario.id && String(usuario.id) !== String(imovel.usuario_id);
 
     container.innerHTML = `
-        <div class="detalhe-grid">
-            <div class="main-col">
-                <div class="galeria">
-                    <div id="carrossel-imagens" class="carrossel-inner"></div>
-                    <div class="arrows">
-                        <button class="arrow left">‹</button>
-                        <button class="arrow right">›</button>
-                    </div>
+    <div class="detalhe-grid">
+        <div class="main-col">
+            <div class="galeria">
+                <div id="carrossel-imagens" class="carrossel-inner"></div>
+                ${imagens.length > 1 ? `
+                <div class="arrows">
+                    <button class="arrow left">‹</button>
+                    <button class="arrow right">›</button>
                 </div>
-
-                <div class="detalhes">
-                    <h1>${escapeHtml(imovel.titulo || 'Imóvel')}</h1>
-                    <p class="local">${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')} - ${escapeHtml(imovel.bairro || '')} • ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</p>
-                    <p class="preco">${preco}${periodo}</p>
-
-                    <div class="acoes">
-                        ${showBookmark ? `<button id="bookmarkBtn" class="bookmark ${isFavorito ? 'favorited' : ''}" title="Favoritar">` + (isFavorito ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-bookmark"></i>') + `</button>` : ''}
-                        <a class="contato-whatsapp" href="https://wa.me/55${imovel.telefone || '999999999'}" target="_blank" title="WhatsApp do anunciante"><i class="bi bi-whatsapp"></i></a>
-                    </div>
-
-                    <div class="valores-box" style="display:flex; gap:12px; margin:12px 0;">
-                        <div style="flex:1; background:#fafafa; padding:10px; border-radius:8px;"> <strong>Venda</strong><div style="margin-top:6px; color:#333">${imovel.preco_venda ? `R$ ${Number(imovel.preco_venda).toLocaleString('pt-BR')}` : '—'}</div></div>
-                        <div style="flex:1; background:#fafafa; padding:10px; border-radius:8px;"> <strong>Aluguel</strong><div style="margin-top:6px; color:#333">${imovel.preco_aluguel ? `R$ ${Number(imovel.preco_aluguel).toLocaleString('pt-BR')}/mês` : '—'}</div></div>
-                    </div>
-
-                    <div class="bloco-dados">
-                        <h3>Descrição</h3>
-                        <p id="descricaoResumo">${escapeHtml(imovel.descricao || '')}</p>
-                        <button id="toggleDescricao" class="btn" style="background:transparent; color:var(--primary-purple); border:none; padding:0; margin-top:6px; cursor:pointer;">Mostrar descrição completa</button>
-                        <h4 style="margin-top:16px">Características</h4>
-                        <ul class="caracteristicas">
-                            ${imovel.quartos ? `<li>🛏 ${imovel.quartos} quarto(s)</li>` : ''}
-                            ${imovel.banheiros ? `<li>🚿 ${imovel.banheiros} banheiro(s)</li>` : ''}
-                            ${imovel.vagas ? `<li>🅿 ${imovel.vagas} vaga(s)</li>` : ''}
-                            ${imovel.comodidades ? imovel.comodidades.split(',').map(c => `<li>${escapeHtml(c.trim())}</li>`).join('') : ''}
-                        </ul>
-                    </div>
-
-                    <div id="proprietario" class="proprietario-card"></div>
-                </div>
+                ` : ''}
             </div>
 
-            <aside class="sidebar">
-                <div class="contact-card">
-                    <h4>Envie uma mensagem</h4>
-                    <label for="contact_name">Insira seu nome</label>
-                    <input id="contact_name" type="text" placeholder="Seu nome">
+            <div class="detalhes">
+                <h1>${escapeHtml(imovel.titulo || 'Imóvel')}</h1>
+                <p class="local">${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')} - ${escapeHtml(imovel.bairro || '')} • ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</p>
+                <p class="preco">${preco}${periodo}</p>
 
-                    <label for="contact_email">Insira seu e-mail</label>
-                    <input id="contact_email" type="email" placeholder="seuemail@exemplo.com">
-
-                    <label for="contact_phone">Insira seu telefone</label>
-                    <input id="contact_phone" type="text" placeholder="(00) 0 0000-0000">
-
-                    <label for="contact_message">Mensagem</label>
-                    <textarea id="contact_message">Olá, gostaria de ter mais informações sobre: ${escapeHtml(imovel.titulo || '')} — ${preco} — ${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')}, ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</textarea>
-
-                    <div class="send-row">
-                        <button id="send_msg" class="btn-send">Enviar mensagem</button>
-                        <button id="send_whatsapp" class="btn-whatsapp">WhatsApp</button>
-                    </div>
-
-                    <div class="phone-line">
-                        <span>Fale com o anunciante</span>
-                        <a id="show_phone" href="#">Ver telefone</a>
-                    </div>
+                <div class="acoes">
+                    ${showBookmark ? `<button id="bookmarkBtn" class="bookmark ${isFavorito ? 'favorited' : ''}" title="Favoritar">` + (isFavorito ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-bookmark"></i>') + `</button>` : ''}
+                    <a class="contato-whatsapp" href="https://wa.me/55${imovel.telefone || '999999999'}" target="_blank" title="WhatsApp do anunciante"><i class="bi bi-whatsapp"></i></a>
                 </div>
-            </aside>
+
+                <!-- REMOVIDO: Bloco valores-box de Venda e Aluguel -->
+
+                <div class="bloco-dados">
+                    <h3>Descrição</h3>
+                    <p id="descricaoResumo">${escapeHtml(imovel.descricao || '')}</p>
+                    <button id="toggleDescricao" class="btn" style="background:transparent; color:var(--primary-purple); border:none; padding:0; margin-top:6px; cursor:pointer;">Mostrar descrição completa</button>
+                    <h4 style="margin-top:16px">Características</h4>
+                    <ul class="caracteristicas">
+                        ${imovel.quartos ? `<li>🛏 ${imovel.quartos} quarto(s)</li>` : ''}
+                        ${imovel.banheiros ? `<li>🚿 ${imovel.banheiros} banheiro(s)</li>` : ''}
+                        ${imovel.vagas ? `<li>🅿 ${imovel.vagas} vaga(s)</li>` : ''}
+                        ${imovel.comodidades ? imovel.comodidades.split(',').map(c => {
+        // Remove colchetes, aspas e espaços extras
+        const caracteristica = c.trim().replace(/[\[\]"]/g, '');
+        return caracteristica ? `<li>${escapeHtml(caracteristica)}</li>` : '';
+    }).join('') : ''}
+                    </ul>
+                </div>
+
+                <div id="proprietario" class="proprietario-card"></div>
+            </div>
         </div>
-    `;
+
+        <aside class="sidebar">
+            <div class="contact-card">
+                <h4>Envie uma mensagem</h4>
+                <label for="contact_name">Insira seu nome</label>
+                <input id="contact_name" type="text" placeholder="Seu nome">
+
+                <label for="contact_email">Insira seu e-mail</label>
+                <input id="contact_email" type="email" placeholder="seuemail@exemplo.com">
+
+                <label for="contact_phone">Insira seu telefone</label>
+                <input id="contact_phone" type="text" placeholder="(00) 0 0000-0000">
+
+                <label for="contact_message">Mensagem</label>
+                <textarea id="contact_message">Olá, gostaria de ter mais informações sobre: ${escapeHtml(imovel.titulo || '')} — ${preco} — ${escapeHtml(imovel.rua || '')} ${escapeHtml(imovel.numero || '')}, ${escapeHtml(imovel.cidade || '')}/${escapeHtml(imovel.estado || '')}</textarea>
+
+                <div class="send-row">
+                    <button id="send_msg" class="btn-send">Enviar mensagem</button>
+                    <button id="send_whatsapp" class="btn-whatsapp">WhatsApp</button>
+                </div>
+
+                <div class="phone-line">
+                    <span>Fale com o anunciante</span>
+                    <a id="show_phone" href="#">Ver telefone</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+`;
+
+    // POPULAR GALERIA IMEDIATAMENTE APÓS CRIAR O CONTAINER
+    const carrosselEl = document.getElementById('carrossel-imagens');
+    if (carrosselEl && imagens.length > 0) {
+        carrosselEl.innerHTML = '';
+        imagens.forEach((src, idx) => {
+            const div = document.createElement('div');
+            div.className = 'slide' + (idx === 0 ? ' active' : '');
+            div.innerHTML = `<img src="${escapeHtml(src)}" alt="Imagem do imóvel ${idx + 1}" onerror="this.src='/frontend/image/placeholder-imovel.jpg'">`;
+            carrosselEl.appendChild(div);
+        });
+
+        // Inicializar carrossel após popular as imagens
+        setTimeout(() => initCarousel(), 100);
+    }
+
+
 
     // monta proprietário
     const propContainer = document.getElementById('proprietario');
