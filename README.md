@@ -97,7 +97,11 @@ O frontend roda diretamente pelo Live Server, Vite ou servidor estático.
 
 ## 👥 Equipe do Projeto
 
-Janylson --- Full Stack Developer (UECE)
+Janylson --- Full Stack Developer & Product Owner (UECE)
+Josue Araujo --- BackEnd Developer (UECE)
+Luis Henrique --- BackEnd Developer (UECE)
+Leticia Mineiro --- FrontEnd Developer (UECE)
+Amabile Fragoso --- FrontEnd Developer (UECE)
 
 ------------------------------------------------------------------------
 
