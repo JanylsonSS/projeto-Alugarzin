@@ -1,56 +1,94 @@
+# 📍 ROADMAP DO PROJETO -- ALUGARZIN
 
-# 🛣️ ROADMAP — Projeto Alugarzin
+Este documento apresenta todas as sprints planejadas, entregues e em
+desenvolvimento para o sistema Alugarzin.
 
-Este documento descreve as próximas etapas, melhorias planejadas e metas do projeto.
+------------------------------------------------------------------------
 
----
+🟦 **Sprint 1 --- Autenticação (Concluída)**\
+**RF-1 --- Cadastro de Usuário**\
+- Formulário com validação\
+- Envio ao backend\
+- Hash de senha com bcrypt\
+- Salvar no MySQL via Sequelize
 
-## ✅ 1. Etapas Concluídas
-- Estrutura inicial do front-end criada  
-- Estrutura inicial do back-end com Servlets configurada  
-- Conexão com MySQL planejada  
-- Sistema de login básico iniciado  
-- Separação frontend/backend organizada  
-- Organização do projeto no GitHub
+**RF-2 --- Login com JWT**\
+- Geração de token\
+- Middleware de autenticação\
+- Auth-Guard no front\
+- Armazenamento seguro no navegador
 
----
+------------------------------------------------------------------------
 
-## 🚧 2. Em Desenvolvimento
-- Sistema completo de autenticação com sessão  
-- Proteção de rotas com validação real no backend  
-- Páginas dinâmicas com dados do banco  
-- Configuração 100% funcional do JDBC  
-- CRUD de produtos/imóveis (HTML + backend)
+🟩 **Sprint 2 --- Painel do Usuário (Concluída)**\
+**RF-4 --- Exibir informações do usuário logado**\
+- Carregar dados via token\
+- Preencher DOM dinamicamente
 
----
+**RF-5 --- Upload de Fotos de Perfil**\
+- Multer configurado\
+- Salvamento no servidor
 
-## 📌 3. Próximas Entregas
-- Finalizar cadastro de imóveis no banco  
-- Criar página do painel do usuário autenticado  
-- Criar listagem dinâmica de imóveis no frontend  
-- Implementar DAO com PreparedStatement  
-- Criar sistema de logout funcional  
-- Melhorar design das telas com CSS refinado  
+------------------------------------------------------------------------
 
----
+🟧 **Sprint 3 --- Imóveis (Concluída)**\
+**RF-3 --- Cadastro de Imóvel**\
+- Upload de múltiplas imagens\
+- Salvar as informações\
+- Relacionamento Usuário → Imóveis
 
-## 🚀 4. Melhorias Futuras
-- Sistema de busca de imóveis com filtros  
-- Upload de imagens para anúncios  
-- Painel administrativo  
-- Notificações para proprietários  
-- Página pública para visitantes verem imóveis  
-- Containerização com Docker  
-- Deploy em servidor remoto  
+**RF-6 --- Visualização Detalhada**\
+- Página dedicada\
+- Exibir imagens, preço, localização e comodidades
 
----
+------------------------------------------------------------------------
 
-## 👥 Colaboradores
-- **PO:** Janylson Sousa Silva  
-- **Backend:** Josué Saraiva, Luís Henrique  
-- **Frontend:** Amabili Fragoso, Letícia Mineiro  
+🟥 **Sprint 4 --- Funcionalidades Avançadas (Atual)**\
+**RF-7 --- Edição e Exclusão de Anúncio**\
+- Rota PUT / DELETE\
+- Autorização por token\
+- Atualização de imagens
 
----
+**RF-8 --- Sistema de Contato**\
+- Envio de mensagem\
+- Salvamento no BD\
+- Envio de email (opcional)
 
-## 💡 Observação
-O roadmap é atualizado conforme o avanço do projeto no Trello e no GitHub.
+**RF-10 --- Logout Seguro**\
+- Revogação local do token\
+- Redirecionamento controlado\
+- Bloqueio do botão voltar
+
+------------------------------------------------------------------------
+
+🟪 **Sprint 5 --- Favoritos e Busca (Futura)**\
+**RF-11 --- Salvar Favoritos**\
+**RF-12 --- Listar Favoritos**\
+**RF-13 --- Busca Avançada**\
+- Filtros\
+- CEP\
+- Comodidades
+
+------------------------------------------------------------------------
+
+🟫 **Sprint 6 --- Publicação e SEO (Futura)**\
+**RF-14 --- Compartilhamento**\
+**RF-15 --- SEO e metatags dinâmicas**
+
+------------------------------------------------------------------------
+
+🟫 **Sprint 7 --- Infraestrutura (Futura)**\
+**RF-16 --- Deploy Back-end**\
+- Railway / Render / VPS
+
+**RF-17 --- Deploy Front-end**\
+- Vercel / Netlify
+
+**RF-18 --- Certificados SSL**
+
+------------------------------------------------------------------------
+
+🏁 **Finalização**\
+- Documentação final\
+- Apresentação\
+- Demonstração funcional
