@@ -27,8 +27,11 @@ colaboração em equipe.
 
 ### **Backend** *(em desenvolvimento)*
 
--   JavaScript\
+-   Java (Servlets)\
 -   MySQL\
+-   JDBC\
+-   Maven\
+-   Tomcat
 
 ## 🚀 Como Executar
 
@@ -40,12 +43,39 @@ git clone https://github.com/JanylsonSS/projeto-Alugarzin.git
 
 ### **Executar o Frontend**
 
+1.  Entre na pasta:
 
+``` bash
+cd projeto-Alugarzin/frontend
+```
+
+2.  Abra o arquivo `index.html` no navegador\
+    *(ou utilize uma extensão como Live Server no VS Code).*
+
+### **Executar o Backend (Caso esteja configurado)**
+
+1.  Importe o projeto no Eclipse como *Maven Project*\
+2.  Configure o Tomcat (versão 9 ou superior)\
+3.  Inicie o servidor
 
 ------------------------------------------------------------------------
 
 ## 📂 Estrutura do Projeto
 
+    projeto-Alugarzin/
+    │
+    ├── frontend/
+    │   ├── css/
+    │   ├── js/
+    │   ├── img/
+    │   └── index.html
+    │
+    ├── backend/
+    │   ├── src/
+    │   ├── webapp/
+    │   └── pom.xml
+    │
+    └── README.md
 
 ------------------------------------------------------------------------
 
@@ -61,6 +91,13 @@ git clone https://github.com/JanylsonSS/projeto-Alugarzin.git
 
 ------------------------------------------------------------------------
 
+## 🎯 Melhorias Futuras
+
+-   Sistema de login completo integrado ao banco\
+-   Upload de fotos dos imóveis\
+-   Dashboard do usuário\
+-   Busca filtrada (preço, tipo, localização)\
+-   Melhorias no design responsivo
 
 ------------------------------------------------------------------------
 
