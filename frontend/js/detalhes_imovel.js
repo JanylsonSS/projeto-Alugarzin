@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     transition: background 0.3s;
                 " onmouseover="this.style.background='#320075'" 
                   onmouseout="this.style.background='var(--primary-purple)'">
-                    ↩️ Voltar para imóveis
+                    ↩️ Voltar para Anúncios
                 </a>
                 <a href="/frontend/index.html" style="
                     background: #f0f0f0; 
@@ -180,7 +180,7 @@ async function renderDetalheMarketplace(imovel, usuario) {
 
                 <div class="phone-line">
                     <span>Fale com o anunciante</span>
-                    <a id="show_phone" href="#">Ver telefone</a>
+                    <a id="show_phone" href="#">Ver Informações</a>
                 </div>
             </div>
         </aside>
