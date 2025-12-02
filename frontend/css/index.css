@@ -50,7 +50,6 @@ Cabeçalho
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    margin-right: 10px;
 }
 
 
@@ -87,17 +86,12 @@ Cabeçalho
 
 /* Botão estilizado para IMÓVEIS no header */
 .btn-imoveis {
+    color: black;
     display: inline-block;
     padding: 12px 22px;
     border-radius: 50px;
     font-weight: 800;
     text-decoration: none;
-    color: white !important;
-    background: linear-gradient(90deg, #ff751f, #430097, #ff751f, #430097);
-    background-size: 300% 100%;
-    background-position: 0%;
-    border: none;
-    box-shadow: 0 6px 18px rgba(67, 0, 151, 0.18);
     font-size: 16px;
     transition: transform 0.3s, opacity 0.12s;
 }
@@ -107,6 +101,7 @@ Cabeçalho
     transform: scale(1.04);
     opacity: 0.95;
 }
+
 
 
 /* =================================

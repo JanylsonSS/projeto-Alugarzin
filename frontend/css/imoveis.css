@@ -30,7 +30,7 @@ body {
 
 /* ======== NAVBAR ======== */
 .navbar {
-  position: fixed;
+  position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -43,8 +43,15 @@ body {
   transition: top 0.3s ease;
 }
 
+.navbar-center {
+    position: absolute;
+    left: 50%;
+    display: flex;
+    gap: 10px;
+}
+
 .logo img {
-  height: 65px;
+  height: 85px;
   margin-left: 250px;
 }
 
@@ -56,7 +63,6 @@ body {
 
 .menu a {
   text-decoration: none;
-  color: #333;
   font-weight: 600;
 }
 
@@ -72,25 +78,36 @@ body {
   margin-right: 10px;
 }
 
-.login {
-  background-color: #ff751f;
-  color: white;
-  border-color: #ff751f;
+.btn-login {
+    background-color: #ff751f;
+    color: white;
+    border-color: #ff751f;
 }
 
-.login:hover {
-  background-color: #e65c00;
+.btn-login:hover {
+    background-color: #e65c00;
 }
 
-.criar {
-  background-color: #430097;
-  color: #ffffff;
-  border-color: #430097;
+.btn-criar-conta {
+    background-color: #430097;
+    color: #ffffff;
+    border-color: #430097;
 }
 
-.criar:hover {
-  background-color: #320075;
+.btn-criar-conta:hover {
+    background-color: #320075;
 }
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    margin-left: 20px;
+    font-weight: 600;
+}
+
+.header-right :hover {
+    color: #ff751f;
+} 
 
 .menu-toggle {
   display: none;
@@ -101,19 +118,34 @@ body {
 
 /* Top navbar filter buttons (Alugar / Comprar) styled as toggle pills */
 .nav-filter {
-  border: 2px solid transparent;
-  background: linear-gradient(white, white) padding-box, linear-gradient(to right, #ff751f, #430097) border-box;
+  display: flex;
+  align-items: center;
   padding: 8px 14px;
   border-radius: 24px;
+  background: 
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(to right, #ff751f, #430097) border-box;
+  border: 2px solid transparent;
+
   font-weight: 700;
   cursor: pointer;
   color: #333;
-  transition: transform .12s ease, opacity .12s ease, color .12s ease;
+  transition: transform 0.3s, opacity 0.12s;
+}
+
+.nav-filter:hover {
+    animation: moveRight 2s linear infinite;
+    transform: scale(1.04);
+    opacity: 0.95;
+    color: #ff751f;
 }
 
 .nav-filter.active {
-  color: #fff;
+  color: #ffffff;
   background: linear-gradient(to right, #ff751f, #430097);
+    background: 
+    linear-gradient(to right, #ff751f, #430097) border-box;
+  border: 2px solid transparent;
   box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
 }
 
@@ -152,6 +184,28 @@ body {
   overflow-y: auto;
   z-index: 100;
 }
+
+#limpar-filtros {
+    position: fixed;
+    margin-top: 15px;
+    width: 204px;
+    bottom: 20px;  
+    left: 20px;  
+    z-index: 9999;  
+    padding: 12px;
+    border-radius: 8px;
+    background: #4f1b8f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#limpar-filtros:hover {
+    background: #3c0c77;
+}
+
 
 .sidebar h3 {
   font-size: 0.9rem;

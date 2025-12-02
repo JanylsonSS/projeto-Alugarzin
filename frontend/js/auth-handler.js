@@ -45,14 +45,14 @@ export async function renderizarHeaderPerfil(selectorLoginBox = '#userBox', sele
         if (userBox) {
             userBox.style.display = 'flex';
             userBox.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px; margin-right: 20px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
                     <img src="${usuario.foto_perfil || '/frontend/image/Karina.jpg'}" 
                          alt="Perfil" 
-                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer;"
+                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;"
                          onclick="window.location.href='/frontend/painel.html'"
                          title="Ir para painel">
-                    <span style="cursor: pointer;" onclick="window.location.href='/frontend/painel.html'">${usuario.nome}</span>
-                    <button onclick="logout()" style="padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
+                    <span style="cursor: pointer; font-weight: 500; font-size: 15px;" onclick="window.location.href='/frontend/painel.html'">${usuario.nome}</span>
+                    <button onclick="logout()" style="padding: 5px 10px; background: #430097; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
                 </div>
             `;
         }
