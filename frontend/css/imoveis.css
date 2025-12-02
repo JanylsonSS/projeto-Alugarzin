@@ -191,21 +191,21 @@ body {
     width: 204px;
     bottom: 20px;  
     left: 20px;  
-    z-index: 9999;  
     padding: 12px;
     border-radius: 8px;
-    background: #4f1b8f;
     color: white;
-    border: none;
     cursor: pointer;
     font-weight: bold;
     transition: 0.2s;
+    margin-top:5px;
+    background:#4f1b8f;
+    border: none;
+      box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.20);
 }
 
 #limpar-filtros:hover {
-    background: #3c0c77;
+    background: #3d0286;
 }
-
 
 .sidebar h3 {
   font-size: 0.9rem;
@@ -281,7 +281,7 @@ body {
 /* ======== CARDS ======== */
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 20px;
 }
 
@@ -310,6 +310,8 @@ body {
 
 /* Compatibility with card markup produced by renderizarCardImovel (card-imovel / card-image) */
 .card-imovel {
+  width: 435px;
+  height: 380px;
   background: white;
   border: 3px solid #6f42c1;
   border-radius: 12px;
@@ -325,7 +327,7 @@ body {
 
 .card-image {
   width: 100%;
-  height: 220px;
+  height: 240px;
   object-fit: cover;
   display: block;
 }
