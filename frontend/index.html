@@ -16,16 +16,16 @@
 
     <header class="header-container">
         <div class="header-left">
+            <div id="userBox" style="display:none;"></div>
             <a href="/frontend/login.html"><button class="btn-login">LOGIN</button></a>
             <a href="/frontend/login.html"><button class="btn-criar-conta">CRIAR CONTA</button></a>
         </div>
-        <div id="userBox" style="display:none;"></div>
         <div class="header-center">
             <a href="/frontend/index.html"><img src="/frontend/image/Alugarzin_roxo_laranja.png" width="400px"></a>
         </div>
         <div class="header-right">
             <nav class="nav-links">
-                <a href="/frontend/imoveis.html" class="btn-imoveis">IMÓVEIS</a>
+                <a href="/frontend/imoveis.html" class="btn-imoveis">ANÚNCIOS</a>
                 <a href="#" class="help-icon"><i class="fa-sharp fa-solid fa-question"></i></a>
             </nav>
         </div>
@@ -115,7 +115,27 @@
         </div>
 
     </main>
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <div class="modal-body">
+            
+            <h2 class="modal-title"><i class="fa-solid fa-circle-info"></i> Sobre o Alugarzin</h2>
+            <p>O Alugarzin é um sistema Web completo para divulgação, busca e gerenciamento de imóveis para aluguel ou venda.</p>
+            <p>O projeto inclui autenticação JWT, cadastro e login de usuários, publicação de anúncios, visualização detalhada, edição e exclusão, além de funcionalidades de contato entre interessados.</p>
 
+            <h2 class="modal-title team-title"><i class="fa-solid fa-people-group"></i> Equipe do Projeto</h2>
+            <ul class="team-list">
+                <li><span class="role">Full Stack Developer & Product Owner (UECE):</span> Janylson</li>
+                <li><span class="role">BackEnd Developer (UECE):</span> Josue Araujo</li>
+                <li><span class="role">BackEnd Developer (UECE):</span> Luis Henrique</li>
+                <li><span class="role">FrontEnd Developer (UECE):</span> Leticia Mineiro</li>
+                <li><span class="role">FrontEnd Developer (UECE):</span> Amabile Fragoso</li>
+            </ul>
+
+        </div>
+    </div>
+</div>
     <footer class="footer-container">
         <div class="footer-links">
             <a href="#">Termos de uso</a>

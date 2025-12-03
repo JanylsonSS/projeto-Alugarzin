@@ -14,8 +14,9 @@
 </head>
 
 <body>
-    <header class="header-container" id="mainHeader">
+    <header class="header-container">
         <div class="header-left">
+            <div id="userBox" style="display:none;"></div>
             <a href="/frontend/login.html"><button class="btn-login">LOGIN</button></a>
             <a href="/frontend/login.html"><button class="btn-criar-conta">CRIAR CONTA</button></a>
         </div>
@@ -24,15 +25,13 @@
         </div>
         <div class="header-right">
             <nav class="nav-links">
-                <a href="/frontend/imoveis.html" class="btn-imoveis">IMÓVEIS</a>
+                <a href="/frontend/imoveis.html" class="btn-imoveis">ANÚNCIOS</a>
                 <a href="#" class="help-icon"><i class="fa-sharp fa-solid fa-question"></i></a>
             </nav>
-            <div id="userBox" style="display:none; margin-left: 12px;"></div>
         </div>
     </header>
 
     <!-- Galeria/carrossel será renderizada pelo JS dentro do container principal -->
-
     <!-- MODAL LOGIN/CADASTRO -->
     <div id="modal" class="modal-over">
         <div class="modal-cont">
@@ -49,8 +48,6 @@
     <div id="imoveis-detalhe" class="cards-detalhe">
         <!-- Cards dos imóveis serão inseridos via JS -->
     </div>
-
-    <div id="map-container"></div>
 
     <script type="module" src="/frontend/js/detalhes_imovel.js"></script>
 </body>

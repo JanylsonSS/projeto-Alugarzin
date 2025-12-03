@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('scroll', () => {
         if (!navbar) return;
         const pos = window.scrollY;
-        navbar.style.top = pos > ultimaPos ? '-80px' : '0';
+        navbar.style.top = pos > ultimaPos ? '-1000px' : '1000';
         ultimaPos = pos;
     });
 

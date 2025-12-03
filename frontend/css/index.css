@@ -50,7 +50,6 @@ Cabeçalho
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    margin-right: 10px;
 }
 
 
@@ -81,9 +80,19 @@ Cabeçalho
     font-weight: 600;
 }
 
-.header-right :hover {
+.header-right a:hover {
     color: #ff751f;
 }
+
+.help-icon {
+    margin-left: 25px !important;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 100%;
+
+}
+
+
 
 /* Botão estilizado para IMÓVEIS no header */
 .btn-imoveis {
@@ -107,6 +116,17 @@ Cabeçalho
     transform: scale(1.04);
     opacity: 0.95;
 }
+
+.btn-imoveis.active {
+  color: #ffffff;
+  background: linear-gradient(to right, #ff751f, #430097);
+    background: 
+    linear-gradient(to right, #ff751f, #430097) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
+}
+
+
 
 
 /* =================================
@@ -443,4 +463,100 @@ Responsividade Header
         /* altura do rodapé */
     }
 
+}
+
+
+
+
+
+/* =====================================
+   ESTILOS DO MODAL DE AJUDA
+   ===================================== */
+.modal {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    z-index: 1050; /* Z-index alto para ficar acima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo escuro */
+    backdrop-filter: blur(3px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* Centralização básica */
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px; /* Largura máxima controlada */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+    text-align: left;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Botão de Fechar */
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    transition: 0.3s;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #430097;
+    text-decoration: none;
+}
+
+/* Títulos internos */
+.modal-title {
+    color: #430097;
+    font-size: 1.4rem;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ff751f;
+}
+.modal-title i {
+    margin-right: 10px;
+}
+
+/* Parágrafos e Listas */
+.modal-body p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.team-list {
+    list-style: none;
+    padding: 0;
+}
+
+.team-list li {
+    margin-bottom: 8px;
+    font-size: 1em;
+    color: #555;
+}
+
+.team-list .role {
+    font-weight: 600;
+    color: #430097;
+}
+
+/* Animação */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }

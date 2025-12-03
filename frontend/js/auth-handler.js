@@ -45,14 +45,14 @@ export async function renderizarHeaderPerfil(selectorLoginBox = '#userBox', sele
         if (userBox) {
             userBox.style.display = 'flex';
             userBox.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px; margin-right: 20px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
                     <img src="${usuario.foto_perfil || '/frontend/image/Karina.jpg'}" 
                          alt="Perfil" 
-                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer;"
+                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; cursor: pointer;"
                          onclick="window.location.href='/frontend/painel.html'"
                          title="Ir para painel">
-                    <span style="cursor: pointer;" onclick="window.location.href='/frontend/painel.html'">${usuario.nome}</span>
-                    <button onclick="logout()" style="padding: 5px 10px; background: #ff6b6b; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
+                    <span style="cursor: pointer; font-weight: 500; font-size: 15px;" onclick="window.location.href='/frontend/painel.html'">${usuario.nome}</span>
+                    <button onclick="logout()" style="padding: 5px 10px; background: #430097; color: white; border: none; border-radius: 4px; cursor: pointer;">Sair</button>
                 </div>
             `;
         }
@@ -166,15 +166,15 @@ export function renderizarCardImovel(imovel) {
         <div class="card-imovel" onclick="window.location.href='/frontend/detalhes_imovel.html?id=${imovel.id}'" style="cursor: pointer;">
             <img src="${imagemUrl}" alt="${imovel.titulo || 'Imóvel'}" class="card-image" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px 8px 0 0;">
             <div class="card-content" style="padding: 12px;">
-                <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #333;">${imovel.titulo || 'Imóvel'}</h3>
-                <p style="margin: 0 0 4px 0; color: #666; font-size: 14px;">
+                <h3 style="margin: 0 0 8px 0; font-size: 17px; color: #333;">${imovel.titulo || 'Imóvel'}</h3>
+                <p style="margin: 0 0 4px 0; color: #666; font-size: 15px;">
                     ${imovel.cidade || ''} ${imovel.estado ? ', ' + imovel.estado : ''}
                 </p>
-                <p style="margin: 0; font-size: 18px; font-weight: bold; color: #ff6b35;">${preco}${periodo}</p>
+                <p style="margin: 0; font-size: 19px; font-weight: bold; color: #ff6b35;">${preco}${periodo}</p>
                 <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: #999;">
-                    ${imovel.quartos ? `<span>🛏 ${imovel.quartos} quarto${imovel.quartos !== '1' ? 's' : ''}</span>` : ''}
+                    ${imovel.quartos ? `<span>🛏️ ${imovel.quartos} quarto${imovel.quartos !== '1' ? 's' : ''}</span>` : ''}
                     ${imovel.banheiros ? `<span>🚿 ${imovel.banheiros} banheiro${imovel.banheiros !== '1' ? 's' : ''}</span>` : ''}
-                    ${imovel.vagas ? `<span>🅿 ${imovel.vagas} vaga${imovel.vagas !== '1' ? 's' : ''}</span>` : ''}
+                    ${imovel.vagas ? `<span>🚗 ${imovel.vagas} vaga${imovel.vagas !== '1' ? 's' : ''}</span>` : ''}
                 </div>
             </div>
         </div>

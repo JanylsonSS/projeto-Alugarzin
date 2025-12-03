@@ -27,26 +27,37 @@ body {
         url('/frontend/image/ideia.png'),
         linear-gradient(to right, #430097, #ff751f);
 }
-
 .logo {
     position: fixed;
-    top: 10px;
-    right: 40px;
-    width: 250px;
-    display: block;
+    top: 15px;
+    left: 15px;
+    width: 130px;
+    z-index: 9999;
 }
 
+/* LAYOUT PRINCIPAL DE DUAS COLUNAS (COMPACTO) */
 .paineldeusuario {
-    width: 1500px;
-    max-height: calc(100vh - 40px);
-    margin: 0 auto;
-    background: #fff;
-    border-radius: 10px;
-    overflow-y: auto;
-    box-shadow: 0 5px 40px rgba(0, 0, 0, 0.6);
+    width: 95%;
+    max-width: 1200px; /* Aumenta a largura total para acomodar as colunas */
+    margin: 80px auto 50px auto; 
+    padding: 0; /* Remove padding, as colunas terão padding */
+    position: relative;
+    z-index: 1;
+    background-color: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Foto de perfil no Modal de Edição (pré-visualização) */
+.conteudo-principal {
+    display: flex; /* Habilita as colunas */
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px;
+    gap: 30px;
+}
+
+/* Foto de perfil no Modal de Edição (pré-visualização) - mantido object-fit: cover para pré-visualização */
 #previewImage {
     width: 130px;
     height: 130px;
@@ -66,67 +77,78 @@ body {
     transform: scale(1.03);
 }
 
-/* ======== CABEÇALHO ======== */
+/* ======== CABEÇALHO (COLUNA ESQUERDA - PERFIL) ======== */
 
 .header {
     position: relative;
+    width: 300px; /* Largura fixa para a coluna de perfil (Sidebar) */
+    flex-shrink: 0;
+    border-right: 1px solid #eee; /* Linha divisória */
+    padding-right: 30px; /* Espaço entre a sidebar e o feed */
 }
 
 .capa {
     position: relative;
-    height: 250px;
+    height: 100px; /* Capa menor, como no modelo */
     width: 100%;
+    overflow: hidden;
+    border-radius: 15px 0 0 0; /* Apenas o topo esquerdo é arredondado */
 }
 
 .capa img:last-child {
     width: 100%;
-    height: 250px;
+    height: 100px;
     object-fit: cover;
     border-radius: 0;
 }
 
 .fotoperfil {
     position: absolute;
-    bottom: -60px;
-    left: 40px;
-    width: 150px;
-    height: 150px;
+    bottom: -30px; /* Ajuste para centralizar verticalmente na capa menor */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px; /* Foto de perfil menor */
+    height: 100px;
     border-radius: 50%;
-    border: 4px solid #fff;
+    border: 3px solid #fff;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
 }
 
 
 .fotoperfil img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* Corrigido: object-fit: cover mantém a proporção e recorta (comum em perfis) */
+    object-fit: cover; 
     border-radius: 50%;
 }
 
 .perfil {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 20px 40px 10px 180px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 45px 0 0 0; /* Padding ajustado para o novo layout (vertical) */
+    width: 100%;
 }
 
 .usuarioinfo h2 {
-    margin: 0;
-    font-size: 1.8rem;
+    margin: 10px 0 5px 0;
+    font-size: 1.6rem;
 }
 
 .localizacao {
     font-size: 0.95rem;
     color: #666;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    /* Adiciona espaçamento entre Local, WhatsApp e Email */
+    gap: 5px;
+    margin-bottom: 20px;
 }
 
-/* Estilos para os links sociais no perfil */
 .localizacao a {
     color: inherit;
     text-decoration: none;
@@ -142,10 +164,14 @@ body {
 
 .botaoeditarperfil {
     display: flex;
+    flex-direction: column;
     gap: 10px;
+    width: 100%;
+    padding: 0 10px;
 }
 
 .botaoeditarperfil button {
+    width: 100%;
     border: none;
     cursor: pointer;
     padding: 10px 16px;
@@ -161,14 +187,18 @@ body {
     opacity: 0.8;
 }
 
-/* ======== ABAS ======== */
+/* ======== ABAS E FEED (COLUNA DIREITA) ======== */
+
+.coluna-feed {
+    flex: 1; /* Ocupa o espaço restante */
+    min-width: 500px; /* Garante que o feed tenha espaço mínimo */
+}
 
 .anunciosefavoritos {
     display: flex;
     justify-content: center;
-    border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
-    margin-top: 20px;
+    margin-top: 0; 
 }
 
 .aba {
@@ -195,7 +225,7 @@ body {
 .feedanuncio,
 .feedfavoritos {
     text-align: center;
-    padding: 40px 20px;
+    padding: 20px 0;
 }
 
 /* Thumbnails/layout for user's anuncios in painel */
@@ -208,7 +238,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin: 12px auto;
-    max-width: 1100px;
+    max-width: 100%;
     border: 2px solid transparent;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.18s ease;
 }
@@ -223,7 +253,6 @@ body {
     transform: translateY(-4px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     border-color: #6f42c1;
-    /* borda roxa ao passar o mouse */
 }
 
 .card-anuncio img {
@@ -239,6 +268,63 @@ body {
     flex: 1;
 }
 
+/* ... (Restante do CSS de Feed) ... */
+
+/* ======== MODAIS (Estilos de organização mantidos) ======== */
+/* ... (Seções de MODAIS, editProfileForm, etc., mantidas do código anterior para organização) ... */
+.modal {
+    overflow: auto;
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal:not(.hidden) {
+    display: flex !important;
+}
+
+.modalcontent {
+    max-height: 90vh;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    width: 800px;
+    max-width: 90%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow-y: auto;
+    margin: 40px auto;
+}
+
+/* Estilos de organização para os títulos H2 (Seções do Modal) */
+.modalcontent h2 {
+    color: #430097; 
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 30px 0 15px 0; 
+    border-bottom: 2px solid #ff751f;
+    padding-bottom: 5px;
+    text-align: left;
+}
+.modalcontent h2:first-of-type {
+    margin-top: 5px;
+}
+.modalcontent h2 i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+.form-section, .edit-top, .edit-bottom {
+    margin-bottom: 25px; 
+}
 .card-anuncio .card-actions {
     display: flex;
     gap: 8px;
@@ -314,6 +400,38 @@ body {
     margin: 40px auto;
 }
 
+/* Estilos de organização para os títulos H2 (Seções do Modal) */
+.modalcontent h2 {
+    color: #430097; /* Cor primária */
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 30px 0 15px 0; /* Espaçamento: 30px em cima, 15px embaixo */
+    border-bottom: 2px solid #ff751f; /* Linha de destaque para separação */
+    padding-bottom: 5px;
+    text-align: left;
+}
+
+/* Garante que o primeiro título não tenha margem superior excessiva */
+.modalcontent h2:first-of-type {
+    margin-top: 5px;
+}
+
+/* Estilização para ícones nos títulos H2 */
+.modalcontent h2 i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+/* Melhorar espaçamento entre grupos de campos */
+.form-section, .edit-top, .edit-bottom {
+    margin-bottom: 25px; 
+}
+/* Removendo margin-bottom em form-section que está dentro de outra div com margin (ex: modaladdanuncio) */
+.modalcontent .form-section:last-of-type {
+    margin-bottom: 10px; 
+}
+
+
 .modalcontent input,
 .modalcontent select {
     width: 100%;
@@ -354,11 +472,12 @@ body {
 
 .edit-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Alinha o topo */
     justify-content: space-between;
     gap: 40px;
     width: 100%;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .profile-pic {
@@ -375,11 +494,20 @@ body {
     display: none;
 }
 
+.profile-pic label {
+    margin-top: 10px;
+    cursor: pointer;
+    color: #430097;
+    font-weight: 600;
+}
+
+
 .info-principal {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    min-width: 300px;
 }
 
 .edit-bottom {
@@ -387,25 +515,22 @@ body {
     flex-direction: column;
     width: 100%;
     gap: 20px;
+    margin-bottom: 10px; /* Reduzida a margem, pois tem o H2 antes */
 }
 
 /* NOVO: Layout de Localização Detalhada  */
 .localizacao-detalhada {
     display: grid;
-
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
 }
 
 .localizacao-detalhada .campo {
-
     grid-column: span 1;
 }
 
-
-.localizacao-detalhada .campo:nth-child(2) {
-    grid-column: 1 / 3;
-}
+/* Faz o campo de CEP ser full-width no perfil, se houver necessidade de um campo único maior */
+/* Removido o seletor ":nth-child(2)" que estava forçando um campo a ser full width */
 
 
 .editProfileForm label {
@@ -443,6 +568,7 @@ body {
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
+    margin-top: 15px !important;
 }
 
 #btnSalvarPerfil:hover {
@@ -451,15 +577,12 @@ body {
 
 /* === MODAL CRIAR ANÚNCIO === */
 #addAnuncioForm {
-    display: flex;
-    flex-direction: column;
+    display: block; /* Garante que as seções se comportem como blocos */
 }
 
 .form-section {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
     width: 100%;
+    /* margin-bottom: 25px; <- Adicionado no bloco geral de modais */
 }
 
 /* === IMAGENS === */
@@ -502,6 +625,8 @@ body {
     line-height: 1.5;
     resize: vertical;
     transition: border-color .18s ease, box-shadow .18s ease;
+    width: 100%; /* Garante que o textarea ocupe a largura total */
+    margin-bottom: 20px; /* Para consistência */
 }
 
 #descricao:focus {
@@ -514,12 +639,13 @@ body {
     color: #9a9a9a;
 }
 
-/* === PREÇO E LOCALIZAÇÃO === */
+/* === PREÇO E TIPO === */
 .preco-tipo {
     display: flex;
     justify-content: space-between;
     gap: 25px;
     align-items: flex-end;
+    flex-wrap: wrap; /* Para responsividade */
 }
 
 .campo-preco,
@@ -556,6 +682,7 @@ body {
     cursor: pointer;
     font-weight: 600;
     transition: 0.25s;
+    margin-bottom: 0; /* Correção de margin-bottom herdado do input */
 }
 
 .radio-group input[type="radio"]:checked+label {
@@ -574,6 +701,7 @@ body {
     justify-content: space-between;
     gap: 25px;
     font-weight: 600;
+    flex: 1;
 }
 
 .tipo-anuncio select {
@@ -587,10 +715,12 @@ body {
     gap: 20px;
     width: 100%;
     font-weight: 600;
+    flex-wrap: wrap;
 }
 
 .quantidades>div {
     flex: 1;
+    min-width: 150px; /* Para evitar quebras feias em telas médias */
 }
 
 .btn-group {
@@ -616,7 +746,7 @@ body {
     font-weight: 600;
     transition: 0.25s;
     min-width: 40px;
-    /* Garante que a opção 0 não fique muito pequena */
+    margin-bottom: 0; /* Correção de margin-bottom herdado do input */
 }
 
 .btn-group input[type="radio"]:checked+label {
@@ -630,11 +760,18 @@ body {
 }
 
 /* === COMODIDADES === */
+.comodidades {
+    margin-top: 10px;
+}
+
+/* O H3 foi removido do HTML, mas mantenho o CSS caso queira reutilizar */
+/*
 .comodidades h3 {
     color: #000000;
     font-size: 1.1rem;
     font-weight: 600;
 }
+*/
 
 .seletor-container {
     display: flex;
@@ -669,7 +806,7 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: 0.2s;
-    margin-top: 15px;
+    margin-top: 30px; /* Aumenta a separação do botão final */
     width: auto;
 }
 
@@ -708,6 +845,82 @@ body {
 /* ===========================
     RESPONSIVIDADE
 =========================== */
+
+@media (max-width: 992px) {
+    .paineldeusuario {
+        padding: 0;
+        max-width: 95%;
+    }
+    
+    .conteudo-principal {
+        flex-direction: column;
+        padding: 0;
+        gap: 0;
+    }
+    
+    .header {
+        width: 100%;
+        border-right: none;
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
+    
+    .coluna-feed {
+        width: 100%;
+        min-width: 100%;
+        padding: 0 20px; 
+    }
+
+   
+    .capa {
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .perfil {
+        padding-top: 40px;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .fotoperfil {
+        bottom: -50px;
+    }
+    
+    .usuarioinfo {
+        margin-top: 20px;
+    }
+
+    .localizacao {
+        flex-direction: row; 
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .botaoeditarperfil {
+        flex-direction: row; 
+        max-width: 100%;
+        padding: 0 20px;
+    }
+    
+    .botaoeditarperfil button {
+        flex: 1;
+    }
+
+  
+    .feedanuncio, .feedfavoritos {
+        padding: 20px 0;
+    }
+    
+    .card-anuncio {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .card-anuncio img {
+        width: 100%;
+        height: 180px;
+    }
+
+}
 @media (max-width: 1200px) {
     .paineldeusuario {
         width: 95%;
@@ -846,16 +1059,26 @@ body {
         padding: 20px;
         margin: 20px auto;
     }
+    
+    /* H2 responsivo */
+    .modalcontent h2 {
+        font-size: 1.3rem;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
 
     /* Edição de Perfil Responsiva */
     .edit-top {
         flex-direction: column;
         gap: 20px;
+        align-items: stretch;
     }
 
+    .info-principal {
+        min-width: 100%;
+    }
 
     .localizacao-detalhada {
-
         grid-template-columns: 1fr;
         gap: 10px;
     }
@@ -871,6 +1094,7 @@ body {
     .quantidades {
         flex-direction: column;
         gap: 15px;
+        align-items: stretch;
     }
 
     .quantidades>div {
@@ -908,4 +1132,46 @@ body {
         min-width: 40px;
         padding: 10px 0;
     }
+    
+    /* Ajusta a largura das categorias no móvel */
+    .tipo-anuncio > div {
+        width: 100%;
+    }
 }
+
+
+/* ======== Ultimas mudanças (Maby) ======== */
+#previewImagens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.preview-item {
+    position: relative;
+}
+
+.preview-item img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.remove-thumb {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+
+
+

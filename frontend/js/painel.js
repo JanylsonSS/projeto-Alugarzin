@@ -1,10 +1,27 @@
 const API_BASE = "http://localhost:3000/api";
 
-// Minimal DOM helpers used across scripts
+// ===================================
+// VARIÁVEIS GLOBAIS / CONSTANTES
+// ===================================
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $all = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 let usuarioLogado = null;
 let EDITING_ANUNCIO_ID = null; // null when creating, set to id when editing
+
+// Armazena as imagens atuais (URL para existentes, File para novas)
+let imagensAtuais = []; 
+// Armazena as URLs das imagens que foram EXCLUÍDAS no modo de edição
+let imagensExcluidas = []; 
+
+const editModal = document.getElementById("editmodal");
+const fecharEditModal = document.getElementById("fechareditmodal1");
+const editProfileForm = document.querySelector(".editProfileForm");
+const addAnuncioModal = document.getElementById("modaladdanuncio");
+const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
+const addAnuncioForm = document.getElementById("addAnuncioForm");
+const imagemInput = document.getElementById("imagemInput");
+const previewContainer = document.getElementById('previewImagens');
+const MIN_IMAGENS = 3;
 
 
 function showMessage(msg, type = 'error', container = null) {
@@ -21,17 +38,6 @@ function showMessage(msg, type = 'error', container = null) {
 
     setTimeout(() => { container.style.display = 'none'; }, 5000);
 }
-
-// ===================================
-// VARIÁVEIS GLOBAIS / CONSTANTES
-// ===================================
-const editModal = document.getElementById("editmodal");
-const fecharEditModal = document.getElementById("fechareditmodal1");
-const editProfileForm = document.querySelector(".editProfileForm");
-const addAnuncioModal = document.getElementById("modaladdanuncio");
-const fecharAddAnuncioModal = document.getElementById("fechareditmodal2");
-const addAnuncioForm = document.getElementById("addAnuncioForm");
-
 
 // ===============================
 // Alternar abas (Anúncios / Favoritos)
@@ -143,7 +149,7 @@ function renderListaFavoritos(imoveis) {
     });
 }
 // =========================
-//   BUSCAR USUÁRIO LOGADO
+//   BUSCAR USUÁRIO LOGADO
 // =========================
 async function carregarUsuario() {
     const token = localStorage.getItem('token');
@@ -186,7 +192,7 @@ carregarUsuario();
 
 
 // =========================
-//         LOGOUT
+//         LOGOUT
 // =========================
 document.getElementById("btnLogout").addEventListener("click", () => {
     localStorage.removeItem("token");
@@ -217,13 +223,16 @@ async function initPainel() {
 
     const fecharAdd = document.getElementById('fecharEditModal2');
     if (fecharAdd) fecharAdd.addEventListener('click', () => fecharModal('#modaladdanuncio'));
+    
     // Reset editing state when modal closed
     if (fecharAdd) fecharAdd.addEventListener('click', () => {
         EDITING_ANUNCIO_ID = null;
         const btnSalvar = document.getElementById('btnSalvarAnuncio');
         if (btnSalvar) btnSalvar.textContent = 'Publicar';
         const formAddLocal = document.getElementById('addAnuncioForm'); if (formAddLocal) formAddLocal.reset();
-        const preview = document.getElementById('previewImagens'); if (preview) preview.innerHTML = '';
+        
+        // Limpeza de imagens atualizada
+        window.clearAnuncioImages(); 
     });
 
     const btnCancelarPerfil = document.getElementById('btnCancelarPerfil');
@@ -236,8 +245,9 @@ async function initPainel() {
     const profileImageInput = document.getElementById('profileImageInput');
     if (profileImageInput) profileImageInput.addEventListener('change', previewProfileImage);
 
-    const imagemInput = document.getElementById('imagemInput');
-    if (imagemInput) imagemInput.addEventListener('change', previewAnuncioImages);
+    // O listener de imagem de anúncio foi movido para o final, mas o input ainda existe
+    // const imagemInput = document.getElementById('imagemInput'); 
+    // if (imagemInput) imagemInput.addEventListener('change', handleImageInputChange); // Chamará handleImageInputChange
 
     // Forms
     const formEditar = document.getElementById('formEditarPerfil');
@@ -259,7 +269,8 @@ async function initPainel() {
         });
     });
 
-    setupAnuncioImageHelpers();
+    // setupAnuncioImageHelpers(); // Substituído pela nova lógica de preview/exclusão
+    
     // Permite desmarcar as opções de período (clicar novamente desmarca)
     if (typeof setupPeriodoToggle === 'function') setupPeriodoToggle();
 
@@ -462,46 +473,67 @@ async function handleEditarPerfil(e) {
 }
 
 // ==============================
-// Handlers: Adicionar Anúncio (envia FormData com imagens[])
+// Handlers: Adicionar/Editar Anúncio (envia FormData com imagens[])
 // ==============================
 async function handleAddAnuncio(e) {
     e.preventDefault();
     const token = localStorage.getItem('token');
     const form = document.getElementById('addAnuncioForm');
-    const fd = new FormData(form);
+
+    if (!verificarMinimoImagens()) {
+        alert(`É necessário adicionar pelo menos ${MIN_IMAGENS} imagens.`);
+        return;
+    }
+
+    const fd = new FormData(); 
+    
+    // 1. Adiciona todos os campos de texto/número/select/etc.
+    new FormData(form).forEach((value, key) => {
+        // Ignora os campos de arquivo para tratá-los separadamente
+        if (key !== 'imagens' && key !== 'imagemInput') { 
+            fd.append(key, value);
+        }
+    });
+
+    // 2. Adiciona as novas imagens (objetos File)
+    imagensAtuais.filter(item => item instanceof File).forEach(file => {
+        fd.append('imagens', file, file.name); 
+    });
+    
+    // 3. Adiciona as URLs das imagens existentes que FORAM MANTIDAS (strings)
+    imagensAtuais.filter(item => typeof item === 'string').forEach(url => {
+        fd.append('imagens_existentes', url); 
+    });
+    
+    // 4. Adiciona as URLs das imagens que FORAM EXCLUÍDAS (somente no modo edição)
+    imagensExcluidas.forEach(url => {
+        fd.append('imagens_para_deletar', url); 
+    });
 
     try {
         let res;
-        if (EDITING_ANUNCIO_ID) {
-            // editar
-            res = await fetch(`${API_BASE}/imoveis/${EDITING_ANUNCIO_ID}`, {
-                method: 'PUT',
-                headers: { 'Authorization': 'Bearer ' + token },
-                body: fd
-            });
-        } else {
-            // criar
-            res = await fetch(`${API_BASE}/imoveis`, {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token },
-                body: fd
-            });
-        }
+        const method = EDITING_ANUNCIO_ID ? 'PUT' : 'POST';
+        const url = EDITING_ANUNCIO_ID ? `${API_BASE}/imoveis/${EDITING_ANUNCIO_ID}` : `${API_BASE}/imoveis`;
+
+        res = await fetch(url, {
+            method: method,
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: fd
+        });
 
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.erro || data.mensagem || 'Falha ao publicar');
+        if (!res.ok) throw new Error(data.erro || data.mensagem || 'Falha ao publicar/atualizar');
 
         alert(EDITING_ANUNCIO_ID ? 'Anúncio atualizado com sucesso!' : 'Anúncio publicado com sucesso!');
         form.reset();
-        const preview = document.getElementById('previewImagens');
-        if (preview) preview.innerHTML = '';
+        window.clearAnuncioImages(); // Limpa estado de imagens
         fecharModal('#modaladdanuncio');
         EDITING_ANUNCIO_ID = null;
         const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Publicar';
         await carregarMeusAnuncios();
     } catch (err) {
-        console.error('Erro publicar anuncio:', err);
-        alert('Erro ao publicar: ' + err.message);
+        console.error('Erro publicar/atualizar anuncio:', err);
+        alert('Erro ao publicar/atualizar: ' + err.message);
     }
 }
 
@@ -512,26 +544,31 @@ async function editarAnuncio(id) {
         if (!res.ok) return alert('Não foi possível carregar anúncio para edição');
         const imovel = await res.json();
 
+        // Limpar o estado de edição/imagens
+        window.clearAnuncioImages(); 
+        
         // Preencher campos do formulário
         const form = document.getElementById('addAnuncioForm');
         if (!form) return;
+        
         // texto / selects
         form.querySelector('#tipolocal_select') && (form.querySelector('#tipolocal_select').value = imovel.tipolocal || '');
         form.querySelector('#tipoanuncio_select') && (form.querySelector('#tipoanuncio_select').value = imovel.tipoanuncio || '');
         form.querySelector('#preco') && (form.querySelector('#preco').value = imovel.preco || '');
+        
         if (imovel.periodo) {
             const p = imovel.periodo;
             const radio = form.querySelector(`input[name="periodo"][value="${p}"]`);
             if (radio) radio.checked = true;
         }
 
-        // If a periodo radio was programmatically checked, mark its wasChecked state
         form.querySelectorAll('input[name="periodo"]').forEach(r => { if (r.checked) r.wasChecked = true; });
         form.querySelector('#rua') && (form.querySelector('#rua').value = imovel.rua || '');
         form.querySelector('#numero') && (form.querySelector('#numero').value = imovel.numero || '');
         form.querySelector('#bairro') && (form.querySelector('#bairro').value = imovel.bairro || '');
         form.querySelector('#cidade_anuncio') && (form.querySelector('#cidade_anuncio').value = imovel.cidade || '');
         form.querySelector('#estado_anuncio') && (form.querySelector('#estado_anuncio').value = imovel.estado || '');
+        
         // titulo / descricao
         form.querySelector('#titulo') && (form.querySelector('#titulo').value = imovel.titulo || '');
         form.querySelector('#descricao') && (form.querySelector('#descricao').value = imovel.descricao || '');
@@ -561,18 +598,14 @@ async function editarAnuncio(id) {
             form.querySelectorAll('input[name="comodidades"]').forEach(cb => cb.checked = comods.includes(cb.value));
         }
 
-        // mostrar imagens existentes como preview (note: uploading new images will replace them)
-        const preview = document.getElementById('previewImagens');
-        if (preview) {
-            preview.innerHTML = '';
-            const imgs = Array.isArray(imovel.imagens) ? imovel.imagens : (imovel.imagens ? JSON.parse(imovel.imagens) : []);
-            const primary = imovel.imagem_url ? [imovel.imagem_url] : [];
-            const all = imgs.length ? imgs : primary;
-            all.forEach(src => {
-                const img = document.createElement('img'); img.src = src; img.className = 'preview-thumb'; preview.appendChild(img);
-            });
-        }
-
+        // mostrar imagens existentes como preview
+        const imgs = Array.isArray(imovel.imagens) ? imovel.imagens : (imovel.imagens ? JSON.parse(imovel.imagens) : []);
+        const primary = imovel.imagem_url ? [imovel.imagem_url] : [];
+        const allExisting = primary.concat(imgs).filter((v, i, a) => a.indexOf(v) === i);
+        
+        imagensAtuais = allExisting;
+        renderAllAnuncioImages(); // Renderiza com os botões de exclusão
+        
         // set editing state
         EDITING_ANUNCIO_ID = id;
         const btnSalvar = document.getElementById('btnSalvarAnuncio'); if (btnSalvar) btnSalvar.textContent = 'Salvar';
@@ -584,7 +617,7 @@ async function editarAnuncio(id) {
 }
 
 // ==============================
-// Preview de imagens
+// Preview de imagens (Perfil)
 // ==============================
 function previewProfileImage(e) {
     const file = e.target.files[0];
@@ -592,20 +625,6 @@ function previewProfileImage(e) {
     const url = URL.createObjectURL(file);
     const img = document.getElementById('previewImage');
     if (img) img.src = url;
-}
-
-function previewAnuncioImages(e) {
-    const files = Array.from(e.target.files || []);
-    const preview = document.getElementById('previewImagens');
-    if (!preview) return;
-    preview.innerHTML = '';
-    files.forEach(f => {
-        const url = URL.createObjectURL(f);
-        const img = document.createElement('img');
-        img.src = url;
-        img.className = 'preview-thumb';
-        preview.appendChild(img);
-    });
 }
 
 // ==============================
@@ -628,12 +647,6 @@ async function deletarAnuncio(id) {
     }
 }
 
-// Note: the full `editarAnuncio(id)` implementation appears earlier in this file
-// (it fetches the anuncio and prefills the form). We avoid redefining it here
-// so the real edit flow is preserved.
-
-window.deletarAnuncio = deletarAnuncio;
-
 // ==============================
 // Util: escapeHTML
 // ==============================
@@ -648,96 +661,191 @@ function escapeHtml(str) {
 }
 
 // ==============================
-// Helpers relacionados a imagens do anúncio (reuso parte do seu código)
+// LÓGICA DE PREVIEW E EXCLUSÃO INDIVIDUAL DE IMAGENS DO ANÚNCIO
 // ==============================
-function setupAnuncioImageHelpers() {
-    const input = document.getElementById('imagemInput');
-    const preview = document.getElementById('previewImagens');
-    if (!input || !preview) return;
 
-    let objectURLs = [];
-    const MIN_IMAGENS = 3;
-
-    const erroMsgId = 'erro-imagens';
-    let erroMsg = document.getElementById(erroMsgId);
-    if (!erroMsg) {
-        erroMsg = document.createElement('p');
-        erroMsg.id = erroMsgId;
-        erroMsg.style.color = 'red';
-        erroMsg.style.fontSize = '14px';
-        erroMsg.style.marginTop = '8px';
-        erroMsg.style.display = 'none';
-        input.insertAdjacentElement('afterend', erroMsg);
-    }
-
-    function renderPreviews() {
-        preview.innerHTML = '';
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
-        objectURLs = [];
-
-        const files = Array.from(input.files || []);
-        files.forEach((file, index) => {
-            const url = URL.createObjectURL(file);
-            objectURLs.push(url);
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'preview-thumb';
-            preview.appendChild(img);
-        });
-
-        verificarMinimoImagens();
-    }
-
-    input.addEventListener('change', () => {
-        renderPreviews();
-    });
-
-    function verificarMinimoImagens() {
-        const total = input.files ? input.files.length : 0;
-        if (total < MIN_IMAGENS) {
-            erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/${MIN_IMAGENS})`;
-            erroMsg.style.display = 'block';
-            input.style.borderColor = 'red';
-            return false;
-        } else {
-            erroMsg.style.display = 'none';
-            input.style.borderColor = 'transparent';
-            return true;
-        }
-    }
-
-    // Expõe para uso externo
-    window.clearAnuncioImages = function () {
-        objectURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
-        objectURLs = [];
-        preview.innerHTML = '';
-        input.value = '';
-        erroMsg.style.display = 'none';
-    };
-
-    window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+const erroMsgId = 'erro-imagens';
+// Elemento para a mensagem de erro
+let erroMsg = document.getElementById(erroMsgId);
+if (!erroMsg && previewContainer) {
+    erroMsg = document.createElement('p');
+    erroMsg.id = erroMsgId;
+    erroMsg.style.color = 'red';
+    erroMsg.style.fontSize = '14px';
+    erroMsg.style.marginTop = '8px';
+    erroMsg.style.display = 'none';
+    previewContainer.insertAdjacentElement('afterend', erroMsg);
 }
 
-// Torna os radios de `name="periodo"` toggleáveis (clicar novamente desmarca)
+/**
+ * Cria o elemento de preview de imagem com botão de exclusão.
+ * @param {string} src - URL da imagem (Blob URL ou URL do servidor).
+ * @param {string | File} source - A URL (para imagem existente) ou o objeto File (para imagem nova).
+ */
+function createPreviewItem(src, source) {
+    const container = document.createElement('div');
+    container.classList.add('preview-item'); 
+    container.style.display = 'inline-block';
+    container.style.position = 'relative';
+    container.style.marginRight = '10px';
+    container.style.marginBottom = '10px';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'preview-thumb'; 
+    img.style.width = '100px'; 
+    img.style.height = '100px'; 
+    img.style.objectFit = 'cover'; 
+    img.style.borderRadius = '4px';
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.innerText = 'X';
+    btnExcluir.classList.add('remove-thumb');
+    btnExcluir.type = 'button'; // Importante para não submeter o form
+    // Estilos inline para o botão (adicione ao seu CSS para melhor separação)
+    btnExcluir.style.position = 'absolute'; 
+    btnExcluir.style.top = '-5px'; 
+    btnExcluir.style.right = '-5px';
+    btnExcluir.style.background = 'red';
+    btnExcluir.style.color = 'white';
+    btnExcluir.style.border = '1px solid white';
+    btnExcluir.style.borderRadius = '50%';
+    btnExcluir.style.cursor = 'pointer';
+    btnExcluir.style.width = '25px';
+    btnExcluir.style.height = '25px';
+    btnExcluir.style.lineHeight = '1';
+    btnExcluir.style.fontWeight = 'bold';
+
+    btnExcluir.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        e.stopPropagation();
+
+        // 1. Remove do DOM
+        container.remove();
+        
+        // 2. Remove da lista de imagens atuais
+        const index = imagensAtuais.indexOf(source);
+        if (index > -1) {
+            imagensAtuais.splice(index, 1);
+        }
+
+        // 3. Se for uma URL (imagem existente), adicione à lista de exclusão
+        if (typeof source === 'string') {
+            imagensExcluidas.push(source);
+        }
+        
+        // 4. Se for um File, revoga a URL do Blob (libera memória)
+        if (source instanceof File) {
+            // Não precisa revogar o Object URL se o elemento do DOM for removido
+        }
+        
+        verificarMinimoImagens();
+    });
+
+    container.appendChild(img);
+    container.appendChild(btnExcluir);
+    return container;
+}
+
+
+/**
+ * Renderiza todas as imagens em 'imagensAtuais'.
+ */
+function renderAllAnuncioImages() {
+    if (!previewContainer) return;
+    previewContainer.innerHTML = '';
+    
+    // Libera URLs de Blob antigas (para Files)
+    // No entanto, é mais seguro apenas usar URLs.createObjectURL 
+    // dentro de createPreviewItem e confiar na limpeza da memória
+    // quando o elemento é removido ou a página é navegada.
+    
+    imagensAtuais.forEach(source => {
+        let url;
+        if (typeof source === 'string') { // Imagem existente (URL)
+            url = source;
+        } else if (source instanceof File) { // Imagem nova (File)
+            url = URL.createObjectURL(source);
+        } else {
+            return;
+        }
+        previewContainer.appendChild(createPreviewItem(url, source));
+    });
+
+    verificarMinimoImagens();
+}
+
+/**
+ * Lida com o evento 'change' do input de arquivos.
+ */
+function handleImageInputChange(e) {
+    const newFiles = Array.from(e.target.files || []);
+    
+    // Adiciona apenas novos arquivos à lista de imagensAtuais
+    newFiles.forEach(file => imagensAtuais.push(file));
+    
+    // Limpa o input de arquivos para que o mesmo arquivo possa ser re-selecionado (opcional, mas bom)
+    e.target.value = ''; 
+
+    renderAllAnuncioImages();
+}
+
+if (imagemInput) {
+    imagemInput.addEventListener('change', handleImageInputChange);
+}
+
+/**
+ * Verifica o mínimo de imagens.
+ */
+function verificarMinimoImagens() {
+    const total = imagensAtuais.length;
+    if (total < MIN_IMAGENS) {
+        if(erroMsg) {
+            erroMsg.textContent = `Adicione pelo menos ${MIN_IMAGENS} imagens (${total}/${MIN_IMAGENS})`;
+            erroMsg.style.display = 'block';
+        }
+        if(imagemInput) imagemInput.style.borderColor = 'red';
+        return false;
+    } else {
+        if(erroMsg) erroMsg.style.display = 'none';
+        if(imagemInput) imagemInput.style.borderColor = 'transparent';
+        return true;
+    }
+}
+
+/**
+ * Limpa o estado global das imagens.
+ */
+window.clearAnuncioImages = function () {
+    imagensAtuais = [];
+    imagensExcluidas = [];
+    if (previewContainer) previewContainer.innerHTML = '';
+    if (imagemInput) imagemInput.value = '';
+    if (erroMsg) erroMsg.style.display = 'none';
+    if (imagemInput) imagemInput.style.borderColor = 'transparent';
+};
+
+window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
+
+
+// ==============================
+// Torna os radios de `name="periodo"` toggleáveis
+// ==============================
 function setupPeriodoToggle() {
     const radios = Array.from(document.querySelectorAll('input[name="periodo"]'));
     if (!radios.length) return;
 
-    // track previous state per element
     radios.forEach(r => {
         r.wasChecked = r.checked;
         r.addEventListener('click', function (e) {
-            // If it was already checked, uncheck it
             if (this.wasChecked) {
                 this.checked = false;
                 this.wasChecked = false;
             } else {
-                // mark others as not-wasChecked and this as wasChecked
                 radios.forEach(rr => rr.wasChecked = false);
                 this.wasChecked = true;
             }
         });
-        // update state on change (in case changed programmatically)
         r.addEventListener('change', function () { this.wasChecked = this.checked; });
     });
 }
@@ -755,7 +863,7 @@ function logout() {
 }
 
 // ==============================
-// Máscara de telefone (seu código)
+// Máscara de telefone 
 // ==============================
 function formatPhoneValue(value) {
     const digits = value.replace(/\D/g, '').slice(0, 11);
@@ -814,5 +922,5 @@ function applyPhoneMaskToInput(input) {
 // Expose functions used in inline handlers (se necessário)
 window.deletarAnuncio = deletarAnuncio;
 window.editarAnuncio = editarAnuncio;
-window.clearAnuncioImages = window.clearAnuncioImages || function () { };
-window.verificarMinimoImagensAnuncio = window.verificarMinimoImagensAnuncio || function () { };
+window.clearAnuncioImages = window.clearAnuncioImages;
+window.verificarMinimoImagensAnuncio = verificarMinimoImagens;
