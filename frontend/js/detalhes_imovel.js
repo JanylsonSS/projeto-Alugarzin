@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (!id) {
-        document.getElementById('imoveis-detalhe').innerHTML = '<p>Nenhum imóvel selecionado. <a href="/frontend/imoveis.html">Voltar</a></p>';
+        document.getElementById('imoveis-detalhe').innerHTML = '<p style="display: flex; align-items: center; justify-content: center;">Nenhum imóvel selecionado. <a href="/frontend/imoveis.html">Voltar</a></p>';
         return;
     }
 
@@ -45,21 +45,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     transition: background 0.3s;
                 " onmouseover="this.style.background='#320075'" 
                   onmouseout="this.style.background='var(--primary-purple)'">
+<<<<<<< HEAD
                     ↩️ Voltar para Anúncios
+=======
+                    Voltar para imóveis
+>>>>>>> 1530111 (Ajustes nas telas index, imoveis e detalhes imoveis)
                 </a>
                 <a href="/frontend/index.html" style="
-                    background: #f0f0f0; 
-                    color: #666; 
+                    background: #e6681aff; 
+                    color: #ffffffff; 
                     padding: 12px 24px; 
                     border-radius: 8px; 
                     text-decoration: none; 
                     font-weight: 600;
                     display: inline-block;
-                    border: 1px solid #ddd;
+                    border: none;
                     transition: background 0.3s;
-                " onmouseover="this.style.background='#e0e0e0'" 
-                  onmouseout="this.style.background='#f0f0f0'">
-                    🏠 Página inicial
+                " onmouseover="this.style.background='#e6681aff'" 
+                  onmouseout="this.style.background='#ff751f'">
+                    Página inicial
                 </a>
             </div>
         </div>
@@ -119,8 +123,8 @@ async function renderDetalheMarketplace(imovel, usuario) {
                 <div id="carrossel-imagens" class="carrossel-inner"></div>
                 ${imagens.length > 1 ? `
                 <div class="arrows">
-                    <button class="arrow left">‹</button>
-                    <button class="arrow right">›</button>
+                    <button class="arrow left"><i class="bi bi-caret-left-fill"></i></button>
+                    <button class="arrow right"><i class="bi bi-caret-right-fill"></i></button>
                 </div>
                 ` : ''}
             </div>
@@ -143,9 +147,9 @@ async function renderDetalheMarketplace(imovel, usuario) {
                     <button id="toggleDescricao" class="btn" style="background:transparent; color:var(--primary-purple); border:none; padding:0; margin-top:6px; cursor:pointer;">Mostrar descrição completa</button>
                     <h4 style="margin-top:16px">Características</h4>
                     <ul class="caracteristicas">
-                        ${imovel.quartos ? `<li>🛏 ${imovel.quartos} quarto(s)</li>` : ''}
+                        ${imovel.quartos ? `<li>🛏️ ${imovel.quartos} quarto(s)</li>` : ''}
                         ${imovel.banheiros ? `<li>🚿 ${imovel.banheiros} banheiro(s)</li>` : ''}
-                        ${imovel.vagas ? `<li>🅿 ${imovel.vagas} vaga(s)</li>` : ''}
+                        ${imovel.vagas ? `<li>🚗 ${imovel.vagas} vaga(s)</li>` : ''}
                         ${imovel.comodidades ? imovel.comodidades.split(',').map(c => {
         // Remove colchetes, aspas e espaços extras
         const caracteristica = c.trim().replace(/[\[\]"]/g, '');
@@ -153,8 +157,6 @@ async function renderDetalheMarketplace(imovel, usuario) {
     }).join('') : ''}
                     </ul>
                 </div>
-
-                <div id="proprietario" class="proprietario-card"></div>
             </div>
         </div>
 
@@ -175,17 +177,22 @@ async function renderDetalheMarketplace(imovel, usuario) {
 
                 <div class="send-row">
                     <button id="send_msg" class="btn-send">Enviar mensagem</button>
-                    <button id="send_whatsapp" class="btn-whatsapp">WhatsApp</button>
+                    <button id="send_whatsapp" class="btn-whatsapp">WhatsApp <i class="bi bi-whatsapp" style="font-size: 16px;"></i></button>
                 </div>
 
                 <div class="phone-line">
                     <span>Fale com o anunciante</span>
-                    <a id="show_phone" href="#">Ver Informações</a>
+                    <a id="btn-informacoes" href="#">Informações</a>
                 </div>
             </div>
+            <div id="proprietario"></div>
         </aside>
+        
     </div>
+                  
 `;
+configurarModalInformacoes(imovel);
+
 
     // POPULAR GALERIA IMEDIATAMENTE APÓS CRIAR O CONTAINER
     const carrosselEl = document.getElementById('carrossel-imagens');
@@ -202,32 +209,29 @@ async function renderDetalheMarketplace(imovel, usuario) {
         setTimeout(() => initCarousel(), 100);
     }
 
-
-
-    // monta proprietário
+    //Verificar pq nn está funcionando
     const propContainer = document.getElementById('proprietario');
-    if (imovel.usuario) {
-        const user = imovel.usuario;
+
+    function montarProprietario(user) {
         propContainer.innerHTML = `
             <div class="prop-flex">
-                <img src="${escapeHtml(user.foto_perfil || '/frontend/image/Karina.jpg')}" alt="Foto do anunciante">
+                <img src="${escapeHtml(user.foto_perfil || user.foto || '/frontend/image/Karina.jpg')}" alt="Foto do anunciante">
                 <div>
                     <strong>${escapeHtml(user.nome || 'Anunciante')}</strong>
                     <p>${escapeHtml(user.cidade || '')} • ${escapeHtml(user.estado || '')}</p>
                 </div>
             </div>
         `;
+    }
+
+    if (imovel.usuario) {
+        console.log("Encontrado imovel.usuario =>", imovel.usuario);
+        montarProprietario(imovel.usuario);
     } else if (imovel.proprietario) {
-        const p = imovel.proprietario;
-        propContainer.innerHTML = `
-            <div class="prop-flex">
-                <img src="${escapeHtml(p.foto || '/frontend/image/Karina.jpg')}" alt="Foto do anunciante">
-                <div>
-                    <strong>${escapeHtml(p.nome || 'Anunciante')}</strong>
-                    <p>${escapeHtml(p.cidade || '')} • ${escapeHtml(p.estado || '')}</p>
-                </div>
-            </div>
-        `;
+        console.log("Encontrado imovel.proprietario =>", imovel.proprietario);
+        montarProprietario(imovel.proprietario);
+    } else {
+        console.warn("⚠ Nenhum proprietário encontrado no objeto imovel.");
     }
 
     // bookmark behavior
@@ -242,7 +246,7 @@ async function renderDetalheMarketplace(imovel, usuario) {
                 const res = await fetch(`/api/favoritos/${imovel.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                 if (res.ok) {
                     bookmarkBtn.classList.remove('favorited');
-                    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark"></i>';
+                    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
                 } else {
                     const err = await res.json().catch(() => ({}));
                     alert(err.erro || 'Erro ao remover favorito');
@@ -309,7 +313,7 @@ async function renderDetalheMarketplace(imovel, usuario) {
             const showPhone = document.getElementById('show_phone');
             if (showPhone) {
                 if (anunciantePhone) showPhone.textContent = anunciantePhoneRaw;
-                else showPhone.textContent = 'Telefone não informado';
+                else showPhone.textContent = 'Sem informações';
             }
 
             const buildMessage = () => {
@@ -461,24 +465,6 @@ function carregarMapa(localizacao) {
     `;
 }
 
-
-/* ============================================================
-    CARD DO PROPRIETÁRIO
-===============================================================*/
-function montarProprietario(dados) {
-    const div = document.createElement("div");
-    div.classList.add("proprietario-container");
-
-    div.innerHTML = `
-        <img src="${dados.foto}">
-        <h3>${dados.nome}</h3>
-        <p><i class="bi bi-geo-alt-fill"></i> ${dados.cidade} - ${dados.estado}</p>
-        <button class="btn-editar-perfil">Editar perfil</button>
-    `;
-
-    document.querySelector(".cards-detalhe").appendChild(div);
-}
-
 // Controle da navbar animada
 class NavbarAnimator {
     constructor() {
@@ -554,6 +540,87 @@ class NavbarAnimator {
         this.isHidden = false;
     }
 }
+
+/* ============================================================
+   CRIAR MODAL DE CONTATO DINAMICAMENTE
+============================================================ */
+function criarModalContato() {
+    // Evita criar duas vezes
+    if (document.getElementById("modalContato")) return;
+
+    const modalHTML = `
+        <div id="modalContato" class="modal-contato" style="
+            display:none; position:fixed; z-index:9999; inset:0;
+            background:rgba(0,0,0,0.6); justify-content:center; align-items:center;
+        ">
+            <div class="modal-content-contato" style="
+                background:#fff; padding:30px; width:350px; border-radius:12px;
+                text-align:center; position:relative;
+            ">
+                <span id="closeModalContato" style="
+                    position:absolute; right:15px; top:10px; cursor:pointer;
+                    font-size:26px; font-weight:bold;
+                ">&times;</span>
+
+                <div>
+                    <img id="modalFoto" src="" alt="Foto" style="
+                        width:120px; height:120px; border-radius:50%; object-fit:cover;
+                        margin-bottom:15px;
+                    ">
+                    <h2 id="modalNome" style="margin-bottom:8px;">Nome</h2>
+                    <p id="modalTelefone">Telefone:</p>
+                    <p id="modalEmail">Email:</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+}
+
+/* ============================================================
+   CONFIGURAR MODAL APÓS CARREGAR O IMÓVEL
+============================================================ */
+function configurarModalInformacoes(imovel) {
+    criarModalContato(); // garante que existe
+
+    const btn = document.getElementById("btn-informacoes");
+    const modal = document.getElementById("modalContato");
+    const close = document.getElementById("closeModalContato");
+
+    if (!btn) {
+        console.warn("Botão #btn-informacoes não encontrado.");
+        return;
+    }
+
+    btn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const user = imovel.usuario || imovel.proprietario || {};
+
+        document.getElementById("modalFoto").src =
+            user.foto_perfil || user.foto || "/frontend/image/Karina.jpg";
+
+        document.getElementById("modalNome").textContent =
+            user.nome || "Anunciante";
+
+        document.getElementById("modalTelefone").innerHTML =
+            "<strong>Telefone:</strong> " + (user.telefone || "Não informado");
+
+        document.getElementById("modalEmail").innerHTML =
+            "<strong>Email:</strong> " + (user.email || "Não informado");
+
+        modal.style.display = "flex";
+    });
+
+    // fechar modal
+    close.addEventListener("click", () => (modal.style.display = "none"));
+
+    window.addEventListener("click", (ev) => {
+        if (ev.target === modal) modal.style.display = "none";
+    });
+}
+
 
 // Inicializa quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {

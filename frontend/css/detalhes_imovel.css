@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 /* Detalhes do imóvel - estilo tipo marketplace (Zap style) */
 :root {
     --primary-purple: #430097;
@@ -6,18 +8,31 @@
     --card-bg: #ffffff;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
-
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+
+
 /* =================================
 Cabeçalho com Animação - CORRIGIDO
 ================================= */
 .header-container {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    position: static;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    margin-bottom: 40px;
+    margin-top: -20px;
+
+    /*
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -33,13 +48,12 @@ Cabeçalho com Animação - CORRIGIDO
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform: translateY(0);
     height: 70px;
-    /* Altura fixa */
-    box-sizing: border-box;
+    box-sizing: border-box;*/
 }
 
 /* Logo central menor */
 .header-center img {
-    max-width: 250px !important;
+    max-width: 350px !important;
     /* Força tamanho menor */
     height: auto;
     transition: max-width 0.4s ease;
@@ -66,13 +80,12 @@ Cabeçalho com Animação - CORRIGIDO
 }
 
 /* Container dos botões alinhados */
-.header-left,
+.header-left button,
 .header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    /* Ocupa espaço igual nas laterais */
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .header-center {
@@ -81,57 +94,42 @@ Cabeçalho com Animação - CORRIGIDO
 }
 
 /* Botões alinhados e consistentes */
-.btn-login,
-.btn-criar-conta {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 2px solid var(--primary-purple);
-    background: transparent;
-    color: var(--primary-purple);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    white-space: nowrap;
+.btn-login {
+    background-color: #ff751f;
+    color: white;
+    border-color: #ff751f;
+}
+
+.btn-login:hover {
+    background-color: #e65c00;
 }
 
 .btn-criar-conta {
-    background-color: var(--primary-purple);
+    background-color: #430097;
     color: #ffffff;
+    border-color: #430097;
 }
 
 .btn-criar-conta:hover {
     background-color: #320075;
-    border-color: #320075;
-}
-
-.btn-login:hover {
-    background-color: var(--primary-purple);
-    color: white;
-}
-
-/* Links de navegação alinhados */
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px;
 }
 
 .nav-links a {
     text-decoration: none;
     color: #333;
+    margin-left: 20px;
     font-weight: 600;
-    transition: color 0.3s ease;
-    white-space: nowrap;
-    font-size: 14px;
 }
 
-.nav-links a:hover {
-    color: var(--accent-orange);
+.header-right a:hover {
+    color: #ff751f;
 }
 
 .help-icon {
-    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 100%;
+
 }
 
 /* Ajuste do body para compensar a navbar fixa */
@@ -345,19 +343,19 @@ Conteúdo Principal
 
 .acoes .bookmark {
     background: transparent;
-    border: 2px solid var(--primary-purple);
-    color: var(--primary-purple);
-    padding: 8px 12px;
+    border: none;
+    background-color: var(--primary-purple);
+    color: #fff;
+    padding: 12px 14.5px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 18px;
     transition: all 0.3s ease;
 }
-
 .acoes .bookmark.favorited {
     background: linear-gradient(90deg, var(--primary-purple), var(--accent-orange));
     color: #fff;
-    border-color: transparent;
+    border: none;
 }
 
 .acoes .contato-whatsapp {
@@ -366,7 +364,7 @@ Conteúdo Principal
     justify-content: center;
     background: #25D366;
     color: #fff;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
     text-decoration: none;
     font-size: 18px;
@@ -427,7 +425,7 @@ Conteúdo Principal
 Sidebar / Contact card
 ================================= */
 .sidebar {
-    position: sticky;
+    position: static;
     top: 120px;
 }
 
@@ -477,32 +475,37 @@ Sidebar / Contact card
     margin-bottom: 16px;
 }
 
-.btn-send {
-    background: var(--primary-purple);
-    color: #fff;
-    border: none;
+.btn-send,
+.btn-whatsapp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    flex: 1 !important;
+    width: 100%;
     padding: 12px 16px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
-    flex: 1;
+    border: none;
     transition: background 0.3s ease;
+}
+
+/* Botão enviar */
+.btn-send {
+    background: var(--primary-purple);
+    color: #fff;
 }
 
 .btn-send:hover {
     background: #320075;
 }
 
+/* WhatsApp */
 .btn-whatsapp {
     background: #25D366;
     color: #fff;
-    border: none;
-    padding: 12px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    flex: 1;
-    transition: background 0.3s ease;
+        padding: 18px 16px;
 }
 
 .btn-whatsapp:hover {
@@ -529,36 +532,38 @@ Sidebar / Contact card
 /* =================================
 Proprietário
 ================================= */
-.proprietario-card {
-    margin-top: 24px;
-    border-top: 1px dashed #eee;
-    padding-top: 16px;
+#proprietario {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 80px 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    margin-top: 20px; /* distancia do card acima */
 }
 
 .prop-flex {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 15px;
 }
 
 .prop-flex img {
-    width: 64px;
-    height: 64px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e6e6e6;
 }
 
-.prop-flex div strong {
+.prop-flex strong {
+    font-size: 16px;
+    color: var(--primary-purple);
     display: block;
-    margin-bottom: 4px;
-    color: #333;
 }
 
-.prop-flex div p {
-    color: #666;
+.prop-flex p {
+    margin-top: 3px;
     font-size: 14px;
+    color: #555;
 }
 
 /* =================================
@@ -610,6 +615,49 @@ Modal
     gap: 10px;
     margin-top: 15px;
 }
+
+/* Fundo escuro do modal */
+.modal-contato {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Caixa do modal */
+.modal-content-contato {
+    background: #fff;
+    padding: 30px;
+    width: 350px;
+    border-radius: 12px;
+    text-align: center;
+    position: relative;
+}
+
+/* Botão fechar */
+.close-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 26px;
+}
+
+/* Foto */
+.modal-foto {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
 
 /* =================================
 Responsividade
@@ -785,4 +833,13 @@ Responsividade
     animation: moveRight 2s linear infinite;
     transform: scale(1.04);
     opacity: 0.95;
+}
+
+.btn-imoveis.active {
+  color: #ffffff;
+  background: linear-gradient(to right, #ff751f, #430097);
+    background: 
+    linear-gradient(to right, #ff751f, #430097) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
 }

@@ -187,7 +187,7 @@ body {
 
 #limpar-filtros {
     position: fixed;
-    margin-top: 15px;
+    margin-top: 20px;
     width: 204px;
     bottom: 20px;  
     left: 20px;  
@@ -280,9 +280,16 @@ body {
 
 /* ======== CARDS ======== */
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+    align-items: stretch;
+}
+
+.cards-container > * {
+    height: 100%;
 }
 
 .imovel-card {
@@ -310,26 +317,26 @@ body {
 
 /* Compatibility with card markup produced by renderizarCardImovel (card-imovel / card-image) */
 .card-imovel {
-  width: 435px;
-  height: 380px;
-  background: white;
-  border: 3px solid #6f42c1;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    height: 380px;  
+    max-width: 330px;
+    width: 100%;
+    background: white;
+    border: 3px solid #6f42c1;
+    border-radius: 12px;
+    overflow: hidden;
 }
+
 
 .card-imovel:hover {
   transform: translateY(-4px);
 }
 
 .card-image {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 240px;  
+    object-fit: cover;
 }
 
 .card-wrapper {
@@ -337,11 +344,11 @@ body {
 }
 
 .card-content {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .card-content h4 {
@@ -510,4 +517,21 @@ body {
   .listagem {
     padding: 20px;
   }
+}
+@media (max-width: 1200px) {
+    .cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .cards-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }
