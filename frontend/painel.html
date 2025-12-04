@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel - Alugarzin</title>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/cd2gL9E2A9qO+F/HkH9nS/u1o9c9qH9w9s6k1y9P7w9d3F7d5p5O5u6j7i0Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <link rel="stylesheet" href="/frontend/css/painel.css">
     <link rel="shortcut icon" href="/frontend/image/Telhado_laranja.png" type="image/x-icon" />
 </head>
@@ -17,65 +20,71 @@
     <a href="index.html"> <img src="/frontend/image/Alugarzin_branco_mudarlogo.png" alt="Logo" class="logo"></a>
 
     <div class="paineldeusuario">
-        <header class="header">
-            <div class="capa">
-                <div class="fotoperfil">
+        
+        <div class="conteudo-principal">
 
-                    <img id="profileDisplayImage" src="/frontend/image/Karina.jpg">
+            <header class="header">
+                <div class="capa">
+                    <div class="fotoperfil">
+                        <img id="profileDisplayImage" src="/frontend/image/Karina.jpg">
+                    </div>
+                    <img src="/frontend/image/Fundo.png"> 
                 </div>
                 <img src="/frontend/image/Alugarzin_roxo_laranja.png">
             </div>
 
-            <div class="perfil">
+                <div class="perfil">
+                    <div class="usuarioinfo">
+                        <h2 id="userName">Carregando...</h2>
+                        <div class="localizacao">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span id="userLocation">--</span>
 
-                <div class="usuarioinfo">
-                    <h2 id="userName">Carregando...</h2>
-                    <div class="localizacao">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span id="userLocation">--</span>
+                            <a href="#" id="whatsappLink" target="_blank" class="social-link">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
 
-                        <a href="#" id="whatsappLink" target="_blank" class="social-link">
-                            <i class="bi bi-whatsapp"></i>
-                        </a>
+                            <a href="#" id="emailLink" class="social-link">
+                                <i class="bi bi-envelope-fill"></i>
+                            </a>
+                        </div>
+                    </div>
 
-                        <a href="#" id="emailLink" class="social-link">
-                            <i class="bi bi-envelope-fill"></i>
-                        </a>
+                    <div class="botaoeditarperfil">
+                        <button id="btnEditarPerfil">EDITAR PERFIL</button>
+                        <button id="btnLogout" class="logout-btn">SAIR <i class="bi bi-box-arrow-right"></i></button>
                     </div>
                 </div>
+            </header>
 
-                <div class="botaoeditarperfil">
-                    <button id="btnEditarPerfil">EDITAR PERFIL</button>
-                    <button id="btnLogout" class="logout-btn">SAIR <i class="bi bi-box-arrow-right"></i></button>
+            <div class="coluna-feed">
+                <div class="anunciosefavoritos">
+                    <div id="anunciosperfil" class="aba ativo">ANÚNCIOS</div>
+                    <div id="favoritosperfil" class="aba">FAVORITOS</div>
                 </div>
-            </div>
-        </header>
 
-        <div class="anunciosefavoritos">
-            <div id="anunciosperfil" class="aba ativo">ANÚNCIOS</div>
-            <div id="favoritosperfil" class="aba">FAVORITOS</div>
+                <section class="feedanuncio" id="anuncio">
+                    <div><button id="addbtn"><i class="bi bi-plus-lg"></i></button></div>
+                    <div id="listaAnuncios">
+                        <p>Você não possui anúncios, clique no botão + para criar!</p>
+                    </div>
+                </section>
+
+                <section class="feedfavoritos hidden" id="favoritos">
+                    <p>Seus locais favoritos aparecerão aqui!</p>
+                </section>
+            </div>
+            </div>
         </div>
 
-        <section class="feedanuncio" id="anuncio">
-            <div><button id="addbtn"><i class="bi bi-plus-lg"></i></button></div>
-            <div id="listaAnuncios">
-                <p>Você não possui anúncios, clique no botão + para criar!</p>
-            </div>
-        </section>
-
-        <section class="feedfavoritos hidden" id="favoritos">
-            <p>Seus locais favoritos aparecerão aqui!</p>
-        </section>
-
-    </div>
-
-    <!-- Modal Editar Perfil -->
     <div id="modalEditarPerfil" class="modal hidden">
         <div class="modalcontent">
             <span class="fechar" id="fecharEditarPerfil">&times;</span>
-            <h2>Editar Perfil</h2>
 
             <form id="formEditarPerfil" class="editProfileForm">
+                
+                <h2><i class="fa-solid fa-user-pen"></i> Informações Principais</h2>
+
                 <div class="edit-top">
                     <div class="profile-pic">
 
@@ -104,6 +113,8 @@
                         </div>
                     </div>
                 </div>
+
+                <h2><i class="fa-solid fa-map-location-dot"></i> Localização</h2>
 
                 <div class="edit-bottom">
                     <div class="campo">
@@ -139,18 +150,10 @@
     <div id="modaladdanuncio" class="modal hidden">
         <div class="modalcontent">
             <span id="fecharEditModal2" class="fechar">&times;</span>
-            <h2>Adicionar Anúncio</h2>
 
             <form id="addAnuncioForm">
-                <div class="form-section imagem-section">
-                    <label for="imagem">
-                        <h4>Imagens do Anúncio:</h4>
-                    </label>
-
-                    <input type="file" id="imagemInput" name="imagem" accept="image/*" multiple>
-
-                    <div id="previewImagens"></div>
-                </div>
+                
+                <h2><i class="fa-solid fa-file-lines"></i> Informações Básicas</h2>
 
                 <div class="form-section titulo-descricao">
                     <div class="campo">
@@ -165,12 +168,12 @@
                             maxlength="1000"></textarea>
                     </div>
                 </div>
+                
+                <h2><i class="fa-solid fa-hand-holding-dollar"></i> Preço e Tipo de Contrato</h2>
 
                 <div class="form-section preco-tipo">
                     <div class="campo-preco">
-                        <label for="preco">
-                            <h4>Preço:</h4>
-                        </label>
+                        <label for="preco">Preço:</label>
                         <div class="valores">
                             <input type="number" id="preco" name="preco" placeholder="Ex: 1500" required>
                             <div class="radio-group">
@@ -182,12 +185,46 @@
                         </div>
                     </div>
 
+                    <div class="tipo-anuncio">
+                        <div>
+                            <label for="tipolocal_select">Tipo de Local:</label>
+                            <select id="tipolocal_select" name="tipolocal" required>
+                                <option value="" disabled selected>Selecione o tipo de local</option>
+                                <option value="Terreno/Lote">Terreno/Lote</option>
+                                <option value="Apartamento">Apartamento</option>
+                                <option value="Casa">Casa</option>
+                                <option value="Chácara/Sítio">Chácara/Sítio</option>
+                                <option value="Casa de Condomínio">Casa de Condomínio</option>
+                                <option value="Flat">Flat</option>
+                                <option value="Kitnet/Conjugado">Kitnet/Conjugado</option>
+                                <option value="Edifício Residencial">Edifício Residencial</option>
+                                <option value="Cobertura">Cobertura</option>
+                                <option value="Sobrado">Sobrado</option>
+                                <option value="Consultório">Consultório</option>
+                                <option value="Galpão/Depósito/Armazém">Galpão/Depósito/Armazém</option>
+                                <option value="Sala/Conjunto">Sala/Conjunto</option>
+                                <option value="Ponto Comercial/Loja/Box">Ponto Comercial/Loja/Box</option>
+                            </select>
+                        </div>
 
+                        <div>
+                            <label for="tipoanuncio_select">Tipo de Anúncio:</label>
+                            <select id="tipoanuncio_select" name="tipoanuncio" required>
+                                <option value="" disabled selected>Selecione o tipo de anúncio</option>
+                                <option value="Venda">Venda</option>
+                                <option value="Aluguel">Aluguel</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
+                <h2><i class="fa-solid fa-map-pin"></i> Localização do Imóvel</h2>
+                
+                <div class="form-section localizacao-anuncio"> 
                     <div class="localizacao-detalhada">
                         <div class="campo campo-cep">
-                            <label for="cep">CEP:</label>
-                            <input type="text" id="cep" name="cep" placeholder="00000-000" maxlength="9" required>
+                            <label for="cep_anuncio">CEP:</label>
+                            <input type="text" id="cep_anuncio" name="cep_anuncio" placeholder="00000-000" maxlength="9" required>
                         </div>
                         <div class="campo">
                             <label for="rua">Rua:</label>
@@ -202,49 +239,18 @@
                             <input type="text" id="bairro" name="bairro" placeholder="Bairro" required>
                         </div>
                         <div class="campo">
-                            <label for="cidade">Cidade:</label>
-                            <input type="text" id="cidade_anuncio" name="cidade" placeholder="Cidade" required>
+                            <label for="cidade_anuncio">Cidade:</label>
+                            <input type="text" id="cidade_anuncio" name="cidade_anuncio" placeholder="Cidade" required>
                         </div>
 
                         <div class="campo">
-                            <label for="estado">Estado:</label>
-                            <input type="text" id="estado_anuncio" name="estado" placeholder="Estado" required>
+                            <label for="estado_anuncio">Estado:</label>
+                            <input type="text" id="estado_anuncio" name="estado_anuncio" placeholder="Estado" required>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section tipo-anuncio">
-                    <div>
-                        <label for="tipolocal_select">Tipo de Local:</label>
-                        <select id="tipolocal_select" name="tipolocal" required>
-                            <option value="" disabled selected>Selecione o tipo de local</option>
-                            <option value="Terreno/Lote">Terreno/Lote</option>
-                            <option value="Apartamento">Apartamento</option>
-                            <option value="Casa">Casa</option>
-                            <option value="Chácara/Sítio">Chácara/Sítio</option>
-                            <option value="Casa de Condomínio">Casa de Condomínio</option>
-                            <option value="Flat">Flat</option>
-                            <option value="Kitnet/Conjugado">Kitnet/Conjugado</option>
-                            <option value="Edifício Residencial">Edifício Residencial</option>
-                            <option value="Cobertura">Cobertura</option>
-                            <option value="Sobrado">Sobrado</option>
-                            <option value="Consultório">Consultório</option>
-                            <option value="Galpão/Depósito/Armazém">Galpão/Depósito/Armazém</option>
-                            <option value="Sala/Conjunto">Sala/Conjunto</option>
-                            <option value="Ponto Comercial/Loja/Box">Ponto Comercial/Loja/Box</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="tipoanuncio_select">Tipo de Anúncio:</label>
-                        <select id="tipoanuncio_select" name="tipoanuncio" required>
-                            <option value="" disabled selected>Selecione o tipo de anúncio</option>
-                            <option value="Venda">Venda</option>
-                            <option value="Aluguel">Aluguel</option>
-                        </select>
-                    </div>
-                </div>
-
+                <h2><i class="fa-solid fa-bed"></i> Estrutura e Cômodos</h2>
 
                 <div class="form-section quantidades">
                     <div>
@@ -281,8 +287,9 @@
                     </div>
                 </div>
 
+                <h2><i class="fa-solid fa-list-check"></i> Comodidades</h2>
+
                 <div class="form-section comodidades">
-                    <h3>O que seu local oferece:</h3>
                     <div class="seletor-container">
                         <label><input type="checkbox" name="comodidades" value="Mobiliado"> Mobiliado</label>
                         <label><input type="checkbox" name="comodidades" value="Piscina"> Piscina</label>
@@ -297,6 +304,16 @@
                         <label><input type="checkbox" name="comodidades" value="Portaria 24h"> Portaria 24h</label>
                     </div>
                 </div>
+                
+                <h2><i class="fa-solid fa-image"></i> Mídia e Fotos</h2>
+
+                <div class="form-section imagem-section">
+                    <label for="imagemInput">Adicionar Imagens:</label>
+
+                    <input type="file" id="imagemInput" name="imagem" accept="image/*" multiple>
+
+                    <div id="previewImagens"></div>
+                </div>
 
                 <button id="btnSalvarAnuncio" type="submit">Publicar</button>
             </form>
@@ -304,6 +321,7 @@
     </div>
 
     <script type="module" src="/frontend/js/painel.js"></script>
+    
 </body>
 
 </html>
