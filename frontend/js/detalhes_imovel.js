@@ -387,6 +387,52 @@ async function renderDetalheMarketplace(imovel, usuario) {
         </aside>
     </div>`;
 
+    setTimeout(() => {
+        const btnEnviar = document.getElementById("send_msg");
+
+        const inputName = document.getElementById("contact_name");
+        const inputEmail = document.getElementById("contact_email");
+        const inputPhone = document.getElementById("contact_phone");
+        const inputMessage = document.getElementById("contact_message");
+
+        btnEnviar.addEventListener("click", () => {
+
+            // (OPCIONAL) validação simples
+            if (!inputName.value.trim() || !inputEmail.value.trim() || !inputMessage.value.trim()) {
+                showPopup("Por favor, preencha todos os campos obrigatórios.");
+                return;
+            }
+
+            // Simulação de envio: apenas limpa os dados
+            inputName.value = "";
+            inputEmail.value = "";
+            inputPhone.value = "";
+            inputMessage.value = "";
+
+            // Pop-up de confirmação
+            showPopup("Suas informações foram enviadas para o anunciante.");
+        });
+    }, 100);
+
+    function showPopup(message) {
+        let popup = document.getElementById("popup-msg");
+
+        if (!popup) {
+            popup = document.createElement("div");
+            popup.id = "popup-msg";
+            popup.className = "popup-msg";
+            document.body.appendChild(popup);
+        }
+
+        popup.textContent = message;
+        popup.classList.add("show");
+
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 3000);
+    }
+
+
     // Configurar o modal de informações
     configurarModalInformacoes(imovel);
 

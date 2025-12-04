@@ -492,6 +492,30 @@ Sidebar / Contact card
     transition: background 0.3s ease;
 }
 
+/* popup message */
+.popup-msg {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4CAF50;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+    z-index: 9999;
+    font-size: 15px;
+}
+
+.popup-msg.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+
 /* Botão enviar */
 .btn-send {
     background: var(--primary-purple);
