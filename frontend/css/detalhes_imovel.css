@@ -892,3 +892,22 @@ Responsividade
     color: var(--accent-orange);
     text-decoration: underline;
 }
+
+.proprietario-sidebar .prop-info {
+    background: #ffffff !important;
+    padding: 20px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+    margin-top: 20px;
+    border: none;
+}
+
+.info-line {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centraliza horizontalmente */
+    gap: 8px;
+    margin: 8px 0;
+    font-size: 16px;
+    text-align: center; /* Garante alinhamento do texto */
+}

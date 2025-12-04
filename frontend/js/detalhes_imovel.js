@@ -913,15 +913,23 @@ function criarModalContato() {
                         margin-bottom:15px; border: 4px solid #f0f0f0;
                     ">
                     <h2 id="modalNome" style="margin-bottom:8px; color:#333;">Nome</h2>
-                    <p id="modalTelefone" style="margin: 8px 0; font-size: 16px;">
-                        <i class="bi bi-telephone-fill" style="color: var(--primary-purple); margin-right: 8px;"></i>
+                    
+                    <p id="modalLocalizacao" class="info-line">
+                        <i class="bi bi-geo-alt-fill" style="color: var(--primary-purple);"></i>
+                        <span id="localizacaoText">Carregando...</span>
+                    </p>
+
+                    <p id="modalTelefone" class="info-line">
+                        <i class="bi bi-telephone-fill" style="color: var(--primary-purple);"></i>
                         <span id="telefoneText">Carregando...</span>
                     </p>
-                    <p id="modalEmail" style="margin: 8px 0; font-size: 16px;">
-                        <i class="bi bi-envelope-fill" style="color: var(--accent-orange); margin-right: 8px;"></i>
+
+                    <p id="modalEmail" class="info-line">
+                        <i class="bi bi-envelope-fill" style="color: var(--accent-orange);"></i>
                         <span id="emailText">Carregando...</span>
                     </p>
-                    
+
+
                     <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
                         <button id="btnWhatsAppModal" style="
                             background: #25D366; color: white; border: none;

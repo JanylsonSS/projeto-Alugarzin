@@ -76,11 +76,26 @@ export const buscarImovelPorId = async (req, res) => {
 
 export const criarImovel = async (req, res) => {
   try {
+    // Verifica autenticação
+    if (!req.usuario || !req.usuario.id) {
+      return res.status(401).json({ sucesso: false, mensagem: 'Usuário não autenticado' });
+    }
+
     const usuarioId = req.usuario.id;
-    const dados = req.body;
+    const dados = req.body || {};
     dados.usuario_id = usuarioId;
 
-    // Handle images from multer
+    // Validar campo preço (obrigatório e numérico)
+    if (dados.preco === undefined || dados.preco === null || dados.preco === '') {
+      return res.status(400).json({ sucesso: false, mensagem: "Campo 'preco' é obrigatório" });
+    }
+    const precoNum = Number(dados.preco);
+    if (Number.isNaN(precoNum)) {
+      return res.status(400).json({ sucesso: false, mensagem: "Campo 'preco' inválido" });
+    }
+    dados.preco = precoNum;
+
+    // Handle images from multer (se houver)
     if (req.files && req.files.length > 0) {
       dados.imagens = req.files.map(f => `/uploads/imoveis/${f.filename}`);
       dados.imagem_url = `/uploads/imoveis/${req.files[0].filename}`;
@@ -114,6 +129,9 @@ export const criarImovel = async (req, res) => {
       dados[k] = comods.includes(map[k]);
     });
 
+    // Garantir que comodidades seja salvo como array/JSON
+    dados.comodidades = comods;
+
     const novoImovel = await Imovel.create(dados);
     return res.status(201).json({
       sucesso: true,
@@ -121,11 +139,11 @@ export const criarImovel = async (req, res) => {
       dados: novoImovel,
     });
   } catch (erro) {
-    console.error("Erro ao criar imóvel:", erro);
+    console.error("Erro ao criar imóvel:", erro && (erro.stack || erro));
     return res.status(500).json({
       sucesso: false,
       mensagem: "Erro ao criar imóvel",
-      detalhes: process.env.NODE_ENV === "development" ? erro.message : undefined,
+      detalhes: process.env.NODE_ENV === "development" ? (erro && erro.message) : undefined,
     });
   }
 };

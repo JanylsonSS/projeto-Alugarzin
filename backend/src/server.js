@@ -89,9 +89,10 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error("Erro global:", err.stack);
+  console.error("Erro global:", err && (err.stack || err));
   res.status(500).json({
     erro: "Erro interno do servidor",
+    detalhes: process.env.NODE_ENV === 'development' ? (err && err.message) : undefined,
   });
 });
 

@@ -31,7 +31,7 @@ body {
     position: fixed;
     top: 15px;
     left: 15px;
-    width: 130px;
+    width: 230px;
     z-index: 9999;
 }
 
@@ -102,11 +102,19 @@ body {
     border-radius: 0;
 }
 
+.capa img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+
 .fotoperfil {
     position: absolute;
-    bottom: -30px; /* Ajuste para centralizar verticalmente na capa menor */
+    bottom: 280px; /* Ajuste para centralizar verticalmente na capa menor */
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-62%);
     width: 100px; /* Foto de perfil menor */
     height: 100px;
     border-radius: 50%;
@@ -132,6 +140,7 @@ body {
     text-align: center;
     padding: 45px 0 0 0; /* Padding ajustado para o novo layout (vertical) */
     width: 100%;
+    margin-top: 30px;
 }
 
 .usuarioinfo h2 {
@@ -477,7 +486,7 @@ body {
     gap: 40px;
     width: 100%;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: -40px;
 }
 
 .profile-pic {
@@ -1172,6 +1181,113 @@ body {
     font-size: 12px;
 }
 
+/* === FOTO DE PERFIL: círculo perfeito e crop centralizado === */
+.fotoperfil {
+  width: 120px;  
+  height: 120px;
+  border-radius: 50%;   
+  overflow: hidden;   
+  display: flex;      
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: #f0f0f0;  
+}
 
+/* garante que qualquer imagem dentro ocupe o container e seja cortada */
+.fotoperfil img,
+#profileDisplayImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    
+  object-position: center;
+  display: block;      
+  border-radius: 0;      
+}
 
+.fotoperfil img {
+  position: relative;
+  z-index: 20;  
+}
 
+.localizacao {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    align-items: center;
+    gap: 2px; 
+}
+
+/* agrupar os dois ícones em uma mini-linha */
+.localizacao .social-group {
+    display: grid;
+    grid-template-columns: 20px 20px;
+    gap: 6px; 
+    justify-content: center;
+    align-items: center;
+}
+
+.localizacao i {
+    font-size: 18px;
+}
+
+.header .fotoperfil {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.perfil {
+    padding: 80px 0 0 0; 
+    margin-top: 30px; 
+}
+
+.usuarioinfo h2 {
+    margin-top: 30px; 
+}
+
+.localizacao {
+    display: grid;
+    grid-template-columns: auto auto; 
+    justify-content: center;
+    align-items: center;
+    gap: 2px; 
+}
+
+.localizacao .social-group {
+    grid-column: 1 / span 2; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    gap: 10px; 
+    margin-top: 5px; 
+}
+
+.localizacao i {
+    font-size: 20px;
+}
+
+.perfil {
+    padding: 10px 0 0 20px; 
+    margin-top: 80px; 
+}
+
+.usuarioinfo {
+    margin-top: 0px !important;
+}
+
+.usuarioinfo h2 {
+    margin: 10px 0 5px 0;
+    font-size: 1.6rem;
+}
+
+.localizacao {
+    margin-bottom: 15px;
+}
+
+.botaoeditarperfil {
+    margin-top: 0px; 
+}

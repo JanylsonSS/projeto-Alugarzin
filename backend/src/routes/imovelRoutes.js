@@ -15,10 +15,11 @@ router.get("/imoveis/meus", verifyToken, listarMeusImoveis);
 router.get("/imoveis/:id", buscarImovelPorId);
 
 // POST /api/imoveis - Criar novo imóvel
-router.post("/imoveis", verifyToken, uploadImovel.array("imagem", 10), criarImovel);
+// O frontend envia os arquivos com o nome 'imagens' (plural). Aceitamos esse campo.
+router.post("/imoveis", verifyToken, uploadImovel.array("imagens", 10), criarImovel);
 
 // PUT /api/imoveis/:id - Atualizar imóvel (requer proprietário)
-router.put("/imoveis/:id", verifyToken, uploadImovel.array("imagem", 10), atualizarImovel);
+router.put("/imoveis/:id", verifyToken, uploadImovel.array("imagens", 10), atualizarImovel);
 
 // DELETE /api/imoveis/:id - Deletar imóvel
 router.delete("/imoveis/:id", verifyToken, deletarImovel);

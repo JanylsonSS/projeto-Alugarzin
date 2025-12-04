@@ -1,9 +1,14 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+
+// Calcular caminho absoluto para a pasta uploads/imoveis a partir deste arquivo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'imoveis');
 
 // Garantir que a pasta uploads/imoveis/ existe
-const uploadDir = "uploads/imoveis";
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
