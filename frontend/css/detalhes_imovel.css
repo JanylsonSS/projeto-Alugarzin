@@ -352,6 +352,7 @@ Conteúdo Principal
     font-size: 18px;
     transition: all 0.3s ease;
 }
+
 .acoes .bookmark.favorited {
     background: linear-gradient(90deg, var(--primary-purple), var(--accent-orange));
     color: #fff;
@@ -505,7 +506,7 @@ Sidebar / Contact card
 .btn-whatsapp {
     background: #25D366;
     color: #fff;
-        padding: 18px 16px;
+    padding: 18px 16px;
 }
 
 .btn-whatsapp:hover {
@@ -537,7 +538,8 @@ Proprietário
     border-radius: 10px;
     padding: 80px 20px;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
-    margin-top: 20px; /* distancia do card acima */
+    margin-top: 20px;
+    /* distancia do card acima */
 }
 
 .prop-flex {
@@ -625,7 +627,7 @@ Modal
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
 }
@@ -836,10 +838,57 @@ Responsividade
 }
 
 .btn-imoveis.active {
-  color: #ffffff;
-  background: linear-gradient(to right, #ff751f, #430097);
-    background: 
-    linear-gradient(to right, #ff751f, #430097) border-box;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
+    color: #ffffff;
+    background: linear-gradient(to right, #ff751f, #430097);
+    background:
+        linear-gradient(to right, #ff751f, #430097) border-box;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 14px rgba(67, 0, 151, 0.18);
+}
+
+/* Modal de Informações do Anunciante */
+.modal-contato-overlay {
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-contato-content {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+
+/* Botão Informações na sidebar */
+.phone-line a {
+    color: var(--primary-purple);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.phone-line a:hover {
+    color: var(--accent-orange);
+    text-decoration: underline;
 }

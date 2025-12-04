@@ -88,10 +88,12 @@ class UsuarioController {
   }
 
   // GET /api/usuarios - Listar todos os usuários
+  // GET /api/usuarios - Listar todos os usuários
   static async listarTodos(req, res) {
     try {
       const usuarios = await Usuario.findAll({
-        attributes: ["id", "nome", "email", "telefone", "data_cadastro"],
+        // ADICIONE "foto_perfil" aqui ↓
+        attributes: ["id", "nome", "email", "telefone", "foto_perfil", "data_cadastro"],
         order: [["data_cadastro", "DESC"]],
       });
 
@@ -108,6 +110,7 @@ class UsuarioController {
     }
   }
 
+
   // GET /api/usuarios/:id - Buscar usuário por ID
   static async buscarPorId(req, res) {
     try {
@@ -121,7 +124,8 @@ class UsuarioController {
       }
 
       const usuario = await Usuario.findByPk(id, {
-        attributes: ["id", "nome", "email", "telefone", "data_cadastro"],
+        // ADICIONE "foto_perfil" aqui ↓
+        attributes: ["id", "nome", "email", "telefone", "foto_perfil", "data_cadastro"],
       });
 
       if (!usuario) {
