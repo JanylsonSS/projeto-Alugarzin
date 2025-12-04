@@ -66,7 +66,7 @@ main.container {
 .buttonform {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
+    margin: 15px 0 30px 0;
     background-color: aliceblue;
     border-radius: 10px;
     overflow: hidden;

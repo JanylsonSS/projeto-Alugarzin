@@ -1,113 +1,110 @@
-# Alugarzin 🏠
+# Projeto Alugarzin
 
-## 📌 Visão Geral
+O **Alugarzin** é um sistema Web completo para divulgação, busca e
+gerenciamento de imóveis para aluguel ou venda.\
+O projeto inclui autenticação JWT, cadastro e login de usuários,
+publicação de anúncios, visualização detalhada, edição e exclusão, além
+de funcionalidades de contato entre interessados.
 
-Alugarzin é um sistema web para anúncios imobiliários, permitindo que
-usuários publiquem, consultem e gerenciem imóveis para aluguel ou venda.
-O projeto foi desenvolvido com foco em usabilidade, organização e
-colaboração em equipe.
+------------------------------------------------------------------------
 
-## ✨ Destaques do Projeto
-
--   Cadastro e autenticação de usuários\
--   Publicação e listagem de imóveis\
--   Interface responsiva e intuitiva\
--   Estrutura organizada em frontend e backend\
--   Planejado para futuras expansões (upload de imagens, filtros
-    avançados, API completa)
-
-## 🛠️ Stack Tecnológica
+## 🚀 Tecnologias Utilizadas
 
 ### **Frontend**
 
--   HTML5\
--   CSS3\
--   JavaScript\
+-   HTML5, CSS3, JavaScript (ES Modules)
 -   Bootstrap Icons
+-   Axios para requisições HTTP
+-   Manipulação dinâmica de DOM
+-   Autenticação no frontend via *auth-guard.js*
 
-### **Backend** *(em desenvolvimento)*
+### **Backend**
 
--   Java (Servlets)\
--   MySQL\
--   JDBC\
--   Maven\
--   Tomcat
+-   Node.js + Express.js
+-   JWT para autenticação
+-   Bcrypt para hash de senha
+-   Multer para upload de imagens
+-   Sequelize (ORM)
+-   MySQL (via phpMyAdmin)
 
-## 🚀 Como Executar
+### **Banco de Dados**
 
-### **Clonar o repositório**
+-   MySQL com tabelas:
+    -   `usuarios`
+    -   `imoveis`
+    -   `imagens`
+    -   `favoritos`
+    -   `mensagens`
 
-``` bash
-git clone https://github.com/JanylsonSS/projeto-Alugarzin.git
-```
+------------------------------------------------------------------------
 
-### **Executar o Frontend**
+## 📌 Funcionalidades Principais
 
-1.  Entre na pasta:
+### ✔ Cadastro e Login (JWT)
 
-``` bash
-cd projeto-Alugarzin/frontend
-```
+### ✔ Painel do Usuário
 
-2.  Abra o arquivo `index.html` no navegador\
-    *(ou utilize uma extensão como Live Server no VS Code).*
+### ✔ Cadastro de Imóvel
 
-### **Executar o Backend (Caso esteja configurado)**
+### ✔ Visualização Detalhada do Imóvel
 
-1.  Importe o projeto no Eclipse como *Maven Project*\
-2.  Configure o Tomcat (versão 9 ou superior)\
-3.  Inicie o servidor
+### ✔ Edição e Exclusão
+
+### ✔ Sistema de Contato
+
+### ✔ Logout Seguro
+
+### ✔ Salvamento de Favoritos
 
 ------------------------------------------------------------------------
 
 ## 📂 Estrutura do Projeto
 
-    projeto-Alugarzin/
-    │
-    ├── frontend/
-    │   ├── css/
-    │   ├── js/
-    │   ├── img/
-    │   └── index.html
-    │
-    ├── backend/
-    │   ├── src/
-    │   ├── webapp/
-    │   └── pom.xml
-    │
-    └── README.md
+/backend\
+/src\
+/controllers\
+/routes\
+/models\
+/middleware\
+/frontend\
+/css\
+/js\
+/pages
 
 ------------------------------------------------------------------------
 
-## 👥 Time de Desenvolvimento
+## 🧪 Testes
 
-  Nome                  Função
-  --------------------- --------------------
-  **Janylson**          Product Owner (PO)
-  **Josue Saraiva**     Backend
-  **Luis Henrique**     Backend
-  **Amabili Fragoso**   Frontend
-  **Leticia Mineiro**   Frontend
+Requisições podem ser testadas no Insomnia ou Postman.
 
 ------------------------------------------------------------------------
 
-## 🎯 Melhorias Futuras
+## 🛠 Como rodar o projeto
 
--   Sistema de login completo integrado ao banco\
--   Upload de fotos dos imóveis\
--   Dashboard do usuário\
--   Busca filtrada (preço, tipo, localização)\
--   Melhorias no design responsivo
+### **Backend**
+
+``` bash
+cd backend
+npm install
+npm start
+```
+
+### **Frontend**
+
+O frontend roda diretamente pelo Live Server, Vite ou servidor estático.
 
 ------------------------------------------------------------------------
 
-## 📄 Licença
+## 👥 Equipe do Projeto
 
-Este projeto ainda não possui uma licença definida.
+Janylson --- Full Stack Developer & Product Owner (UECE)
+Josue Araujo --- BackEnd Developer (UECE)
+Luis Henrique --- BackEnd Developer (UECE)
+Leticia Mineiro --- FrontEnd Developer (UECE)
+Amabile Fragoso --- FrontEnd Developer (UECE)
 
 ------------------------------------------------------------------------
 
-## 📌 Observação
+## 📜 Licença
 
-Este repositório está em constante evolução e serve como base para
-prática, colaboração e portfólio da equipe.
+Projeto acadêmico --- livre para fins de estudo.
