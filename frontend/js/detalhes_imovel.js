@@ -16,51 +16,34 @@ async function buscarUsuarioPorId(usuarioId) {
             const resultado = await response.json();
             console.log("📦 Resultado API usuário:", resultado);
 
-            // CORREÇÃO: Preserva a estrutura original
+            // CORREÇÃO: Verifica diferentes estruturas de retorno
             const usuario = resultado.usuario || resultado;
 
-            // CORREÇÃO: NÃO modifica se for undefined
-            // Apenas corrige o caminho SE existir
-            if (usuario.foto_perfil && usuario.foto_perfil !== 'undefined') {
+            // CORREÇÃO: Garante que o caminho da foto seja absoluto
+            if (usuario.foto_perfil) {
                 // Se já começar com http, mantém
-                if (!usuario.foto_perfil.startsWith('http://') &&
-                    !usuario.foto_perfil.startsWith('https://')) {
-
-                    // Se começar com /uploads/, adiciona localhost
-                    if (usuario.foto_perfil.startsWith('/uploads/')) {
-                        usuario.foto_perfil = `http://localhost:3000${usuario.foto_perfil}`;
-                    }
-                    // Se for caminho relativo, adiciona /uploads/
-                    else if (usuario.foto_perfil.includes('perfis/')) {
-                        usuario.foto_perfil = `http://localhost:3000/uploads/${usuario.foto_perfil}`;
-                    }
+                if (usuario.foto_perfil.startsWith('http://') || usuario.foto_perfil.startsWith('https://')) {
+                    // Já está OK
                 }
-                console.log("✅ Foto perfil final:", usuario.foto_perfil);
-            } else {
-                // CORREÇÃO IMPORTANTE: Mantém o fallback no objeto
-                usuario.foto_perfil = '/frontend/image/Karina.jpg';
-                console.log("⚠️ Foto não encontrada, usando fallback");
+                // Se começar com /uploads/, adiciona localhost
+                else if (usuario.foto_perfil.startsWith('/uploads/')) {
+                    usuario.foto_perfil = `http://localhost:3000${usuario.foto_perfil}`;
+                }
+                // Se for caminho relativo, adiciona /uploads/
+                else if (usuario.foto_perfil.includes('perfis/')) {
+                    usuario.foto_perfil = `http://localhost:3000/uploads/${usuario.foto_perfil}`;
+                }
             }
 
+            console.log("✅ Foto perfil final:", usuario.foto_perfil);
             return usuario;
         } else {
             console.warn(`⚠️ Erro ao buscar usuário ${usuarioId}:`, response.status);
-            // Retorna um objeto básico com fallback
-            return {
-                id: usuarioId,
-                nome: "Anunciante",
-                email: "Não informado",
-                foto_perfil: '/frontend/image/Karina.jpg'
-            };
+            return null;
         }
     } catch (error) {
         console.error("❌ Erro na requisição do usuário:", error);
-        return {
-            id: usuarioId,
-            nome: "Anunciante",
-            email: "Não informado",
-            foto_perfil: '/frontend/image/Karina.jpg'
-        };
+        return null;
     }
 }
 
@@ -529,216 +512,8 @@ async function renderDetalheMarketplace(imovel, usuario) {
             }
 
             // Contact card handlers
-            // BOTÃO "ENVIAR MENSAGEM" - Formulário lateral
             const sendBtn = document.getElementById('send_msg');
-            if (sendBtn) {
-                sendBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-
-                    // Validação dos campos
-                    const name = document.getElementById('contact_name')?.value.trim();
-                    const email = document.getElementById('contact_email')?.value.trim();
-                    const phone = document.getElementById('contact_phone')?.value.trim();
-                    const message = document.getElementById('contact_message')?.value.trim();
-
-                    // Validação básica
-                    if (!name) {
-                        alert('Por favor, informe seu nome');
-                        document.getElementById('contact_name')?.focus();
-                        return;
-                    }
-
-                    if (!email && !phone) {
-                        alert('Por favor, informe pelo menos um contato (email ou telefone)');
-                        return;
-                    }
-
-                    // Construir mensagem formatada
-                    let finalMessage = message;
-                    if (!finalMessage) {
-                        finalMessage = `Olá, tenho interesse no imóvel: ${imovel.titulo || ''}`;
-                        if (imovel.preco) {
-                            finalMessage += ` (R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR')})`;
-                        }
-                    }
-
-                    // Adicionar informações do interessado
-                    finalMessage += `\n\n--- DADOS DO INTERESSADO ---`;
-                    finalMessage += `\nNome: ${name}`;
-                    if (email) finalMessage += `\nEmail: ${email}`;
-                    if (phone) finalMessage += `\nTelefone: ${phone}`;
-
-                    // TENTAR WHATSAPP PRIMEIRO
-                    const anunciantePhoneRaw = (imovel.telefone || (imovel.usuario && imovel.usuario.telefone) || '');
-                    const anunciantePhone = String(anunciantePhoneRaw).replace(/\D/g, '');
-
-                    if (anunciantePhone && anunciantePhone.length >= 10) {
-                        // Envia por WhatsApp
-                        const waLink = `https://wa.me/55${anunciantePhone}?text=${encodeURIComponent(finalMessage)}`;
-                        window.open(waLink, '_blank');
-
-                        // Mostra confirmação
-                        showToast('Mensagem enviada pelo WhatsApp!', 'success');
-                    }
-                    // SE NÃO TIVER WHATSAPP, TENTA EMAIL
-                    else if (imovel.usuario && imovel.usuario.email) {
-                        const to = imovel.usuario.email;
-                        const subject = `Interesse no imóvel: ${imovel.titulo || ''}`;
-                        const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(finalMessage)}`;
-
-                        // Abre cliente de email
-                        window.location.href = mailtoLink;
-
-                        // Mostra confirmação
-                        showToast('Abrindo cliente de e-mail...', 'info');
-                    }
-                    // SE NÃO TIVER NENHUM CONTATO
-                    else {
-                        // Simula envio e mostra mensagem de sucesso
-                        showToast('Mensagem preparada! (Contato do anunciante não disponível)', 'info');
-
-                        // Copia a mensagem para área de transferência
-                        navigator.clipboard.writeText(finalMessage).then(() => {
-                            console.log('Mensagem copiada para área de transferência:', finalMessage);
-                        });
-                    }
-
-                    // Limpa o formulário após envio
-                    setTimeout(() => {
-                        const form = document.querySelector('.contact-card');
-                        if (form) {
-                            form.querySelectorAll('input, textarea').forEach(field => {
-                                if (field.id !== 'contact_message') { // Mantém a mensagem padrão
-                                    field.value = '';
-                                }
-                            });
-                        }
-                    }, 1000);
-                });
-            }
-
-            // Função para mostrar notificações (toast)
-            function showToast(message, type = 'info') {
-                // Remove toast anterior se existir
-                const existingToast = document.getElementById('custom-toast');
-                if (existingToast) existingToast.remove();
-
-                // Cria novo toast
-                const toast = document.createElement('div');
-                toast.id = 'custom-toast';
-                toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 99999;
-        animation: slideIn 0.3s ease;
-        max-width: 400px;
-        font-size: 14px;
-    `;
-
-                toast.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-exclamation-circle' : 'bi-info-circle'}" 
-               style="font-size: 20px;"></i>
-            <span>${message}</span>
-        </div>
-    `;
-
-                document.body.appendChild(toast);
-
-                // Remove após 5 segundos
-                setTimeout(() => {
-                    toast.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
-                }, 5000);
-            }
-
-            // Adicionar estilos CSS para animação
-            const style = document.createElement('style');
-            style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-            document.head.appendChild(style);
-            // BOTÃO WHATSAPP DO FORMULÁRIO
             const waBtn = document.getElementById('send_whatsapp');
-            if (waBtn) {
-                waBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-
-                    const name = document.getElementById('contact_name')?.value.trim();
-                    const phone = document.getElementById('contact_phone')?.value.trim();
-                    const message = document.getElementById('contact_message')?.value.trim();
-
-                    // Validação
-                    if (!name) {
-                        alert('Por favor, informe seu nome para enviar pelo WhatsApp');
-                        document.getElementById('contact_name')?.focus();
-                        return;
-                    }
-
-                    // Telefone do anunciante
-                    const anunciantePhoneRaw = (imovel.telefone || (imovel.usuario && imovel.usuario.telefone) || '');
-                    const anunciantePhone = String(anunciantePhoneRaw).replace(/\D/g, '');
-
-                    if (anunciantePhone && anunciantePhone.length >= 10) {
-                        // Construir mensagem
-                        let finalMessage = message;
-                        if (!finalMessage) {
-                            finalMessage = `Olá! Meu nome é ${name}`;
-                            if (phone) finalMessage += `, meu telefone é ${phone}`;
-                            finalMessage += `. Tenho interesse no imóvel: ${imovel.titulo || ''}`;
-                            if (imovel.preco) {
-                                finalMessage += ` (R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR')})`;
-                            }
-                        } else {
-                            finalMessage = `Olá! Sou ${name}${phone ? ` (${phone})` : ''}. ${message}`;
-                        }
-
-                        // Abrir WhatsApp
-                        const waLink = `https://wa.me/55${anunciantePhone}?text=${encodeURIComponent(finalMessage)}`;
-                        window.open(waLink, '_blank');
-
-                        showToast('Abrindo WhatsApp...', 'success');
-                    } else {
-                        showToast('Número do anunciante não disponível para WhatsApp', 'error');
-
-                        // Oferece alternativa: copiar mensagem
-                        if (confirm('Número não disponível. Deseja copiar a mensagem para enviar manualmente?')) {
-                            let copyMessage = `Interesse no imóvel: ${imovel.titulo || ''}\n`;
-                            if (imovel.preco) copyMessage += `Valor: R$ ${parseFloat(imovel.preco).toLocaleString('pt-BR')}\n`;
-                            copyMessage += `Interessado: ${name}${phone ? ` - ${phone}` : ''}\n`;
-                            copyMessage += `Mensagem: ${message || 'Gostaria de mais informações'}`;
-
-                            navigator.clipboard.writeText(copyMessage);
-                            showToast('Mensagem copiada para área de transferência!', 'info');
-                        }
-                    }
-                });
-            }
             const contactMsg = document.getElementById('contact_message');
             const contactName = document.getElementById('contact_name');
             const contactEmail = document.getElementById('contact_email');
@@ -1260,68 +1035,44 @@ function configurarModalInformacoes(imovel) {
                 localizacaoEl.style.display = 'none';
             }
 
-            // CONFIGURA BOTÕES DO MODAL
+            // Configura ações dos botões
             const whatsappBtn = document.getElementById("btnWhatsAppModal");
             const emailBtn = document.getElementById("btnEmailModal");
 
-            // BOTÃO WHATSAPP DO MODAL
+            // Configura botão WhatsApp
             if (whatsappBtn) {
-                whatsappBtn.style.display = 'block'; // Sempre mostra
+                whatsappBtn.style.display = 'none'; // Esconde por padrão
 
-                // Telefone do anunciante
-                const telefone = user.telefone || imovel.telefone || "";
-                const whatsappNumero = telefone.replace(/\D/g, '');
-
-                whatsappBtn.onclick = (e) => {
-                    e.preventDefault();
-
+                if (telefone && telefone !== "Não informado") {
+                    const whatsappNumero = telefone.replace(/\D/g, '');
                     if (whatsappNumero && whatsappNumero.length >= 10) {
-                        const mensagem = `Olá ${nome}! Vi seu anúncio no AlugarZin e gostaria de mais informações sobre: ${imovel.titulo || 'o imóvel'}${imovel.preco ? ' - R$ ' + parseFloat(imovel.preco).toLocaleString('pt-BR') : ''}`;
-                        const waLink = `https://wa.me/55${whatsappNumero}?text=${encodeURIComponent(mensagem)}`;
-                        window.open(waLink, '_blank');
-
-                        // Fecha modal após 1 segundo
-                        setTimeout(() => {
+                        whatsappBtn.onclick = () => {
+                            const mensagem = `Olá ${nome}! Vi seu anúncio no AlugarZin e gostaria de mais informações sobre: ${imovel.titulo || 'o imóvel'}${imovel.preco ? ' - R$ ' + parseFloat(imovel.preco).toLocaleString('pt-BR') : ''}`;
+                            window.open(`https://wa.me/55${whatsappNumero}?text=${encodeURIComponent(mensagem)}`, '_blank');
                             modal.style.display = "none";
-                        }, 1000);
-                    } else {
-                        // Se não tem telefone, oferece opções
-                        const mensagem = `Não foi possível encontrar o WhatsApp do anunciante.\n\nVocê pode:\n1. Usar o formulário de contato ao lado\n2. Copiar os dados para contato manual\n\nNome: ${nome}\nEmail: ${email || 'Não informado'}\nTelefone: ${telefone || 'Não informado'}`;
-
-                        if (confirm(mensagem + "\n\nDeseja copiar estas informações?")) {
-                            const infoToCopy = `Contato do anunciante "${nome}":\nEmail: ${email || 'Não informado'}\nTelefone: ${telefone || 'Não informado'}\nImóvel: ${imovel.titulo || ''}`;
-                            navigator.clipboard.writeText(infoToCopy);
-                            alert('Informações copiadas para área de transferência!');
-                        }
+                        };
+                        whatsappBtn.style.display = 'inline-block';
+                        whatsappBtn.innerHTML = '<i class="bi bi-whatsapp"></i> Enviar WhatsApp';
                     }
-                };
+                }
             }
 
-            // BOTÃO EMAIL DO MODAL
+            // Configura botão Email
             if (emailBtn) {
-                emailBtn.style.display = 'block'; // Sempre mostra
+                emailBtn.style.display = 'none'; // Esconde por padrão
 
-                emailBtn.onclick = (e) => {
-                    e.preventDefault();
-
-                    if (email && email.includes('@')) {
+                if (email && email !== "Não informado" && email.includes('@')) {
+                    emailBtn.onclick = () => {
                         const assunto = `Interesse no imóvel: ${imovel.titulo || ''}`;
                         const corpo = `Prezado(a) ${nome},\n\nTenho interesse no imóvel anunciado por você no AlugarZin.\n\nDetalhes do imóvel:\n- Título: ${imovel.titulo || ''}\n- ${imovel.preco ? 'Valor: R$ ' + parseFloat(imovel.preco).toLocaleString('pt-BR') : ''}\n- Local: ${imovel.cidade || ''}${imovel.estado ? '/' + imovel.estado : ''}\n\nAguardo seu retorno.\n\nAtenciosamente.`;
-
-                        // Tenta simular se for email fictício
-                        if (!simularEnvioEmail(email, assunto, corpo, nome)) {
-                            // Se não simulou, usa mailto normal
-                            window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
-                        }
-
-                        setTimeout(() => {
-                            modal.style.display = "none";
-                        }, 500);
-                    } else {
-                        // ... tratamento para email não disponível
-                    }
-                };
+                        window.location.href = `mailto:${email}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+                        modal.style.display = "none";
+                    };
+                    emailBtn.style.display = 'inline-block';
+                    emailBtn.innerHTML = '<i class="bi bi-envelope"></i> Enviar E-mail';
+                }
             }
+
             // Mostra o modal
             modal.style.display = "flex";
         });
@@ -1349,81 +1100,6 @@ function configurarModalInformacoes(imovel) {
         });
 
     }, 500);
-}
-
-function simularEnvioEmail(to, subject, body, nomeInteressado) {
-    // Verifica se é email fictício/example.com
-    if (to.includes('example.com') || to.includes('ficticio') || to.includes('teste')) {
-        // Simula envio
-        console.log('📧 Email fictício detectado - Simulando envio:', { to, subject });
-
-        // Mostra mensagem de simulação
-        const modalSimulacao = document.createElement('div');
-        modalSimulacao.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 99999;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        `;
-
-        modalSimulacao.innerHTML = `
-            <h3 style="color: #4A90E2; margin-bottom: 15px;">✉️ Mensagem Simulada</h3>
-            <p>Este email (<strong>${to}</strong>) é fictício para demonstração.</p>
-            <p>Sua mensagem foi registrada no sistema e seria enviada ao anunciante em um ambiente real.</p>
-            
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left;">
-                <p><strong>Para:</strong> ${to}</p>
-                <p><strong>Assunto:</strong> ${subject}</p>
-                <p><strong>Mensagem:</strong></p>
-                <p style="white-space: pre-wrap; font-size: 14px;">${body}</p>
-            </div>
-            
-            <button id="fecharSimulacao" style="
-                background: #4A90E2;
-                color: white;
-                border: none;
-                padding: 10px 25px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: bold;
-                margin-top: 10px;
-            ">Fechar</button>
-        `;
-
-        // Overlay escuro
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 99998;
-        `;
-
-        document.body.appendChild(overlay);
-        document.body.appendChild(modalSimulacao);
-
-        // Botão fechar
-        document.getElementById('fecharSimulacao').onclick = () => {
-            modalSimulacao.remove();
-            overlay.remove();
-            showToast('Mensagem registrada no sistema!', 'success');
-        };
-
-        return true; // Indica que foi simulada
-    }
-
-    return false; // Não simulou, email real
 }
 
 
