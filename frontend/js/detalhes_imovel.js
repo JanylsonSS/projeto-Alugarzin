@@ -389,30 +389,44 @@ async function renderDetalheMarketplace(imovel, usuario) {
 
     setTimeout(() => {
         const btnEnviar = document.getElementById("send_msg");
+        const btnWhatsapp = document.getElementById("send_whatsapp"); // 👈 PEGAR O BOTÃO WHATSAPP
 
         const inputName = document.getElementById("contact_name");
         const inputEmail = document.getElementById("contact_email");
         const inputPhone = document.getElementById("contact_phone");
         const inputMessage = document.getElementById("contact_message");
 
+        // ✅ AÇÃO DO BOTÃO WHATSAPP
+        btnWhatsapp.addEventListener("click", () => {
+            const numero = imovel.telefone || (imovel.usuario && imovel.usuario.telefone) || "999999999";
+            const mensagem = encodeURIComponent(
+                inputMessage.value.trim() ||
+                "Olá! Gostaria de mais informações sobre o imóvel."
+            );
+
+            const link = `https://wa.me/55${numero}?text=${mensagem}`;
+            window.open(link, "_blank");
+        });
+
+        // ✅ AÇÃO DO BOTÃO ENVIAR MENSAGEM
         btnEnviar.addEventListener("click", () => {
 
-            // (OPCIONAL) validação simples
             if (!inputName.value.trim() || !inputEmail.value.trim() || !inputMessage.value.trim()) {
-                showPopup("Por favor, preencha todos os campos obrigatórios.");
+                showPopup("Por favor, preencha todos os campos obrigatórios.", "error");
                 return;
             }
 
-            // Simulação de envio: apenas limpa os dados
+            // Resetar os campos
             inputName.value = "";
             inputEmail.value = "";
             inputPhone.value = "";
             inputMessage.value = "";
 
-            // Pop-up de confirmação
-            showPopup("Suas informações foram enviadas para o anunciante.");
+            showPopup("Suas informações foram enviadas para o anunciante.", "success");
         });
+
     }, 100);
+
 
     function showPopup(message) {
         let popup = document.getElementById("popup-msg");
