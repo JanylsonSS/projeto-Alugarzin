@@ -1175,3 +1175,36 @@ function configurarModalInformacoes(imovel) {
 document.addEventListener('DOMContentLoaded', () => {
     new NavbarAnimator();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Seleção de Elementos
+    const helpIcon = document.querySelector('.help-icon');
+    const modal = document.getElementById('helpModal');
+    const closeButton = document.querySelector('.close-button');
+
+    // 2. Abrir Modal
+    if (helpIcon) {
+        helpIcon.addEventListener('click', (event) => {
+            event.preventDefault(); // Impede o link de navegar
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        });
+    }
+
+    // 3. Fechar Modal 
+    if (closeButton) {
+        closeButton.addEventListener('click', () => {
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // 4. Fechar Modal 
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
